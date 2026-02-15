@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Alejandro Aldama | AI Engineer",
+  title: "Jose Alejandro Aldama Ramos| AI Engineer",
   description:
     "Personal portfolio of Jose Alejandro Aldama Ramos — AI Engineer specializing in GenAI, Cloud Architecture, and Full-Stack Development.",
   keywords: [
@@ -23,11 +23,11 @@ export const metadata: Metadata = {
     "LangChain",
     "Next.js",
     "Portfolio",
-    "Alejandro Aldama",
+    "Jose Alejandro Aldama Ramos",
   ],
   authors: [{ name: "Jose Alejandro Aldama Ramos" }],
   openGraph: {
-    title: "Alejandro Aldama | AI Engineer",
+    title: "Jose Alejandro Aldama Ramos | AI Engineer",
     description:
       "AI Engineer specializing in GenAI, Cloud Architecture, and Full-Stack Development.",
     type: "website",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Alejandro Aldama | AI Engineer",
+    title: "Jose Alejandro Aldama Ramos | AI Engineer",
     description:
       "AI Engineer specializing in GenAI, Cloud Architecture, and Full-Stack Development.",
   },

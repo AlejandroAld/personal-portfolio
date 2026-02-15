@@ -9,7 +9,7 @@ export default function Hero() {
       <div className="max-w-3xl w-full">
         <p className="text-accent font-mono text-sm mb-4">Hi, my name is</p>
         <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-4">
-          Alejandro Aldama<span className="text-accent">.</span>
+          Jose Alejandro Aldama Ramos<span className="text-accent">.</span>
         </h1>
         <h2 className="text-2xl sm:text-4xl font-bold text-muted mb-6">
           I build intelligent systems.
