@@ -7,8 +7,8 @@ const experiences = [
     period: "Nov 2025 – Present",
     location: "Hybrid - Guadalajara, Jalisco, MX",
     highlights: [
-      "Architected intelligent automation using Google Genkit, LangChain, and LangGraph. Developed agentic workflows for document parsing (XML/PDF) and anomaly detection with Vector Databases for RAG.",
-      "Designed the \"Dalton Finance Manager\" — a scalable Event-Driven Architecture on Firebase (GCP) and Azure with serverless Cloud Functions for high-concurrency financial logic.",
+      "Architected intelligent automation using Google Genkit, N8N, LangChain and LangGraph. Developed agentic workflows for document parsing (XML/PDF) and anomaly detection with Vector Databases for RAG.",
+      "Designed the \"Dalton Plan Piso Platform\" — a scalable Event-Driven Architecture on Firebase (GCP) and Azure with serverless Cloud Functions for high-concurrency financial logic.",
       "Engineered a deterministic Finite State Machine (FSM) governing the lifecycle of financed assets, from XML ingestion through validation, funding, and liquidation.",
       "Orchestrated ETL pipelines using n8n and REST APIs to synchronize real-time data between MS Dynamics 365 and Firestore databases.",
       "Developed responsive dashboards using Next.js, TypeScript, and ShadCN UI for real-time credit line monitoring with automated PDF report generation.",
@@ -31,7 +31,7 @@ const experiences = [
     location: "Hybrid - Mexico City, MX",
     highlights: [
       "Designed a centralized data architecture for the Procurement department, including automated ETL processes for financial calculations and sampling.",
-      "Developed an interactive financial media dashboard providing strategic visibility across Mexico operations, presenting monthly updates directly to the CIO.",
+      "Developed an interactive financial media dashboard providing strategic visibility across Mexico operations for 40+ users.",
     ],
   },
 ];

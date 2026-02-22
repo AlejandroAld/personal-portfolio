@@ -54,6 +54,15 @@ const skillCategories = [
       "MS Dynamics 365",
     ],
   },
+  {
+    title: "Methodologies",
+    skills: [
+      "Scrum",
+      "Agile",
+      "Kanban",
+      "Project Management",
+    ],
+  },
 ];
 
 export default function Skills() {
