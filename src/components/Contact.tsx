@@ -1,52 +1,90 @@
-import { Mail, Linkedin, Github, Send } from "lucide-react";
+import type { Dictionary } from "@/content/dictionary";
+import { contacto, persona } from "@/content/perfil";
+import { RESUME_URL } from "@/lib/site";
+import SectionHeading from "./SectionHeading";
+import { Reveal, Stagger, StaggerItem } from "./Reveal";
 
-export default function Contact() {
+/**
+ * Contacto.
+ *
+ * Correo, ciudad, LinkedIn, GitHub y la descarga del CV. Sin teléfono y sin
+ * dirección: el perfil los declara como datos no divulgables, y el sitio
+ * respeta la misma regla que el agente.
+ */
+export default function Contact({ dict }: { dict: Dictionary }) {
+  const entries = [
+    { label: dict.contact.email, value: contacto.email, href: `mailto:${contacto.email}`, external: false },
+    { label: dict.contact.location, value: persona.ubicacion, href: null, external: false },
+    { label: dict.contact.linkedin, value: "in/jose-alejandro-aldama-ramos", href: contacto.linkedin, external: true },
+    { label: dict.contact.github, value: "@AlejandroAld", href: contacto.github, external: true },
+  ];
+
   return (
-    <section id="contact" className="py-24 px-6">
-      <div className="max-w-xl mx-auto text-center">
-        <Send size={20} className="text-accent mx-auto mb-4" />
-        <h2 className="text-2xl font-bold mb-4">Get In Touch</h2>
-        <p className="text-muted leading-relaxed mb-8">
-          I&apos;m currently open to new opportunities and collaborations. Whether
-          you have a project idea, a question, or just want to connect — feel
-          free to reach out.
-        </p>
+    <section id="contact" className="scroll-mt-20 border-t border-border px-4 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto max-w-5xl">
+        <SectionHeading
+          eyebrow={dict.contact.eyebrow}
+          title={dict.contact.title}
+          intro={dict.contact.body}
+        />
 
-        <a
-          href="mailto:josealejandroaldamaramos@gmail.com"
-          className="inline-flex items-center gap-2 border border-accent text-accent px-6 py-3 rounded text-sm font-mono hover:bg-accent/10 transition-colors mb-8"
-        >
-          <Mail size={16} />
-          Say Hello
-        </a>
+        <Stagger className="mt-10 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+          {entries.map((entry) => {
+            const inner = (
+              <>
+                <span className="block font-mono text-[0.6875rem] tracking-wide text-subtle uppercase">
+                  {entry.label}
+                </span>
+                <span className="mt-1.5 block truncate text-sm text-fg transition-colors group-hover:text-accent">
+                  {entry.value}
+                </span>
+              </>
+            );
 
-        <div className="flex items-center justify-center gap-6 mt-4">
-          <a
-            href="https://www.linkedin.com/in/jose-alejandro-aldama-ramos/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted hover:text-accent transition-colors"
-            aria-label="LinkedIn"
-          >
-            <Linkedin size={22} />
-          </a>
-          <a
-            href="https://github.com/AlejandroAld"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted hover:text-accent transition-colors"
-            aria-label="GitHub"
-          >
-            <Github size={22} />
-          </a>
-          <a
-            href="mailto:josealejandroaldamaramos@gmail.com"
-            className="text-muted hover:text-accent transition-colors"
-            aria-label="Email"
-          >
-            <Mail size={22} />
-          </a>
-        </div>
+            return (
+              <StaggerItem key={entry.label} className="bg-bg">
+                {entry.href ? (
+                  <a
+                    href={entry.href}
+                    target={entry.external ? "_blank" : undefined}
+                    rel={entry.external ? "noopener noreferrer" : undefined}
+                    className="group block px-5 py-5 transition-colors hover:bg-surface"
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <div className="px-5 py-5">{inner}</div>
+                )}
+              </StaggerItem>
+            );
+          })}
+        </Stagger>
+
+        <Reveal>
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <a
+              href={`mailto:${contacto.email}`}
+              className="inline-flex items-center gap-2 rounded bg-accent-solid px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-solid-hover"
+            >
+              {dict.contact.title}
+              <span aria-hidden="true">→</span>
+            </a>
+            {/* Apagado hasta que exista el PDF. */}
+            {RESUME_URL && (
+              <a
+                href={RESUME_URL}
+                download
+                className="inline-flex items-center gap-2 rounded border border-border-strong px-5 py-2.5 text-sm text-fg transition-colors hover:border-accent hover:text-accent"
+              >
+                {dict.contact.resume}
+              </a>
+            )}
+          </div>
+
+          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-subtle text-pretty">
+            {dict.contact.languages}
+          </p>
+        </Reveal>
       </div>
     </section>
   );

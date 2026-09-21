@@ -1,77 +1,93 @@
-import { Briefcase } from "lucide-react";
+import type { Dictionary } from "@/content/dictionary";
+import { formatPeriod, perfil, term } from "@/content/perfil";
+import SectionHeading from "./SectionHeading";
+import SourceLink from "./SourceLink";
+import { Stagger, StaggerItem } from "./Reveal";
 
-const experiences = [
-  {
-    company: "Grupo Dalton",
-    role: "Mid Artificial Intelligence Developer",
-    period: "Nov 2025 – Present",
-    location: "Hybrid - Guadalajara, Jalisco, MX",
-    highlights: [
-      "Architected intelligent automation using Google Genkit, N8N, LangChain and LangGraph. Developed agentic workflows for document parsing (XML/PDF) and anomaly detection with Vector Databases for RAG.",
-      "Designed the \"Dalton Plan Piso Platform\" — a scalable Event-Driven Architecture on Firebase (GCP) and Azure with serverless Cloud Functions for high-concurrency financial logic.",
-      "Engineered a deterministic Finite State Machine (FSM) governing the lifecycle of financed assets, from XML ingestion through validation, funding, and liquidation.",
-      "Orchestrated ETL pipelines using n8n and REST APIs to synchronize real-time data between MS Dynamics 365 and Firestore databases.",
-      "Developed responsive dashboards using Next.js, TypeScript, and ShadCN UI for real-time credit line monitoring with automated PDF report generation.",
-    ],
-  },
-  {
-    company: "Grupo TI Mexico",
-    role: "Junior Artificial Intelligence Engineer",
-    period: "Aug 2025 – Nov 2025",
-    location: "Mexico City, MX",
-    highlights: [
-      "Designed and deployed AI-driven applications integrating NLP and RAG pipelines using Oracle Cloud Infrastructure (OCI).",
-      "Built Python and JavaScript-based backends to orchestrate data ingestion and Computer Vision analysis services via RESTful APIs in Oracle APEX.",
-    ],
-  },
-  {
-    company: "L'Oreal",
-    role: "Beauty Tech Intern (IT and Data)",
-    period: "Nov 2024 – July 2025",
-    location: "Hybrid - Mexico City, MX",
-    highlights: [
-      "Designed a centralized data architecture for the Procurement department, including automated ETL processes for financial calculations and sampling.",
-      "Developed an interactive financial media dashboard providing strategic visibility across Mexico operations for 40+ users.",
-    ],
-  },
-];
+/** La cita de cada puesto, para la trazabilidad en hover. */
+const CITE_BY_ROLE = {
+  "exp-dalton": "costReduction",
+  "exp-loreal": "lorealDashboard",
+  "exp-ipn": "publicationMetrics",
+} as const;
 
-export default function Experience() {
+/**
+ * Trayectoria.
+ *
+ * Cada puesto se titula con su RESULTADO cuando el perfil lo cuantifica, no
+ * con el nombre del proyecto: un número se lee en un segundo y un nombre
+ * propio obliga a leer el párrafo para saber si importa. Grupo TI México no
+ * tiene métrica en el perfil, así que se titula por lo que resolvió.
+ *
+ * Fechas, empresas, puestos y ubicaciones salen de perfil.json tal cual.
+ */
+export default function Experience({ dict }: { dict: Dictionary }) {
   return (
-    <section id="experience" className="py-24 px-6">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-3 mb-12">
-          <Briefcase size={20} className="text-accent" />
-          <h2 className="text-2xl font-bold">Experience</h2>
-          <div className="flex-1 h-px bg-border ml-4" />
-        </div>
+    <section id="experience" className="scroll-mt-20 px-4 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto max-w-5xl">
+        <SectionHeading eyebrow={dict.experience.eyebrow} title={dict.experience.title} />
 
-        <div className="space-y-12">
-          {experiences.map((exp, i) => (
-            <div key={i} className="relative pl-6 border-l border-border">
-              <div className="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-accent" />
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                <h3 className="text-lg font-semibold">{exp.company}</h3>
-                <span className="text-sm text-muted font-mono">
-                  {exp.period}
-                </span>
-              </div>
-              <p className="text-accent text-sm mb-1">{exp.role}</p>
-              <p className="text-muted text-xs mb-4">{exp.location}</p>
-              <ul className="space-y-2">
-                {exp.highlights.map((item, j) => (
-                  <li
-                    key={j}
-                    className="text-sm text-muted leading-relaxed flex gap-2"
-                  >
-                    <span className="text-accent mt-1 shrink-0">▹</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+        <Stagger as="ol" className="mt-10" step={0.08}>
+          {perfil.experiencia.map((rol) => {
+            const copy = dict.experience.roles[rol.id];
+            const cite = CITE_BY_ROLE[rol.id as keyof typeof CITE_BY_ROLE];
+
+            return (
+              <StaggerItem
+                key={rol.id}
+                className="group relative border-b border-border py-8 first:pt-0 last:border-b-0"
+              >
+                <div className="grid gap-4 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-8">
+                  <div>
+                    <p className="font-mono text-xs text-subtle tnum">
+                      {formatPeriod(rol.inicio, rol.fin, dict)}
+                    </p>
+                    <p className="mt-1.5 text-sm font-medium text-fg">{rol.empresa}</p>
+                    <p className="mt-0.5 text-xs text-subtle">{term(rol.puesto, dict)}</p>
+                    <p className="mt-0.5 text-xs text-subtle">{term(rol.ubicacion, dict)}</p>
+                  </div>
+
+                  <div>
+                    {copy && (
+                      <>
+                        <h3 className="text-lg font-semibold tracking-tight text-fg text-balance">
+                          {copy.headline}
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed text-muted text-pretty">
+                          {copy.summary}
+                        </p>
+                        <ul className="mt-4 space-y-2">
+                          {copy.highlights.map((h) => (
+                            <li key={h} className="flex gap-2.5 text-sm leading-relaxed text-muted">
+                              <span
+                                aria-hidden="true"
+                                className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-accent"
+                              />
+                              <span className="text-pretty">{h}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+
+                    <ul className="mt-5 flex flex-wrap gap-1.5">
+                      {rol.stack.slice(0, 10).map((tech) => (
+                        <li
+                          key={tech}
+                          className="rounded border border-border px-2 py-1 font-mono text-[0.6875rem] text-subtle"
+                        >
+                          {term(tech, dict)}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {cite && <SourceLink cite={cite} />}
+              </StaggerItem>
+            );
+          })}
+        </Stagger>
       </div>
     </section>
   );

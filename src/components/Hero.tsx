@@ -1,60 +1,67 @@
-import { Mail, Linkedin, Github, MapPin } from "lucide-react";
+import type { Dictionary } from "@/content/dictionary";
+import { contacto, persona } from "@/content/perfil";
+import { RESUME_URL } from "@/lib/site";
+import HeroBackdrop from "./HeroBackdrop";
 
-export default function Hero() {
+/**
+ * Arriba del pliegue: quién soy en una frase y dos salidas.
+ *
+ * Nada más. Las cifras van en su propia tira justo abajo, y las secciones se
+ * ganan el clic por sí solas. Un héroe que intenta decirlo todo no dice nada.
+ *
+ * El LCP de la página es este texto. No hay imagen ni canvas que lo retrase:
+ * el fondo de WebGL se carga después del primer pintado.
+ */
+export default function Hero({ dict }: { dict: Dictionary }) {
   return (
-    <section
-      id="about"
-      className="min-h-screen flex items-center justify-center px-6 pt-20"
-    >
-      <div className="max-w-3xl w-full">
-        <p className="text-accent font-mono text-sm mb-4">Hi, my name is</p>
-        <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-4">
-          Jose Alejandro Aldama Ramos<span className="text-accent">.</span>
-        </h1>
-        <h2 className="text-2xl sm:text-4xl font-bold text-muted mb-6">
-          I build intelligent systems.
-        </h2>
-        <p className="text-muted max-w-xl leading-relaxed mb-4">
-          AI Engineer specializing in{" "}
-          <span className="text-foreground font-medium">
-            Generative AI, Agentic Workflows, and Cloud Architecture
-          </span>
-          . I design and deploy scalable AI-driven applications — from NLP
-          pipelines and RAG architectures to full-stack dashboards and
-          event-driven backends.
-        </p>
-        <div className="flex items-center gap-2 text-muted text-sm mb-8">
-          <MapPin size={14} />
-          <span>Zapopan, Jalisco, Mexico</span>
+    <section id="top" className="relative isolate px-4 pt-28 pb-14 sm:px-6 sm:pt-36 sm:pb-16">
+      <HeroBackdrop />
+
+      <div className="relative z-10 mx-auto max-w-5xl">
+        <div className="max-w-3xl">
+          <p className="font-mono text-xs tracking-wide text-accent sm:text-sm">{dict.hero.eyebrow}</p>
+
+          <h1 className="mt-5 text-[2rem] leading-[1.1] font-semibold tracking-tight text-balance sm:text-5xl lg:text-[3.5rem]">
+            {dict.hero.positioning} <span className="text-muted">{dict.hero.positioningAccent}</span>
+          </h1>
+
+          <p className="mt-6 max-w-2xl leading-relaxed text-muted text-pretty">{dict.hero.summary}</p>
+
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-subtle text-pretty">
+            {dict.hero.availability}
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 rounded bg-accent-solid px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-solid-hover"
+            >
+              {dict.hero.ctaContact}
+              <span aria-hidden="true">→</span>
+            </a>
+            <a
+              href="#projects"
+              className="inline-flex items-center gap-2 rounded border border-border-strong px-5 py-2.5 text-sm text-fg transition-colors hover:border-accent hover:text-accent"
+            >
+              {dict.hero.ctaProjects}
+            </a>
+            {/* La única bandera que queda: apagada hasta que exista el PDF.
+                Encenderla es poner la ruta en RESUME_URL. */}
+            {RESUME_URL && (
+              <a
+                href={RESUME_URL}
+                download
+                className="inline-flex items-center gap-2 rounded px-3 py-2.5 font-mono text-xs text-muted transition-colors hover:text-accent"
+              >
+                {dict.hero.ctaResume}
+              </a>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <a
-            href="mailto:josealejandroaldamaramos@gmail.com"
-            className="inline-flex items-center gap-2 border border-accent text-accent px-5 py-2.5 rounded text-sm font-mono hover:bg-accent/10 transition-colors"
-          >
-            <Mail size={16} />
-            Get in touch
-          </a>
-          <a
-            href="https://www.linkedin.com/in/jose-alejandro-aldama-ramos/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted hover:text-accent transition-colors"
-            aria-label="LinkedIn"
-          >
-            <Linkedin size={22} />
-          </a>
-          <a
-            href="https://github.com/AlejandroAld"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted hover:text-accent transition-colors"
-            aria-label="GitHub"
-          >
-            <Github size={22} />
-          </a>
-        </div>
+        <span className="sr-only">
+          {persona.nombre} — {contacto.email}
+        </span>
       </div>
     </section>
   );

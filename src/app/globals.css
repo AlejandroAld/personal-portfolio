@@ -1,44 +1,181 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-background: #0a0a0a;
-  --color-foreground: #ededed;
+/* ===========================================================================
+   Tokens
+   ---------------------------------------------------------------------------
+   Contraste verificado contra el fondo #0a0a0a (ratios WCAG):
+     fg      #ededed  →  16.4:1   texto normal AAA
+     muted   #a1a1aa  →   7.7:1   texto normal AAA
+     subtle  #8b8b94  →   5.9:1   texto normal AA
+     accent  #3b82f6  →   5.4:1   texto normal AA
+   No bajar de #8b8b94 para texto: #71717a da 4.1:1 y reprueba AA.
+
+   El acento de TEXTO y el de RELLENO no pueden ser el mismo color: uno tiene
+   que ser claro para contrastar contra negro, el otro oscuro para contrastar
+   contra el blanco que lleva encima. Con blanco:
+     accent        #3b82f6  →  3.7:1   REPRUEBA
+     accent-solid  #2563eb  →  5.2:1   AA
+     hover         #1d4ed8  →  6.7:1   AA
+   =========================================================================== */
+
+@theme {
+  --color-bg: #0a0a0a;
+  --color-surface: #101012;
+  --color-surface-2: #17171a;
+  --color-border: #26262b;
+  --color-border-strong: #3a3a42;
+  --color-fg: #ededed;
   --color-muted: #a1a1aa;
+  --color-subtle: #8b8b94;
   --color-accent: #3b82f6;
-  --color-accent-hover: #60a5fa;
-  --color-card: #141414;
-  --color-card-hover: #1a1a1a;
-  --color-border: #27272a;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-accent-soft: #93b9fb;
+  --color-accent-solid: #2563eb;
+  --color-accent-solid-hover: #1d4ed8;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-* {
+:root {
+  color-scheme: dark;
+}
+
+html {
   scroll-behavior: smooth;
+  /* La navbar fija no debe tapar el encabezado al saltar a un ancla. */
+  scroll-padding-top: 5rem;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Ningún layout puede provocar scroll horizontal en móvil. */
+  overflow-x: hidden;
 }
 
 ::selection {
-  background: var(--color-accent);
-  color: white;
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: #fff;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-background);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+/* Foco visible en todo lo que se pueda enfocar. Nunca se quita sin reemplazo. */
+:focus-visible {
+  outline: 2px solid var(--color-accent-soft);
+  outline-offset: 3px;
   border-radius: 3px;
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 4px;
+}
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-muted);
+  background: var(--color-subtle);
+}
+
+/* ===========================================================================
+   Fondo del héroe
+   ---------------------------------------------------------------------------
+   El degradado está SIEMPRE, sin JS. El canvas de WebGL lo tapa cuando puede;
+   cuando no —sin WebGL, contexto perdido, movimiento reducido o equipo
+   modesto— esto es lo que se ve, y es una composición terminada.
+
+   Reproduce la misma composición que el shader: una fuente fría abajo a la
+   derecha sobre casi negro, con el mismo tope de brillo (#121b34) que mantiene
+   el contraste AA de todo el texto que va encima. Ver src/lib/glow.ts.
+   =========================================================================== */
+
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(115% 85% at 72% 108%, #121b34 0%, rgba(18, 27, 52, 0.38) 36%, transparent 70%),
+    var(--color-bg);
+}
+
+.hero-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Las cifras no deben cambiar de ancho mientras el contador corre. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ===========================================================================
+   Trazabilidad en hover
+   ---------------------------------------------------------------------------
+   La página ya no lleva una cita bajo cada bloque: el pie explica de una vez
+   que todo se genera desde un YAML. Lo que queda es esto, para quien quiera
+   comprobar un número concreto.
+
+   `absolute` para que no ocupe espacio en reposo, y visible al pasar el cursor
+   por el bloque o al llegar con el teclado. Sigue en el orden de tabulación:
+   no está escondido, está en reposo.
+   =========================================================================== */
+
+.source-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-subtle);
+  padding: 0.25rem 0.375rem;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  opacity: 0;
+  transition: opacity 160ms ease, color 160ms ease;
+}
+
+/* `:focus` y no sólo `:focus-visible`: un elemento enfocable que no se ve es
+   un fallo de foco visible, llegue el foco como llegue. */
+.group:hover > .source-link,
+.group:focus-within > .source-link,
+.source-link:hover,
+.source-link:focus {
+  opacity: 1;
+  color: var(--color-accent);
+}
+
+/* ===========================================================================
+   prefers-reduced-motion
+   ---------------------------------------------------------------------------
+   No "menos animación": ninguna. Los elementos aparecen en su estado final.
+   =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
 }
