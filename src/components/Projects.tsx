@@ -22,7 +22,7 @@ export default function Projects({ dict }: { dict: Dictionary }) {
   });
 
   return (
-    <section id="projects" className="scroll-mt-20 border-t border-border px-4 py-20 sm:px-6 sm:py-24">
+    <section id="projects" className="section">
       <div className="mx-auto max-w-5xl">
         <SectionHeading
           eyebrow={dict.projects.eyebrow}
@@ -30,7 +30,7 @@ export default function Projects({ dict }: { dict: Dictionary }) {
           intro={dict.projects.intro}
         />
 
-        <Stagger className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" step={0.05}>
+        <Stagger className="mt-heading grid gap-5 sm:grid-cols-2 lg:grid-cols-3" step={0.05}>
           {ordered.map((proyecto) => {
             const copy = dict.projects.items[proyecto.id];
             if (!copy) return null;
@@ -46,19 +46,19 @@ export default function Projects({ dict }: { dict: Dictionary }) {
                     {copy.title}
                   </h3>
                   {copy.featured && (
-                    <span className="shrink-0 rounded bg-accent/10 px-2 py-0.5 font-mono text-[0.625rem] text-accent">
+                    <span className="badge shrink-0">
                       {dict.projects.inProgress}
                     </span>
                   )}
                 </div>
 
-                <p className="mt-3 text-sm leading-relaxed text-muted text-pretty">{copy.summary}</p>
+                <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted text-pretty">{copy.summary}</p>
 
                 {copy.bullets && (
                   <ul className="mt-4 grid gap-2 sm:grid-cols-2">
                     {copy.bullets.map((b) => (
                       <li key={b} className="flex gap-2 text-xs leading-relaxed text-subtle">
-                        <span aria-hidden="true" className="mt-[0.4rem] h-1 w-1 shrink-0 rounded-full bg-accent" />
+                        <span aria-hidden="true" className="dot" />
                         <span className="text-pretty">{b}</span>
                       </li>
                     ))}
@@ -69,7 +69,7 @@ export default function Projects({ dict }: { dict: Dictionary }) {
                   {stack.map((tech) => (
                     <li
                       key={tech}
-                      className="rounded border border-border px-2 py-1 font-mono text-[0.6875rem] text-subtle"
+                      className="tag"
                     >
                       {tech}
                     </li>

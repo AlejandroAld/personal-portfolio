@@ -231,6 +231,7 @@ const es: Dictionary = {
     title: "Credenciales",
     inProgress: "En curso",
     education: "Estudios",
+    list: "Certificaciones",
     gpa: "Promedio",
   },
 

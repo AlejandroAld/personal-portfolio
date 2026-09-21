@@ -11,11 +11,11 @@ import { Stagger, StaggerItem } from "./Reveal";
  */
 export default function Skills({ dict }: { dict: Dictionary }) {
   return (
-    <section id="skills" className="scroll-mt-20 border-t border-border px-4 py-20 sm:px-6 sm:py-24">
+    <section id="skills" className="section">
       <div className="mx-auto max-w-5xl">
         <SectionHeading eyebrow={dict.skills.eyebrow} title={dict.skills.title} />
 
-        <Stagger className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3" step={0.04}>
+        <Stagger className="mt-heading grid gap-8 sm:grid-cols-2 lg:grid-cols-3" step={0.04}>
           {perfil.habilidades.map((grupo) => (
             <StaggerItem key={grupo.categoria}>
               <h3 className="text-sm font-semibold text-fg">{term(grupo.categoria, dict)}</h3>
@@ -23,7 +23,7 @@ export default function Skills({ dict }: { dict: Dictionary }) {
                 {terms(grupo.items, dict).map((item) => (
                   <li
                     key={item}
-                    className="rounded border border-border px-2 py-1 font-mono text-[0.6875rem] text-subtle"
+                    className="tag"
                   >
                     {item}
                   </li>

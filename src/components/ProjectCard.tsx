@@ -23,8 +23,8 @@ export default function ProjectCard({
   return (
     <m.li
       data-reveal=""
-      className={`group relative flex flex-col rounded-lg border border-border bg-surface/50 p-6 transition-colors hover:border-accent/45 ${
-        featured ? "sm:col-span-2" : ""
+      className={`card group relative flex flex-col p-6 transition-colors hover:border-accent-line ${
+        featured ? "sm:col-span-2 lg:col-span-3" : ""
       }`}
       variants={
         reduced

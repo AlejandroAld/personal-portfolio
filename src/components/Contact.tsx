@@ -23,7 +23,7 @@ export default function Contact({ dict }: { dict: Dictionary }) {
   ];
 
   return (
-    <section id="contact" className="scroll-mt-20 border-t border-border px-4 py-20 sm:px-6 sm:py-24">
+    <section id="contact" className="section">
       <div className="mx-auto max-w-5xl">
         <SectionHeading
           eyebrow={dict.contact.eyebrow}
@@ -31,11 +31,11 @@ export default function Contact({ dict }: { dict: Dictionary }) {
           intro={dict.contact.body}
         />
 
-        <Stagger className="mt-10 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+        <Stagger className="mt-heading grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
           {entries.map((entry) => {
             const inner = (
               <>
-                <span className="block font-mono text-[0.6875rem] tracking-wide text-subtle uppercase">
+                <span className="label block">
                   {entry.label}
                 </span>
                 <span className="mt-1.5 block truncate text-sm text-fg transition-colors group-hover:text-accent">
@@ -67,9 +67,9 @@ export default function Contact({ dict }: { dict: Dictionary }) {
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <a
               href={`mailto:${contacto.email}`}
-              className="inline-flex items-center gap-2 rounded bg-accent-solid px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-solid-hover"
+              className="btn btn-primary"
             >
-              {dict.contact.title}
+              {dict.hero.ctaContact}
               <span aria-hidden="true">→</span>
             </a>
             {/* Apagado hasta que exista el PDF. */}
@@ -77,7 +77,7 @@ export default function Contact({ dict }: { dict: Dictionary }) {
               <a
                 href={RESUME_URL}
                 download
-                className="inline-flex items-center gap-2 rounded border border-border-strong px-5 py-2.5 text-sm text-fg transition-colors hover:border-accent hover:text-accent"
+                className="btn btn-secondary"
               >
                 {dict.contact.resume}
               </a>

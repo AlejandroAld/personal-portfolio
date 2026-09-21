@@ -232,6 +232,7 @@ const en: Dictionary = {
     title: "Credentials",
     inProgress: "In progress",
     education: "Education",
+    list: "Certifications",
     gpa: "GPA",
   },
 

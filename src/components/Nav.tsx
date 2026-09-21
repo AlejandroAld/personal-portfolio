@@ -50,7 +50,7 @@ export default function Nav({
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled || open ? "border-b border-border bg-bg/85 backdrop-blur-md" : "border-b border-transparent"
+        scrolled || open ? "border-b border-border bg-nav backdrop-blur-md" : "border-b border-transparent"
       }`}
     >
       <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
@@ -82,7 +82,7 @@ export default function Nav({
             <Link
               href={languageSwitch.href}
               hrefLang={languageSwitch.href.replace("/", "")}
-              className="rounded px-2 py-1.5 font-mono text-xs text-muted transition-colors hover:text-fg"
+              className="rounded-sm px-2 py-1.5 font-mono text-xs text-muted transition-colors hover:text-fg"
             >
               {languageSwitch.label}
             </Link>
@@ -91,7 +91,7 @@ export default function Nav({
           {cta && (
             <a
               href={cta.href}
-              className="hidden rounded border border-accent/60 px-3.5 py-1.5 font-mono text-xs text-accent transition-colors hover:bg-accent/10 sm:inline-block"
+              className="hidden rounded-sm border border-accent-line px-3.5 py-1.5 font-mono text-xs text-accent transition-colors hover:bg-accent-tint sm:inline-block"
             >
               {cta.label}
             </a>
@@ -117,13 +117,13 @@ export default function Nav({
       </nav>
 
       {open && (
-        <div id="mobile-nav" className="border-t border-border bg-bg/95 backdrop-blur-md md:hidden">
+        <div id="mobile-nav" className="border-t border-border bg-nav backdrop-blur-md md:hidden">
           <ul className="mx-auto flex max-w-5xl flex-col gap-1 px-4 py-3 sm:px-6">
             {[...links, ...(cta ? [cta] : [])].map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="block rounded px-2 py-2.5 text-sm text-muted transition-colors hover:bg-surface hover:text-fg"
+                  className="block rounded-sm px-2 py-2.5 text-sm text-muted transition-colors hover:bg-surface hover:text-fg"
                   onClick={() => setOpen(false)}
                 >
                   {link.label}

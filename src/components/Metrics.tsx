@@ -19,7 +19,7 @@ export default function Metrics({ dict }: { dict: Dictionary }) {
   return (
     <section
       aria-label={dict.metrics.sourceNote}
-      className="border-y border-border bg-surface/40 px-4 py-12 sm:px-6 sm:py-14"
+      className="border-y border-border bg-card px-4 py-12 sm:px-6 sm:py-14"
     >
       <div className="mx-auto max-w-5xl">
         <Stagger className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">

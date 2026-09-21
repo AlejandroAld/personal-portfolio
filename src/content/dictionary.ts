@@ -149,6 +149,8 @@ export interface Dictionary {
     readonly title: string;
     readonly inProgress: string;
     readonly education: string;
+    /** Subtítulo de la lista. No es `title`: repetir el h2 debajo del h2 confunde. */
+    readonly list: string;
     readonly gpa: string;
   };
 

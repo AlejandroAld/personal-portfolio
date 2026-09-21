@@ -19,9 +19,9 @@ export default function Hero({ dict }: { dict: Dictionary }) {
 
       <div className="relative z-10 mx-auto max-w-5xl">
         <div className="max-w-3xl">
-          <p className="font-mono text-xs tracking-wide text-accent sm:text-sm">{dict.hero.eyebrow}</p>
+          <p className="eyebrow">{dict.hero.eyebrow}</p>
 
-          <h1 className="mt-5 text-[2rem] leading-[1.1] font-semibold tracking-tight text-balance sm:text-5xl lg:text-[3.5rem]">
+          <h1 className="mt-5 text-display-sm font-semibold tracking-tight text-balance sm:text-display-md lg:text-display">
             {dict.hero.positioning} <span className="text-muted">{dict.hero.positioningAccent}</span>
           </h1>
 
@@ -34,14 +34,14 @@ export default function Hero({ dict }: { dict: Dictionary }) {
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 rounded bg-accent-solid px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-solid-hover"
+              className="btn btn-primary"
             >
               {dict.hero.ctaContact}
               <span aria-hidden="true">→</span>
             </a>
             <a
               href="#projects"
-              className="inline-flex items-center gap-2 rounded border border-border-strong px-5 py-2.5 text-sm text-fg transition-colors hover:border-accent hover:text-accent"
+              className="btn btn-secondary"
             >
               {dict.hero.ctaProjects}
             </a>
@@ -51,7 +51,7 @@ export default function Hero({ dict }: { dict: Dictionary }) {
               <a
                 href={RESUME_URL}
                 download
-                className="inline-flex items-center gap-2 rounded px-3 py-2.5 font-mono text-xs text-muted transition-colors hover:text-accent"
+                className="btn btn-ghost"
               >
                 {dict.hero.ctaResume}
               </a>

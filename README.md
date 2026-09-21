@@ -36,7 +36,7 @@ src/
     [lang]/            layout raíz, página, imagen OG  (/en y /es, estáticas)
     sitemap.ts         sólo los idiomas terminados
     robots.ts          los pendientes van a Disallow
-    globals.css        tokens, evidencia, revelado, reduced-motion
+    globals.css        tokens (@theme), clases de componente, evidencia, reduced-motion
   components/          secciones + islas de cliente:
                          Nav, Counter, Reveal/Stagger, ProjectCard,
                          HeroBackdrop, Motion (LazyMotion)
@@ -122,6 +122,32 @@ lo ofrece —aunque la ruta funciona para revisarla a mano.
 `true` metió el español al sitemap, le quitó el `noindex`, lo sacó del
 `Disallow` de robots y encendió el selector en las dos direcciones, sin tocar
 una línea de arquitectura.
+
+---
+
+## Tokens
+
+Todo valor de diseño vive en `src/app/globals.css`, en un solo `@theme`:
+colores (incluidos `card`, `nav`, `accent-line` y `accent-tint`, que antes
+eran cuatro transparencias distintas repartidas por los componentes), los
+tamaños `micro` y `display-*`, y el ritmo vertical (`section`, `heading`,
+`anchor`, `meta`). Ningún componente lleva un número suelto: si hace falta uno
+nuevo, se nombra ahí.
+
+Debajo del `@theme` van las clases de componente, una por rol: `.section`,
+`.role-grid`, `.eyebrow`, `.label`, `.tag`, `.badge`, `.card`, `.btn` con sus
+tres variantes, y `.dot`. Cuando dos elementos significan lo mismo —un eyebrow,
+una etiqueta de campo, un badge de estado— llevan la misma clase, y el sitio no
+puede tener dos versiones de la misma pieza sin que se note ahí. El "En curso"
+de la tarjeta del agente y el de las certificaciones eran dos badges de dos
+colores; ahora son uno.
+
+Dos excepciones, documentadas donde viven: el color del degradado del héroe
+está calculado contra el shader en `src/lib/glow.ts`, y la imagen OG repite
+cuatro hexadecimales porque el renderizador de `next/og` no lee CSS.
+
+`AgentChat` y `AgentDemo` quedan fuera del escaneo de Tailwind (`@source not`):
+un componente que no se publica no debe meter clases en el CSS servido.
 
 ---
 

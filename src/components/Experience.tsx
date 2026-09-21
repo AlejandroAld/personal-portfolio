@@ -23,11 +23,11 @@ const CITE_BY_ROLE = {
  */
 export default function Experience({ dict }: { dict: Dictionary }) {
   return (
-    <section id="experience" className="scroll-mt-20 px-4 py-20 sm:px-6 sm:py-24">
+    <section id="experience" className="section border-t-0">
       <div className="mx-auto max-w-5xl">
         <SectionHeading eyebrow={dict.experience.eyebrow} title={dict.experience.title} />
 
-        <Stagger as="ol" className="mt-10" step={0.08}>
+        <Stagger as="ol" className="mt-heading" step={0.08}>
           {perfil.experiencia.map((rol) => {
             const copy = dict.experience.roles[rol.id];
             const cite = CITE_BY_ROLE[rol.id as keyof typeof CITE_BY_ROLE];
@@ -37,7 +37,7 @@ export default function Experience({ dict }: { dict: Dictionary }) {
                 key={rol.id}
                 className="group relative border-b border-border py-8 first:pt-0 last:border-b-0"
               >
-                <div className="grid gap-4 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-8">
+                <div className="role-grid">
                   <div>
                     <p className="font-mono text-xs text-subtle tnum">
                       {formatPeriod(rol.inicio, rol.fin, dict)}
@@ -61,7 +61,7 @@ export default function Experience({ dict }: { dict: Dictionary }) {
                             <li key={h} className="flex gap-2.5 text-sm leading-relaxed text-muted">
                               <span
                                 aria-hidden="true"
-                                className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-accent"
+                                className="dot"
                               />
                               <span className="text-pretty">{h}</span>
                             </li>
@@ -74,7 +74,7 @@ export default function Experience({ dict }: { dict: Dictionary }) {
                       {rol.stack.slice(0, 10).map((tech) => (
                         <li
                           key={tech}
-                          className="rounded border border-border px-2 py-1 font-mono text-[0.6875rem] text-subtle"
+                          className="tag"
                         >
                           {term(tech, dict)}
                         </li>
