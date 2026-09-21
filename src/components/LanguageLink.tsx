@@ -16,6 +16,11 @@ import { useLayoutEffect, type MouseEvent } from "react";
  * cambió; aquí eso es "el pathname es otro". Si el navegador no tiene la API,
  * el `Link` navega como siempre.
  *
+ * La posición de lectura se conserva a propósito —`scroll: false` en las dos
+ * rutas—: las dos páginas tienen la misma estructura, así que el mismo
+ * desplazamiento muestra la misma sección en el otro idioma, y saltar al
+ * inicio sería perder el sitio por el que se iba.
+ *
  * La entrada del héroe es sólo para la primera carga: el héroe nuevo llega
  * con el fundido, no con su propia animación encima. La señal es
  * `data-navigated` en <html>, pero el layout de `[lang]` se vuelve a montar al
@@ -63,13 +68,13 @@ export default function LanguageLink({
           settle = resolve;
           // Si la navegación no llega, el documento no se queda congelado.
           setTimeout(resolve, 1000);
-          router.push(href);
+          router.push(href, { scroll: false });
         }),
     );
   };
 
   return (
-    <Link href={href} hrefLang={href.replace("/", "")} className={className} onClick={onClick}>
+    <Link href={href} hrefLang={href.replace("/", "")} className={className} onClick={onClick} scroll={false}>
       {label}
     </Link>
   );

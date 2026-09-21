@@ -80,8 +80,7 @@
   /* Exactamente estos, y ninguno más. src/lib/motion.ts los espeja para
      `motion`, y `npm run lint` comprueba que sigan iguales. */
   --duration-fast: 150ms; /* hover, foco, cambios de estado */
-  --duration-base: 300ms; /* entradas de elementos */
-  --duration-slow: 500ms; /* transiciones de sección */
+  --duration-base: 300ms; /* entradas de elementos y el cambio de idioma */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* entradas */
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* transiciones */
   /* Desplazamiento de una entrada. El tope es 20px. */
@@ -278,14 +277,13 @@ html[data-navigated] .rise {
    Cambio de idioma
    ---------------------------------------------------------------------------
    Fundido cruzado del documento entero con la View Transitions API; lo
-   dispara LanguageLink. Los 200 ms son del plan: es el único valor de
-   movimiento fuera de la escala de tokens, y está aquí a propósito, no
-   repartido.
+   dispara LanguageLink. Dura lo que una entrada: ningún valor de movimiento
+   vive fuera de la escala de tokens.
    =========================================================================== */
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 200ms;
+  animation-duration: var(--duration-base);
   animation-timing-function: var(--ease-in-out);
 }
 

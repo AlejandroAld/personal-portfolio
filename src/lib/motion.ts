@@ -10,10 +10,8 @@
 export const DURATION = {
   /** hover, foco, cambios de estado */
   fast: 0.15,
-  /** entradas de elementos */
+  /** entradas de elementos y el cambio de idioma */
   base: 0.3,
-  /** transiciones de sección */
-  slow: 0.5,
 } as const;
 
 /** Entradas. */

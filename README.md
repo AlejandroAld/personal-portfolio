@@ -156,13 +156,13 @@ un componente que no se publica no debe meter clases en el CSS servido.
 
 ## Animación
 
-Los tokens de movimiento son exactamente seis, en el `@theme` de
-`globals.css`: `duration-fast` (150 ms: hover, foco, estado), `duration-base`
-(300 ms: entradas), `duration-slow` (500 ms: transiciones de sección, sin uso
-todavía), `ease-out` `cubic-bezier(0.16, 1, 0.3, 1)` para entradas,
-`ease-in-out` `cubic-bezier(0.65, 0, 0.35, 1)` para transiciones, y la
-distancia (`distance-sm` 12 px, `distance` 16 px; tope 20). `src/lib/motion.ts`
-los espeja para `motion`, y `npm run lint` falla si los dos se separan.
+Los tokens de movimiento viven en el `@theme` de `globals.css`, y son sólo
+los que algo usa: `duration-fast` (150 ms: hover, foco, estado),
+`duration-base` (300 ms: entradas y el cambio de idioma), `ease-out`
+`cubic-bezier(0.16, 1, 0.3, 1)` para entradas, `ease-in-out`
+`cubic-bezier(0.65, 0, 0.35, 1)` para transiciones, y la distancia
+(`distance-sm` 12 px, `distance` 16 px; tope 20). `src/lib/motion.ts` los
+espeja para `motion`, y `npm run lint` falla si los dos se separan.
 
 **Regla dura:** todo lo que se mueve anima sólo `transform` y `opacity`. Los
 hovers cambian color, que no dispara layout. Nada anima ancho, alto, posición,
@@ -175,7 +175,7 @@ margen ni relleno, y se puede comprobar en el CSS compilado: un solo
 | Contadores | Implementación propia: el valor final se renderiza en el servidor —existe sin JS y lo indexa un buscador— y el JS cuenta desde cero en 800 ms con la curva de entrada cuando el 30 % de la cifra entra en pantalla, una vez. "Miles" no es número: entra con fade como todo lo demás. |
 | Entradas por scroll | `motion` con `whileInView` y `once: true`: cada bloque de experiencia y cada tarjeta se observa a sí misma y entra —fade + 12 px, 300 ms— al cruzar el 20 % inferior del viewport. Los hijos de una lista se escalonan 50 ms por índice, y a partir del cuarto ya no esperan más. No se usa `animation-timeline: view()`: una línea de tiempo de scroll se deshace al subir, y re-animar al subir está prohibido. |
 | Hovers | Tarjetas: 2 px hacia arriba y el borde encendido, 150 ms. Enlaces del nav: un subrayado que crece desde la izquierda, que es un `scaleX` sobre un pseudoelemento. Botones: fondo, 150 ms. Las utilidades `transition-*` de Tailwind heredan los tokens de estado. |
-| Cambio de idioma | Fundido cruzado de 200 ms con la View Transitions API, disparado por `LanguageLink`: sin recarga, sin blanco en medio, y la posición de lectura se conserva. Los 200 ms son del plan y son el único valor de movimiento fuera de la escala de tokens; viven en `globals.css`, no repartidos. Sin la API, el enlace navega como siempre. |
+| Cambio de idioma | Fundido cruzado con la View Transitions API a `duration-base`, disparado por `LanguageLink`: sin recarga, sin blanco en medio. La posición de lectura se conserva a propósito (`scroll: false` en las dos rutas): las dos páginas tienen la misma estructura, y el mismo desplazamiento muestra la misma sección en el otro idioma. Sin la API, el enlace navega como siempre. |
 | Fondo del héroe | Un shader de fragmento en WebGL crudo, sin three.js. Ver abajo. |
 
 `motion` se carga con `LazyMotion` + `domAnimation` y el componente `m` desde

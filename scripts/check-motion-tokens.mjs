@@ -28,7 +28,6 @@ const tuple = (v) => (v == null ? v : v.split(",").map((n) => parseFloat(n)).joi
 
 same("duration-fast", ms(cssVar("duration-fast")), tsValue(/fast:\s*([\d.]+)/));
 same("duration-base", ms(cssVar("duration-base")), tsValue(/base:\s*([\d.]+)/));
-same("duration-slow", ms(cssVar("duration-slow")), tsValue(/slow:\s*([\d.]+)/));
 same("ease-out", bezier(cssVar("ease-out")), tuple(tsValue(/EASE_OUT[^=]*=\s*\[([^\]]+)\]/)));
 same("ease-in-out", bezier(cssVar("ease-in-out")), tuple(tsValue(/EASE_IN_OUT[^=]*=\s*\[([^\]]+)\]/)));
 same("distance-sm", String(parseFloat(cssVar("distance-sm"))), tsValue(/sm:\s*(\d+)/));
