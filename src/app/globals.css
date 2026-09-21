@@ -85,6 +85,35 @@ body {
 }
 
 /* ===========================================================================
+   Fondo del héroe
+   ---------------------------------------------------------------------------
+   El degradado está SIEMPRE, sin JS. El canvas de WebGL lo tapa cuando puede;
+   cuando no —sin WebGL, contexto perdido, movimiento reducido o equipo
+   modesto— esto es lo que se ve, y es una composición terminada.
+
+   Reproduce la misma composición que el shader: una fuente fría abajo a la
+   derecha sobre casi negro, con el mismo tope de brillo (#121b34) que mantiene
+   el contraste AA de todo el texto que va encima. Ver src/lib/glow.ts.
+   =========================================================================== */
+
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(115% 85% at 72% 108%, #121b34 0%, rgba(18, 27, 52, 0.38) 36%, transparent 70%),
+    var(--color-bg);
+}
+
+.hero-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ===========================================================================
    Entrada progresiva de secciones
    ---------------------------------------------------------------------------
    IntersectionObserver añade `.is-visible`. Sólo `opacity` y `transform`, que

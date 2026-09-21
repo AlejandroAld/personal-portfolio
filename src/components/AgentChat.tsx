@@ -3,7 +3,17 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
 /**
- * Cliente del agente de CV.
+ * Cliente del agente de CV. NO PUBLICADO TODAVÍA.
+ *
+ * Este archivo está escrito, probado y deliberadamente fuera del bundle:
+ * DemoSection no lo importa, así que Next no lo incluye en ningún chunk
+ * servido. Se conserva aquí, y no en una rama aparte, porque el trabajo ya
+ * está hecho y verificado —ver tests/agent-demo/— y perderlo para volver a
+ * escribirlo el día del lanzamiento sería tirar esa verificación.
+ *
+ * Para publicarlo: importar AgentDemo desde DemoSection y pasarle
+ * `dict.demo.chat` con AGENT_CHAT_ENDPOINT. Nada más; las cadenas ya están en
+ * el diccionario, completas y en los dos idiomas.
  *
  * ARQUITECTURA (opción A del plan): el navegador habla DIRECTO con `/api/chat`
  * del agente desplegado. No hay proxy y no hay credencial en ninguna parte.
@@ -19,24 +29,15 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
  * reenvía la transcripción completa en cada turno.
  */
 
-const MAX_CHARS = 1200;
+import type { Dictionary } from "@/content/dictionary";
 
-export interface ChatStrings {
-  placeholder: string;
-  send: string;
-  sending: string;
-  suggestionsLabel: string;
-  suggestions: readonly string[];
-  you: string;
-  agent: string;
-  thinking: string;
-  reset: string;
-  liveLabel: string;
-  errorGeneric: string;
-  errorRateLimit: string;
-  errorOffline: string;
-  transcriptLabel: string;
-}
+/**
+ * Las cadenas salen del diccionario, no de una interfaz paralela: así el
+ * contenido y el cliente no pueden desincronizarse mientras la demo espera.
+ */
+export type ChatStrings = Dictionary["demo"]["chat"];
+
+const MAX_CHARS = 1200;
 
 type Turn = { role: "user" | "assistant"; text: string };
 

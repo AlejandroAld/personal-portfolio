@@ -101,39 +101,63 @@ export interface Dictionary {
     readonly evidenceNote: string;
   };
 
+  /**
+   * La sección del agente. Hoy es un teaser: el cliente de chat existe en la
+   * rama pero no se publica todavía, así que esta sección vende lo que viene
+   * en vez de disculparse por lo que falta.
+   *
+   * `chat` se conserva intacto para el día que la demo salga: encenderla es
+   * volver a importar el cliente en DemoSection, no reescribir contenido.
+   */
   readonly demo: {
     readonly eyebrow: string;
     readonly title: string;
     readonly intro: string;
-    readonly launch: string;
-    readonly placeholder: string;
-    readonly send: string;
-    readonly sending: string;
-    readonly suggestionsLabel: string;
-    readonly suggestions: readonly string[];
-    readonly you: string;
-    readonly agent: string;
-    readonly thinking: string;
-    readonly reset: string;
-    readonly liveLabel: string;
-    readonly errorGeneric: string;
-    readonly errorRateLimit: string;
-    readonly errorOffline: string;
-    readonly fallbackNote: string;
-    readonly transcriptLabel: string;
-    readonly disclaimer: string;
+
+    /** Las etapas del flujo interno que la demo va a exponer. */
+    readonly stagesTitle: string;
+    readonly stages: readonly { readonly title: string; readonly body: string }[];
+
+    readonly whyTitle: string;
+    readonly why: string;
+
+    readonly ctaRepo: string;
+    readonly ctaRepoNote: string;
+
+    readonly exampleTitle: string;
+    readonly exampleNote: string;
     /**
-     * Intercambio guardado que se muestra si el agente no contesta o si el
-     * visitante topó el límite. El texto de las respuestas es el que el perfil
-     * ya fija para esas preguntas, no uno redactado aquí: la sección degrada
-     * sin inventar nada.
+     * Un intercambio real. Las respuestas son las que el perfil ya fija para
+     * esas preguntas, no redactadas para esta página.
      */
-    readonly fallback: readonly { readonly q: string; readonly a: string }[];
+    readonly example: readonly { readonly q: string; readonly a: string }[];
+
+    readonly architectureTitle: string;
     readonly architecture: readonly {
       readonly title: string;
       readonly body: string;
       readonly cite: CiteKey;
     }[];
+
+    /** Cadenas del cliente de chat. Sin uso mientras la demo no se publique. */
+    readonly chat: {
+      readonly launch: string;
+      readonly placeholder: string;
+      readonly send: string;
+      readonly sending: string;
+      readonly suggestionsLabel: string;
+      readonly suggestions: readonly string[];
+      readonly you: string;
+      readonly agent: string;
+      readonly thinking: string;
+      readonly reset: string;
+      readonly liveLabel: string;
+      readonly errorGeneric: string;
+      readonly errorRateLimit: string;
+      readonly errorOffline: string;
+      readonly transcriptLabel: string;
+      readonly disclaimer: string;
+    };
   };
 
   readonly cases: {

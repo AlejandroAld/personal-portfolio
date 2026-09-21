@@ -17,7 +17,7 @@ const en: Dictionary = {
   meta: {
     title: "José Alejandro Aldama Ramos — AI Engineer",
     description:
-      "AI Engineer. I take AI systems to production and keep them running there: agents with real customer traffic, evaluation anchored in real failure modes, guardrails and cost control. Talk to my CV agent, live.",
+      "AI Engineer. I take AI systems to production and keep them running there: four agents with real customer traffic, evaluation anchored in real failure modes, guardrails, and cost cut 92%. Every claim on the page links to the line it comes from.",
     keywords: [
       "AI Engineer",
       "AI Engineer Mexico",
@@ -35,7 +35,7 @@ const en: Dictionary = {
 
   nav: {
     work: "Work",
-    agent: "Live agent",
+    agent: "The agent",
     cases: "Case studies",
     thinking: "How I think",
     track: "Track record",
@@ -54,7 +54,7 @@ const en: Dictionary = {
       "I'm the technical owner of the generative AI systems in production at an automotive group: tool calling against the business systems, context and memory for conversations that span days, human escalation — and the layer that keeps them alive, which is an evaluation suite anchored in real failure modes, regression tests on every change, tracing, and cost and latency measured per interaction.",
     availability:
       "Open to AI engineering roles in Mexico — on-site, hybrid or remote. Available to relocate to Mexico City.",
-    ctaPrimary: "Ask my CV agent",
+    ctaPrimary: "Inside my CV agent",
     ctaSecondary: "Get in touch",
     ctaResume: "Download CV",
     portraitAlt: "Portrait of José Alejandro Aldama Ramos",
@@ -97,36 +97,41 @@ const en: Dictionary = {
   },
 
   demo: {
-    eyebrow: "Live demo",
-    title: "Ask my CV agent",
+    eyebrow: "In progress",
+    title: "An agent that shows its work",
     intro:
-      "Not a chatbot over a PDF. An Open Responses server with an agent loop, server-side tools over a single source of truth, five guardrail layers and an eval suite that runs in CI before every deploy. Ask it something hard — it's built to say what it doesn't cover.",
-    launch: "Start the conversation",
-    placeholder: "Ask about experience, stack, or a specific role…",
-    send: "Send",
-    sending: "Sending",
-    suggestionsLabel: "Try one of these",
-    suggestions: [
-      "What can't you do?",
-      "Do you have experience integrating with a banking core?",
-      "Evaluate me against this role: Kubernetes, Terraform, banking core",
-      "What's the most expensive technical mistake you've made?",
+      "Most agent demos show you the answer and hide the machine. This one is being built to do the opposite: put the whole internal flow on screen, because what an agent says is easy to fake and what it decided is not.",
+
+    stagesTitle: "What you'll see",
+    stages: [
+      {
+        title: "The input, exactly as the model gets it",
+        body: "The entire profile, in the prompt, with no retrieval step in between. You'll see the same source of truth the answer is grounded in — not a summary of it, and not a chunk a retriever happened to pick.",
+      },
+      {
+        title: "Every tool call, with arguments and result",
+        body: "Which tool the model chose, what it passed, what came back. Tool selection is a decision, and a decision you can read is a decision you can judge.",
+      },
+      {
+        title: "The reasoning before the answer",
+        body: "This is where the guardrails actually bite: a gap declared instead of filled, a false premise corrected before the reply, a requirement marked adjacent instead of covered.",
+      },
+      {
+        title: "Tokens as they leave",
+        body: "Real streaming, not a typing animation — the provider's deltas forwarded one by one. Alongside them, the cost and latency of that single interaction.",
+      },
     ],
-    you: "You",
-    agent: "Agent",
-    thinking: "Thinking",
-    reset: "Start over",
-    liveLabel: "Live",
-    errorGeneric: "The agent couldn't answer. The saved exchange below still shows how it responds.",
-    errorRateLimit:
-      "You've hit the hourly limit for this public demo. It's capped per IP because a web page can't hold a credential — the cost, not the identity, is what gets protected. The saved exchange below is still readable.",
-    errorOffline:
-      "The agent is unreachable right now. The saved exchange below is still readable.",
-    fallbackNote: "Saved exchange — not live",
-    transcriptLabel: "Conversation with the CV agent",
-    disclaimer:
-      "The demo endpoint takes no credential and is rate-limited per IP. The Bearer-protected endpoint is for Open Responses clients, not for this page.",
-    fallback: [
+
+    whyTitle: "Why put that on screen",
+    why: "Because an agent is only as good as what it refuses to claim, and that never shows up in the output. Ship the transcript and you've shown a chatbot. Ship the tool calls, the grounding and the refusals, and you've shown the engineering — which is the part that took the work, and the part worth being judged on.",
+
+    ctaRepo: "Read the code",
+    ctaRepoNote:
+      "The server is public today: the agent loop, the five guardrail layers, the 68 contract tests and the 26 eval cases are all in the repository.",
+
+    exampleTitle: "What it already answers",
+    exampleNote: "From the profile — not a live call",
+    example: [
       {
         q: "What can't you do?",
         a: "Several things, and I'd rather say them before they come up. I haven't written .NET or C#, or Rust. I haven't used PySpark, Databricks or Airflow; my distributed compute has been BigQuery. I haven't built voice agents — all my conversational work has been in text. And I haven't run a formal red team exercise against my own agents, which is a gap I'm clear about.",
@@ -136,6 +141,8 @@ const en: Dictionary = {
         a: "Three layers, and the third is the one almost nobody builds. The first is technical: output validation that blocks answers not grounded in a tool result, plus reviewer agents that audit before the answer reaches the customer. The second is engineering: tracing on every call, and an evaluation suite that runs on every change. The third is human: I built the web platforms where someone from the business reviews, validates, approves and corrects what the agent produces. They're mini CRMs, one per line of business. Without that layer an agent can work, but nobody outside engineering can answer for it.",
       },
     ],
+
+    architectureTitle: "Already built",
     architecture: [
       {
         title: "An agent loop, not a prompt",
@@ -158,11 +165,37 @@ const en: Dictionary = {
         cite: "evalSuite",
       },
       {
-        title: "No credential in your browser",
-        body: "This page talks to the demo endpoint, which takes no key and is capped per IP. A token shipped to a browser is a public token, so the demo is protected by consumption instead of identity.",
+        title: "Two surfaces, two security models",
+        body: "The Open Responses endpoint is protected by a Bearer token, for clients with a verifiable identity. The browser-facing endpoint takes no credential and is capped per IP, because a token shipped to a browser is a public token — so it's protected by consumption instead.",
         cite: "demoEndpoint",
       },
     ],
+
+    chat: {
+      launch: "Start the conversation",
+      placeholder: "Ask about experience, stack, or a specific role…",
+      send: "Send",
+      sending: "Sending",
+      suggestionsLabel: "Try one of these",
+      suggestions: [
+        "What can't you do?",
+        "Do you have experience integrating with a banking core?",
+        "Evaluate me against this role: Kubernetes, Terraform, banking core",
+        "What's the most expensive technical mistake you've made?",
+      ],
+      you: "You",
+      agent: "Agent",
+      thinking: "Thinking",
+      reset: "Start over",
+      liveLabel: "Live",
+      errorGeneric: "The agent couldn't answer. The saved exchange below still shows how it responds.",
+      errorRateLimit:
+        "You've hit the hourly limit for this public demo. It's capped per IP because a web page can't hold a credential — the cost, not the identity, is what gets protected. The saved exchange below is still readable.",
+      errorOffline: "The agent is unreachable right now. The saved exchange below is still readable.",
+      transcriptLabel: "Conversation with the CV agent",
+      disclaimer:
+        "The demo endpoint takes no credential and is rate-limited per IP. The Bearer-protected endpoint is for Open Responses clients, not for this page.",
+    },
   },
 
   cases: {

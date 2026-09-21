@@ -2,6 +2,7 @@ import type { Dictionary } from "@/content/dictionary";
 import { contacto, persona } from "@/content/perfil";
 import { PORTRAIT_URL, RESUME_URL } from "@/lib/site";
 import Counter from "./Counter";
+import HeroBackdrop from "./HeroBackdrop";
 import Evidence from "./Evidence";
 import Reveal from "./Reveal";
 
@@ -13,12 +14,14 @@ import Reveal from "./Reveal";
  * acciones. Cada cifra enlaza a la línea del perfil de donde sale, porque una
  * cifra sin fuente es una cifra que hay que creer.
  *
- * El LCP de la página es el texto de la tesis. No hay imagen que lo retrase.
+ * El LCP de la página es el texto de la tesis. No hay imagen que lo retrase, y
+ * el fondo de WebGL se carga después del primer pintado, nunca antes.
  */
 export default function Hero({ dict }: { dict: Dictionary }) {
   return (
-    <section id="top" className="px-4 pt-28 pb-16 sm:px-6 sm:pt-36 sm:pb-20">
-      <div className="mx-auto max-w-5xl">
+    <section id="top" className="relative isolate px-4 pt-28 pb-16 sm:px-6 sm:pt-36 sm:pb-20">
+      <HeroBackdrop />
+      <div className="relative z-10 mx-auto max-w-5xl">
         {/* El hueco del retrato: cuando PORTRAIT_URL exista, la segunda
             columna se llena y nada más cambia de sitio. */}
         <div className={PORTRAIT_URL ? "lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-14" : ""}>

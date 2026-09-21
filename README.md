@@ -37,30 +37,54 @@ src/
     sitemap.ts         sólo los idiomas terminados
     robots.ts          los pendientes van a Disallow
     globals.css        tokens, evidencia, revelado, reduced-motion
-  components/          secciones + tres islas de cliente (Nav, Counter, chat)
+  components/          secciones + islas de cliente:
+                         Nav, Counter, Reveal, HeroBackdrop
+                         AgentChat, AgentDemo  ← escritos, SIN publicar
   content/
     perfil.json        GENERADO — no editar a mano
     perfil.ts          acceso tipado + formateo de fechas
     dictionary.ts      la forma del contenido
     en.ts              prosa en inglés  (completo)
-    es.ts              prosa en español (PENDIENTE)
+    es.ts              prosa en español (completo)
   lib/
     evidence.ts        SHA fijado + todas las citas, en un solo lugar
+    glow.ts            el shader del héroe, en chunk aparte
     site.ts            dominio, endpoint del agente, idiomas, banderas
 scripts/
   sync-perfil.mjs      trae perfil.yaml del repo del agente
+tests/
+  agent-demo/          pruebas del cliente del agente, con su README
 ```
 
 ---
 
-## La demo en vivo
+## El agente: teaser, no demo
 
-El navegador habla **directo** con `/api/chat` del agente desplegado. Sin proxy
-y sin credencial en ninguna parte.
+La sección del agente vende lo que viene —el flujo interno en pantalla: la
+entrada, las llamadas a herramienta, el razonamiento y los tokens saliendo— y
+enlaza al código, que ya es público. **Sin fecha prometida.**
 
-`/v1/responses` exige Bearer y no se toca desde aquí: una página web no puede
-guardar una llave en secreto. La demo no se protege por identidad sino por
-consumo, con un tope por IP en el backend.
+El cliente de chat existe, está probado y **no se publica todavía**:
+
+- `src/components/AgentChat.tsx` y `AgentDemo.tsx` se conservan en la rama.
+- `DemoSection.tsx` NO los importa, así que Next no los mete en ningún chunk
+  servido. Verificado en el build: ni `response.output_text.delta`, ni
+  `agent-input`, ni el hostname del agente aparecen en `.next/static/`.
+- Las cadenas del cliente siguen en el diccionario, completas y en los dos
+  idiomas, bajo `demo.chat`.
+- Las pruebas están en `tests/agent-demo/`, con su README.
+
+**Para encenderla:** importar `AgentDemo` en `DemoSection`, pasarle
+`dict.demo.chat` y `AGENT_CHAT_ENDPOINT`. Nada más.
+
+### La arquitectura que ya está decidida
+
+El navegador hablará **directo** con `/api/chat` del agente desplegado. Sin
+proxy y sin credencial en ninguna parte.
+
+`/v1/responses` exige Bearer y no se toca desde el sitio: una página web no
+puede guardar una llave en secreto. La demo no se protege por identidad sino
+por consumo, con un tope por IP en el backend.
 
 Se descartó meter un route handler de Next en medio. Habría escondido el
 hostname —que no es un secreto y ya se publica en `/.well-known/agent-card.json`—
@@ -71,13 +95,6 @@ Reenviar `X-Forwarded-For` tampoco sirve, porque el cliente puede falsificarlo.
 `/api/chat` es **sin estado**: descarta `previous_response_id`, así que el
 cliente reenvía la transcripción completa en cada turno.
 
-La sección degrada sin romperse. El intercambio guardado se renderiza siempre en
-el servidor —lo indexa un buscador y se lee sin pulsar nada— y los errores de
-429, caída y evento `error` apuntan a él. Las respuestas guardadas son las que el
-propio perfil fija para esas preguntas; ninguna se redactó para esta página.
-
----
-
 ## Bilingüe
 
 `/en` y `/es`, ambas estáticas vía `generateStaticParams`, con `hreflang` y
@@ -87,21 +104,48 @@ La bandera `complete` de cada diccionario manda. Mientras sea `false`, ese idiom
 queda fuera del sitemap y de los hreflang, se marca `noindex`, y el selector no
 lo ofrece —aunque la ruta funciona para revisarla a mano.
 
-**Estado: el español está pendiente.** Para terminarlo: traduce los bloques de
-`src/content/es.ts` desde `perfil.yaml` (que ya está en español, así que la mayor
-parte es copiar) y pon `complete: true`. No hay que tocar nada de arquitectura.
+**Los dos idiomas están terminados.** La bandera hizo su trabajo: ponerla en
+`true` metió el español al sitemap, le quitó el `noindex`, lo sacó del
+`Disallow` de robots y encendió el selector en las dos direcciones, sin tocar
+una línea de arquitectura.
 
 ---
 
 ## Animación
 
-Sin librerías. Toda la capa son unos 2 KB de JS:
+Sin librerías: ni framer-motion, ni three.js, ni nada. La capa de animación de
+secciones son unos 2 KB de JS; el fondo del héroe, 2.2 KB más en un chunk que
+sólo se pide cuando se va a usar.
 
 | Qué | Cómo |
 |---|---|
 | Contadores | El valor final se renderiza en el servidor; el JS sólo anima desde cero al entrar en pantalla. Existe sin JS y no hay salto de ancho (`tabular-nums`). |
 | Entrada de secciones | Un solo `IntersectionObserver` para toda la página. Sólo `opacity` y `transform`. |
 | Casos de estudio | `grid-template-rows: 0fr → 1fr`: altura animada sin medir nada en JS. |
+| Fondo del héroe | Un shader de fragmento en WebGL crudo (WebGL2 con respaldo a WebGL1), sin three.js. Ver abajo. |
+
+### El fondo del héroe
+
+Un triángulo a pantalla completa y un shader de ruido que se mueve muy despacio.
+**2 235 bytes gzip** añadidos al sitio completo, de los cuales 1 950 son un
+chunk aparte que sólo se pide si de verdad se va a usar.
+
+Fuera de la ruta crítica: el LCP es el texto de la tesis y se pinta sin esperar
+a nada; la importación del shader arranca en `requestIdleCallback`.
+
+Se cae al degradado CSS —que está siempre debajo y es una composición
+terminada, no un hueco— si no hay WebGL, si se pierde el contexto, con
+`prefers-reduced-motion: reduce`, o si `hardwareConcurrency <= 4`. En esos casos
+**no se descargan los bytes**: el respaldo no es cargar y no usar.
+
+El bucle se detiene cuando la pestaña no está visible y cuando el canvas sale
+del viewport. El canvas va con `aria-hidden` y no toca el árbol de
+accesibilidad.
+
+El tope de brillo del shader no es una decisión estética, es de contraste: el
+color más claro que puede producir está calculado para que todo color de texto
+de la página siga pasando AA encima de él. Los números están en
+`src/lib/glow.ts`; si se sube el tinte, hay que recalcularlos.
 
 Con `prefers-reduced-motion: reduce` no hay animación, no una más corta. Sin JS,
 un `<noscript>` deja todo visible: la entrada progresiva es una mejora, nunca un
@@ -111,17 +155,31 @@ requisito para leer la página.
 
 ## Medido, no estimado
 
-Lighthouse móvil contra `next build && next start`:
+Lighthouse móvil contra `next build && next start`, mediana de 3 corridas:
 
-| Rendimiento | Accesibilidad | Buenas prácticas | SEO |
-|---|---|---|---|
-| **99** | **100** | **100** | **100** |
+| Ruta | Rendimiento | Accesibilidad | Buenas prácticas | SEO |
+|---|---|---|---|---|
+| `/en` | **97** | **100** | **100** | **100** |
+| `/es` | **99** | **100** | **100** | **100** |
 
-FCP 0.9 s · LCP 1.9 s · TBT 80 ms · CLS 0.001
+FCP 0.91 s · LCP 1.87–2.46 s · TBT 78–98 ms · CLS ≤ 0.001
 
-Cero violaciones de WCAG 2.1 AA con axe-core, incluidos los estados que
-Lighthouse no ve: chat abierto, casos expandidos y menú móvil. Los ratios de
-contraste están anotados en `globals.css`.
+Coste del shader, aislado (misma página, 3 corridas cada una):
+
+| | Rendimiento (mediana) | LCP (mediana) |
+|---|---|---|
+| Sin shader | 97 | 2.48 s |
+| Con shader activo | 99 | 1.86 s |
+
+Las tres condiciones se solapan dentro del ruido de la máquina de medición: el
+shader no tiene coste medible. El umbral que se aplicó fue que por debajo de 95
+se retiraba.
+
+Cero violaciones de WCAG 2.1 AA con axe-core, en **los dos idiomas** y en todos
+los estados interactivos: inicial, casos expandidos, menú móvil, escritorio y
+movimiento reducido. Diez auditorías, cero violaciones. El recorrido de teclado
+empieza en el skip link en ambos idiomas y ningún elemento enfocable se queda
+sin anillo de foco.
 
 ---
 

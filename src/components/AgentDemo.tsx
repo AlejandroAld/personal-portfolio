@@ -5,7 +5,8 @@ import { useState } from "react";
 import type { ChatStrings } from "./AgentChat";
 
 /**
- * Carga diferida del chat.
+ * Carga diferida del chat. NO PUBLICADO TODAVÍA: ver la nota de AgentChat.tsx.
+ *
  *
  * El cliente del agente no entra al bundle inicial: se importa cuando alguien
  * decide usarlo. Así la portada no paga streaming, parser SSE ni estado de
@@ -25,11 +26,9 @@ const AgentChat = dynamic(() => import("./AgentChat"), {
 
 export default function AgentDemo({
   endpoint,
-  launch,
   strings,
 }: {
   endpoint: string;
-  launch: string;
   strings: ChatStrings;
 }) {
   const [started, setStarted] = useState(false);
@@ -53,7 +52,7 @@ export default function AgentDemo({
         onClick={() => setStarted(true)}
         className="mt-1 inline-flex items-center gap-2 rounded bg-accent-solid px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-solid-hover"
       >
-        {launch}
+        {strings.launch}
         <span aria-hidden="true">→</span>
       </button>
     </div>
