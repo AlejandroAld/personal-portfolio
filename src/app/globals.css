@@ -1,44 +1,192 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-background: #0a0a0a;
-  --color-foreground: #ededed;
+/* ===========================================================================
+   Tokens
+   ---------------------------------------------------------------------------
+   Contraste verificado contra el fondo #0a0a0a (ratios WCAG):
+     fg      #ededed  →  16.4:1   texto normal AAA
+     muted   #a1a1aa  →   7.7:1   texto normal AAA
+     subtle  #8b8b94  →   5.9:1   texto normal AA
+     accent  #3b82f6  →   5.4:1   texto normal AA
+   No bajar de #8b8b94 para texto: #71717a da 4.1:1 y reprueba AA.
+
+   El acento de TEXTO y el de RELLENO no pueden ser el mismo color: uno tiene
+   que ser claro para contrastar contra negro, el otro oscuro para contrastar
+   contra el blanco que lleva encima. Con blanco:
+     accent        #3b82f6  →  3.7:1   REPRUEBA
+     accent-solid  #2563eb  →  5.2:1   AA
+     hover         #1d4ed8  →  6.7:1   AA
+   =========================================================================== */
+
+@theme {
+  --color-bg: #0a0a0a;
+  --color-surface: #101012;
+  --color-surface-2: #17171a;
+  --color-border: #26262b;
+  --color-border-strong: #3a3a42;
+  --color-fg: #ededed;
   --color-muted: #a1a1aa;
+  --color-subtle: #8b8b94;
   --color-accent: #3b82f6;
-  --color-accent-hover: #60a5fa;
-  --color-card: #141414;
-  --color-card-hover: #1a1a1a;
-  --color-border: #27272a;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-accent-soft: #93b9fb;
+  --color-accent-solid: #2563eb;
+  --color-accent-solid-hover: #1d4ed8;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
-* {
+:root {
+  color-scheme: dark;
+}
+
+html {
   scroll-behavior: smooth;
+  /* La navbar fija no debe tapar el encabezado al saltar a un ancla. */
+  scroll-padding-top: 5rem;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Ningún layout puede provocar scroll horizontal en móvil. */
+  overflow-x: hidden;
 }
 
 ::selection {
-  background: var(--color-accent);
-  color: white;
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: #fff;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-background);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-border);
+/* Foco visible en todo lo que se pueda enfocar. Nunca se quita sin reemplazo. */
+:focus-visible {
+  outline: 2px solid var(--color-accent-soft);
+  outline-offset: 3px;
   border-radius: 3px;
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 4px;
+}
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-muted);
+  background: var(--color-subtle);
+}
+
+/* ===========================================================================
+   Entrada progresiva de secciones
+   ---------------------------------------------------------------------------
+   IntersectionObserver añade `.is-visible`. Sólo `opacity` y `transform`, que
+   son propiedades de compositor: no provocan layout ni repaint del documento.
+   Sin JS, el <noscript> del layout lo deja todo visible; con
+   prefers-reduced-motion no hay animación, no una más corta.
+   =========================================================================== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+/* Las cifras no deben cambiar de ancho mientras el contador corre. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ===========================================================================
+   Evidencia
+   ---------------------------------------------------------------------------
+   El enlace a la línea exacta. Se lee como una nota al pie, no como un botón:
+   la página se comporta como el agente, que no afirma nada que no sustente.
+   =========================================================================== */
+
+.evidence {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--color-subtle);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-border-strong);
+  transition: color 160ms ease, text-decoration-color 160ms ease;
+  white-space: nowrap;
+}
+
+.evidence:hover,
+.evidence:focus-visible {
+  color: var(--color-accent);
+  text-decoration-color: currentColor;
+}
+
+/* ===========================================================================
+   Apertura de casos de estudio
+   ---------------------------------------------------------------------------
+   grid-template-rows 0fr → 1fr anima la altura sin medir nada en JS y sin
+   `max-height` inventado que corte el contenido largo.
+   =========================================================================== */
+
+.collapsible {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.collapsible[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+.collapsible > * {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ===========================================================================
+   prefers-reduced-motion
+   ---------------------------------------------------------------------------
+   No "menos animación": ninguna. Los elementos aparecen en su estado final.
+   =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .collapsible {
+    transition: none !important;
+  }
 }

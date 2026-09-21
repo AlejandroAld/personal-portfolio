@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# .env.example sí se versiona: documenta qué variables existen y no lleva
+# ninguna credencial. Todo lo NEXT_PUBLIC_ es público por definición.
+!.env.example
 
 # vercel
 .vercel

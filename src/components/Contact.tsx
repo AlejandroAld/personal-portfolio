@@ -1,52 +1,51 @@
-import { Mail, Linkedin, Github, Send } from "lucide-react";
+import type { Dictionary } from "@/content/dictionary";
+import { contacto } from "@/content/perfil";
+import Reveal from "./Reveal";
+import SectionHeading from "./SectionHeading";
 
-export default function Contact() {
+/**
+ * Contacto.
+ *
+ * Sin teléfono y sin dirección. No es una omisión: el perfil los declara como
+ * datos no divulgables, y el sitio respeta la misma regla que el agente.
+ */
+export default function Contact({ dict }: { dict: Dictionary }) {
+  const links = [
+    { label: dict.contact.email, value: contacto.email, href: `mailto:${contacto.email}` },
+    { label: dict.contact.linkedin, value: "in/jose-alejandro-aldama-ramos", href: contacto.linkedin },
+    { label: dict.contact.github, value: "@AlejandroAld", href: contacto.github },
+  ];
+
   return (
-    <section id="contact" className="py-24 px-6">
-      <div className="max-w-xl mx-auto text-center">
-        <Send size={20} className="text-accent mx-auto mb-4" />
-        <h2 className="text-2xl font-bold mb-4">Get In Touch</h2>
-        <p className="text-muted leading-relaxed mb-8">
-          I&apos;m currently open to new opportunities and collaborations. Whether
-          you have a project idea, a question, or just want to connect — feel
-          free to reach out.
-        </p>
+    <section id="contact" className="scroll-mt-20 border-t border-border px-4 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto max-w-5xl">
+        <SectionHeading eyebrow={dict.contact.eyebrow} title={dict.contact.title} intro={dict.contact.body} />
 
-        <a
-          href="mailto:josealejandroaldamaramos@gmail.com"
-          className="inline-flex items-center gap-2 border border-accent text-accent px-6 py-3 rounded text-sm font-mono hover:bg-accent/10 transition-colors mb-8"
-        >
-          <Mail size={16} />
-          Say Hello
-        </a>
+        <Reveal>
+          <ul className="mt-10 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
+            {links.map((link) => (
+              <li key={link.href} className="bg-bg">
+                <a
+                  href={link.href}
+                  target={link.href.startsWith("mailto:") ? undefined : "_blank"}
+                  rel={link.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
+                  className="group block px-5 py-5 transition-colors hover:bg-surface"
+                >
+                  <span className="block font-mono text-[0.6875rem] tracking-wide text-subtle uppercase">
+                    {link.label}
+                  </span>
+                  <span className="mt-1.5 block truncate text-sm text-fg transition-colors group-hover:text-accent">
+                    {link.value}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
 
-        <div className="flex items-center justify-center gap-6 mt-4">
-          <a
-            href="https://www.linkedin.com/in/jose-alejandro-aldama-ramos/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted hover:text-accent transition-colors"
-            aria-label="LinkedIn"
-          >
-            <Linkedin size={22} />
-          </a>
-          <a
-            href="https://github.com/AlejandroAld"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted hover:text-accent transition-colors"
-            aria-label="GitHub"
-          >
-            <Github size={22} />
-          </a>
-          <a
-            href="mailto:josealejandroaldamaramos@gmail.com"
-            className="text-muted hover:text-accent transition-colors"
-            aria-label="Email"
-          >
-            <Mail size={22} />
-          </a>
-        </div>
+          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-subtle text-pretty">
+            {dict.contact.availability}
+          </p>
+        </Reveal>
       </div>
     </section>
   );
