@@ -11,7 +11,16 @@ import { CITES, type CiteKey } from "@/lib/evidence";
  * bloque o al enfocarlo con el teclado. Sigue siendo alcanzable con tabulador,
  * que es lo que lo separa de esconderlo de verdad.
  */
-export default function SourceLink({ cite, className = "" }: { cite: CiteKey; className?: string }) {
+export default function SourceLink({
+  cite,
+  ariaLabel,
+  className = "",
+}: {
+  cite: CiteKey;
+  /** Plantilla del diccionario; `{label}` se sustituye por la línea citada. */
+  ariaLabel: string;
+  className?: string;
+}) {
   const { href, label } = CITES[cite];
   return (
     <a
@@ -19,7 +28,7 @@ export default function SourceLink({ cite, className = "" }: { cite: CiteKey; cl
       target="_blank"
       rel="noopener noreferrer"
       className={`source-link ${className}`}
-      aria-label={`Source: ${label} — opens in a new tab`}
+      aria-label={ariaLabel.replace("{label}", label)}
     >
       <span aria-hidden="true">↗ </span>
       {label}

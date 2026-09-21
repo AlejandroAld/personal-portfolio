@@ -41,6 +41,8 @@ export interface Perfil {
     readonly nombre: string;
     readonly alias: string;
     readonly titular: string;
+    /** Párrafo del héroe del sitio público. `resumen` es la versión completa del agente. */
+    readonly presentacion: string;
     readonly ubicacion: string;
     readonly disponibilidad: string;
     readonly idiomas: readonly { readonly idioma: string; readonly nivel: string }[];

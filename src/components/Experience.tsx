@@ -83,7 +83,7 @@ export default function Experience({ dict }: { dict: Dictionary }) {
                   </div>
                 </div>
 
-                {cite && <SourceLink cite={cite} />}
+                {cite && <SourceLink cite={cite} ariaLabel={dict.footer.sourceAria} />}
               </StaggerItem>
             );
           })}

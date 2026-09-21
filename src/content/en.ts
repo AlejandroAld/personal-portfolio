@@ -53,18 +53,18 @@ const en: Dictionary = {
     eyebrow: "AI Engineer · Guadalajara, Mexico",
     positioning: "I take AI systems to production",
     positioningAccent: "and keep them running there.",
+    // Traducción de `persona.presentacion` y `persona.disponibilidad` del YAML.
     summary:
-      "Technical owner of the generative AI systems in production at an automotive group, with a peer-reviewed publication in NLP behind me. I work the stretch from pilot to production — tool calling against real business systems, evaluation anchored in real failure modes, guardrails, tracing, and cost per interaction.",
+      "Technical owner of the generative AI systems in production at an automotive group, with a peer-reviewed publication in NLP behind me. I work the stretch from pilot to production: tool calling against real business systems, evaluation anchored in real failure modes, guardrails, tracing and cost per interaction. I also build the internal platforms where a person reviews, approves and corrects what the agent produced before it takes effect.",
     availability:
-      "Open to AI engineering roles in Mexico — on-site, hybrid or remote. Available to relocate to Mexico City.",
+      "Open to AI engineering roles in Mexico — on-site, hybrid or remote. Open to relocation.",
     ctaContact: "Get in touch",
     ctaProjects: "See the work",
     ctaResume: "Download CV",
   },
 
   metrics: {
-    sourceNote: "Results from my current role at Grupo Dalton.",
-    toWord: "to",
+    sourceNote: "Results from my current role.",
     items: [
       {
         value: "−92%",
@@ -76,16 +76,11 @@ const en: Dictionary = {
         cite: "costReduction",
       },
       {
-        // Antes y después literal, no "−79%": la cifra de origen dice cuánto
-        // trabajo había ahí, y el porcentaje solo se lo traga.
-        value: "10 h",
-        before: "48 h",
-        countFrom: 48,
-        countTo: 10,
-        suffix: " h",
-        label: "of weekly process time",
-        context: "The same operational process, before and after the system",
-        cite: "processHours",
+        value: "4",
+        countTo: 4,
+        label: "agents in production",
+        context: "Conversational agents on live customer traffic, each with its own session state, tool catalog and conversation store.",
+        cite: "fourAgents",
       },
       {
         // "Miles" y "alcance nacional" se quedan vagos a propósito: es una
@@ -112,7 +107,7 @@ const en: Dictionary = {
           "Technical owner of the generative AI systems in production, end to end: architecture, integration with the business systems, deployment, security, evaluation and monitoring.",
         highlights: [
           "Inherited a system of more than 180 nodes where logic was scattered, context was lost between hops and errors weren't reproducible. Rebuilt it onto a single traceable orchestrator with explicit state — monthly operating cost fell 92%.",
-          "The operational process went from taking 48 hours a week to 10.",
+          "Cut a recurring calculation from 48 to 10 hours of manual work per week, and made it auditable. Before the system, the calculation left no trace and its error rate could not be measured.",
           "The systems I run serve four separate business units inside the group.",
           "The internal communications bot runs nationwide and reaches thousands of advisors across the group.",
           "Four conversational agents with real customer traffic on WhatsApp Business API, each with its own session state, tool catalog and conversation store.",
@@ -121,7 +116,6 @@ const en: Dictionary = {
           "Anti-hallucination guardrails with output validation that blocks answers not grounded in a tool result, plus reviewer agents that audit before the customer sees anything.",
           "An MCP server in Node on Cloud Run with OAuth and per-role permissions, exposing internal systems as a natural-language connector.",
           "A deterministic state machine on Cloud Functions for the accounting processes that require reproducibility — deliberately with no model in the path.",
-          "Before the system, margin calculation left no trail: there was no way to reconstruct how a figure had been reached, so the error rate couldn't be measured at all. The engine gave it an auditable history, which is the precondition for measuring anything.",
           "Access control across the architecture: granular RBAC, least privilege per tool, tenant isolation, and OAuth 2.0 / JWT on every integration touching customer data.",
         ],
       },
@@ -171,7 +165,6 @@ const en: Dictionary = {
         title: "CV agent — an Open Responses server",
         summary:
           "A conversational agent over my own profile, built on the open interoperability spec rather than as a chatbot over a PDF. It implements POST /v1/responses in sync and SSE streaming modes, runs an agent loop with server-side tools, and yields control when a client declares its own function tools.",
-        href: "https://github.com/AlejandroAld/cv-agent",
         hrefLabel: "View code",
         featured: true,
         bullets: [
@@ -301,6 +294,7 @@ const en: Dictionary = {
   },
 
   footer: {
+    sourceAria: "Source: {label} — opens in a new tab",
     generated: "Every fact on this page is generated from a single YAML file — the same source of truth my CV agent answers from.",
     generatedLink: "See perfil.yaml",
     builtWith: "Next.js, TypeScript, Tailwind. Hero background is a hand-written WebGL shader.",

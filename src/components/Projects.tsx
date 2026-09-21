@@ -35,6 +35,9 @@ export default function Projects({ dict }: { dict: Dictionary }) {
             const copy = dict.projects.items[proyecto.id];
             if (!copy) return null;
             const stack = terms(proyecto.stack, dict);
+            // El enlace sale del YAML (`repo`); el diccionario sólo lo cubre
+            // cuando el destino no es un repositorio, como el artículo.
+            const href = proyecto.repo || copy.href;
 
             return (
               <ProjectCard key={proyecto.id} featured={copy.featured}>
@@ -74,9 +77,9 @@ export default function Projects({ dict }: { dict: Dictionary }) {
                 </ul>
 
                 <div className="mt-5 flex items-center gap-4 border-t border-border pt-4">
-                  {copy.href ? (
+                  {href ? (
                     <a
-                      href={copy.href}
+                      href={href}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-mono text-xs text-accent transition-colors hover:text-accent-soft"

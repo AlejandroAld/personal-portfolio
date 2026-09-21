@@ -12,11 +12,14 @@ import { Reveal, Stagger, StaggerItem } from "./Reveal";
  * respeta la misma regla que el agente.
  */
 export default function Contact({ dict }: { dict: Dictionary }) {
+  // Lo visible se deriva de las URLs del YAML: si cambia un handle allá, cambia
+  // aquí sin que nadie tenga que acordarse de este archivo.
+  const handle = (url: string) => new URL(url).pathname.replace(/^\/|\/$/g, "");
   const entries = [
     { label: dict.contact.email, value: contacto.email, href: `mailto:${contacto.email}`, external: false },
     { label: dict.contact.location, value: persona.ubicacion, href: null, external: false },
-    { label: dict.contact.linkedin, value: "in/jose-alejandro-aldama-ramos", href: contacto.linkedin, external: true },
-    { label: dict.contact.github, value: "@AlejandroAld", href: contacto.github, external: true },
+    { label: dict.contact.linkedin, value: handle(contacto.linkedin), href: contacto.linkedin, external: true },
+    { label: dict.contact.github, value: `@${handle(contacto.github)}`, href: contacto.github, external: true },
   ];
 
   return (

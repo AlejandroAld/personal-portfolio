@@ -50,7 +50,7 @@ export default function Thinking({ dict }: { dict: Dictionary }) {
                 </div>
               </div>
 
-              {item.cites[0] && <SourceLink cite={item.cites[0]} />}
+              {item.cites[0] && <SourceLink cite={item.cites[0]} ariaLabel={dict.footer.sourceAria} />}
             </StaggerItem>
           ))}
         </Stagger>
