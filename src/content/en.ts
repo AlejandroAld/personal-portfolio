@@ -4,9 +4,9 @@
  * Todo sale de perfil.yaml del repo del agente. Ninguna cifra, fecha ni
  * proyecto se inventa: lo que no está en la fuente de verdad, no está aquí.
  *
- * Las cuatro métricas de la tira son las ÚNICAS cifras de resultado que el
- * perfil cuantifica y que sirven como titular. Si alguna se quita del YAML,
- * se quita de aquí; no se sustituye por una estimación.
+ * Las tres métricas de la tira salen del rol actual y están todas en el YAML.
+ * Si alguna se quita de la fuente de verdad, se quita de aquí; no se sustituye
+ * por una estimación.
  */
 
 import type { Dictionary } from "./dictionary";
@@ -64,7 +64,8 @@ const en: Dictionary = {
   },
 
   metrics: {
-    sourceNote: "Results from four different employers and projects.",
+    sourceNote: "Results from my current role at Grupo Dalton.",
+    toWord: "to",
     items: [
       {
         value: "−92%",
@@ -72,30 +73,27 @@ const en: Dictionary = {
         prefix: "−",
         suffix: "%",
         label: "monthly operating cost",
-        context: "Grupo Dalton — rebuilt a 180+ node system onto one traceable orchestrator, while volume grew",
+        context: "Rebuilt a 180+ node system onto one traceable orchestrator, while the volume handled grew",
         cite: "costReduction",
+      },
+      {
+        // Antes y después literal, no "−79%": la cifra de origen dice cuánto
+        // trabajo había ahí, y el porcentaje solo se lo traga.
+        value: "10 h",
+        before: "48 h",
+        countFrom: 48,
+        countTo: 10,
+        suffix: " h",
+        label: "of weekly process time",
+        context: "The same operational process, before and after the system",
+        cite: "processHours",
       },
       {
         value: "4",
         countTo: 4,
-        label: "agents in production",
-        context: "Grupo Dalton — real customer traffic on WhatsApp Business API",
-        cite: "fourAgents",
-      },
-      {
-        value: "96",
-        countTo: 96,
-        label: "PageSpeed, up from 34",
-        context: "Public site migration — LCP down from 8.3s to 2.5s",
-        cite: "webMigration",
-      },
-      {
-        value: "40+",
-        countTo: 40,
-        suffix: "+",
-        label: "users on a financial dashboard",
-        context: "L'Oréal — non-technical business users, across Mexico operations",
-        cite: "lorealDashboard",
+        label: "business units served",
+        context: "Separate lines of business inside the group, under NDA",
+        cite: "businessUnits",
       },
     ],
   },
@@ -111,12 +109,15 @@ const en: Dictionary = {
           "Technical owner of the generative AI systems in production, end to end: architecture, integration with the business systems, deployment, security, evaluation and monitoring.",
         highlights: [
           "Inherited a system of more than 180 nodes where logic was scattered, context was lost between hops and errors weren't reproducible. Rebuilt it onto a single traceable orchestrator with explicit state — monthly operating cost fell 92%.",
+          "The operational process went from taking 48 hours a week to 10.",
+          "The systems I run serve four separate business units inside the group.",
           "Four conversational agents with real customer traffic on WhatsApp Business API, each with its own session state, tool catalog and conversation store.",
           "Tool calling on self-hosted n8n over Kubernetes with Claude via the Anthropic API on Azure AI Foundry: a dozen-plus custom tools on HTTP endpoints, structured output with JSON Schema, state-machine routing and human escalation.",
           "Evaluation strategy from scratch: an offline suite anchored in real production failure modes that runs on every change and decides whether a prompt change ships or gets reverted.",
           "Anti-hallucination guardrails with output validation that blocks answers not grounded in a tool result, plus reviewer agents that audit before the customer sees anything.",
           "An MCP server in Node on Cloud Run with OAuth and per-role permissions, exposing internal systems as a natural-language connector.",
           "A deterministic state machine on Cloud Functions for the accounting processes that require reproducibility — deliberately with no model in the path.",
+          "Before the system, margin calculation left no trail: there was no way to reconstruct how a figure had been reached, so the error rate couldn't be measured at all. The engine gave it an auditable history, which is the precondition for measuring anything.",
           "Access control across the architecture: granular RBAC, least privilege per tool, tenant isolation, and OAuth 2.0 / JWT on every integration touching customer data.",
         ],
       },

@@ -14,11 +14,14 @@ import { useEffect, useRef, useState } from "react";
  */
 export default function Counter({
   to,
+  from = 0,
   prefix = "",
   suffix = "",
   duration = 900,
 }: {
   to: number;
+  /** Arranca aquí. Con `from > to` el contador baja, que es el punto. */
+  from?: number;
   prefix?: string;
   suffix?: string;
   duration?: number;
@@ -48,7 +51,7 @@ export default function Counter({
           const t = Math.min(1, (now - start) / duration);
           // easeOutCubic: arranca rápido y asienta, sin rebote.
           const eased = 1 - Math.pow(1 - t, 3);
-          setShown(Math.round(eased * to));
+          setShown(Math.round(from + eased * (to - from)));
           if (t < 1) frame = requestAnimationFrame(tick);
         };
         frame = requestAnimationFrame(tick);
@@ -61,7 +64,7 @@ export default function Counter({
       observer.disconnect();
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [to, duration]);
+  }, [to, from, duration]);
 
   return (
     <span ref={ref} className="tnum">

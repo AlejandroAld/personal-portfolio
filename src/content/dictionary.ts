@@ -19,9 +19,16 @@ export type Locale = "en" | "es";
 
 /** Un número de la tira. TODOS salen de perfil.yaml: ninguno se inventa. */
 export interface Metric {
-  /** Lo que se renderiza en HTML antes de que corra el contador. */
+  /** El estado final, ya renderizado en el servidor. Existe sin JS. */
   readonly value: string;
+  /**
+   * El "antes" de un par antes/después, cuando la cifra de origen dice más
+   * que la reducción calculada: 48 h → 10 h es más honesto que "−79%".
+   */
+  readonly before?: string;
   readonly countTo?: number;
+  /** El contador arranca aquí en vez de en cero, para que baje. */
+  readonly countFrom?: number;
   readonly prefix?: string;
   readonly suffix?: string;
   readonly label: string;
@@ -110,6 +117,8 @@ export interface Dictionary {
 
   readonly metrics: {
     readonly sourceNote: string;
+    /** Se lee en lugar de la flecha: "48 h a 10 h", no "48 h flecha 10 h". */
+    readonly toWord: string;
     readonly items: readonly Metric[];
   };
 

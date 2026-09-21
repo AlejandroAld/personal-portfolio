@@ -64,7 +64,7 @@ tests/
 El orden es el de un portafolio, no el de un proyecto:
 
 1. **Héroe** — una frase de posicionamiento y dos salidas: contacto y trabajo.
-2. **Métricas** — cuatro números de cuatro empleadores y proyectos distintos.
+2. **Métricas** — tres números del rol actual, todos cuantificados en el YAML.
 3. **Experiencia** — los cuatro puestos. Cada uno titulado con su RESULTADO
    cuando el perfil lo cuantifica; Grupo TI México no tiene métrica en el
    YAML, así que se titula por lo que resolvió.
@@ -185,7 +185,7 @@ Lighthouse móvil contra `next build && next start`, mediana de 3 corridas:
 | `/en` | **99** | **100** | **100** | **100** |
 | `/es` | **97** | **100** | **100** | **100** |
 
-FCP 0.91 s · LCP 2.27–2.57 s · TBT 27–29 ms · CLS 0.001
+FCP 0.91 s · LCP 2.16–2.57 s · TBT 27–39 ms · CLS 0.001
 
 Costo de `motion`, medido con dos builds del mismo contenido:
 
@@ -224,7 +224,9 @@ npm run sync:perfil    # re-sincroniza perfil.yaml al SHA fijado en evidence.ts
 
 1. Cambia `CV_AGENT_SHA` en `src/lib/evidence.ts`.
 2. `npm run sync:perfil`
-3. Revisa los números de línea de `CITES`: están fijados a ese SHA.
+3. **Revisa los números de línea de `CITES`.** Están fijados a ese SHA, y
+   cualquier línea añadida al YAML desplaza todas las de abajo. No es opcional:
+   una cita desfasada apunta a una afirmación que no es la que dice.
 
 ---
 

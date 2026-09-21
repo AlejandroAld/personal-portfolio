@@ -25,7 +25,9 @@ export default async function Image({ params }: { params: Promise<{ lang: string
   // El guion menos tipográfico no está en todas las fuentes del renderizador;
   // en la tarjeta se usa uno ASCII para que nunca salga un cuadro vacío.
   const metrics = dict.metrics.items.map((m: (typeof dict.metrics.items)[number]) => ({
-    value: m.value.replace("−", "-"),
+    // El par antes → después se arma aquí: la tarjeta compartida enseña la
+    // misma cifra literal que la página.
+    value: (m.before ? `${m.before} → ${m.value}` : m.value).replace("−", "-"),
     label: m.label,
   }));
 

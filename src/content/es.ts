@@ -64,7 +64,8 @@ const es: Dictionary = {
   },
 
   metrics: {
-    sourceNote: "Resultados de cuatro empleadores y proyectos distintos.",
+    sourceNote: "Resultados del rol actual, en Grupo Dalton.",
+    toWord: "a",
     items: [
       {
         value: "−92%",
@@ -72,30 +73,27 @@ const es: Dictionary = {
         prefix: "−",
         suffix: "%",
         label: "costo mensual de operación",
-        context: "Grupo Dalton — reconstruí un sistema de más de 180 nodos sobre un orquestador trazable, mientras el volumen crecía",
+        context: "Reconstruí un sistema de más de 180 nodos sobre un orquestador trazable, mientras el volumen atendido crecía",
         cite: "costReduction",
+      },
+      {
+        // Antes y después literal, no "−79%": la cifra de origen dice cuánto
+        // trabajo había ahí, y el porcentaje sólo se lo traga.
+        value: "10 h",
+        before: "48 h",
+        countFrom: 48,
+        countTo: 10,
+        suffix: " h",
+        label: "de proceso semanal",
+        context: "El mismo proceso operativo, antes y después del sistema",
+        cite: "processHours",
       },
       {
         value: "4",
         countTo: 4,
-        label: "agentes en producción",
-        context: "Grupo Dalton — tráfico real de clientes sobre WhatsApp Business API",
-        cite: "fourAgents",
-      },
-      {
-        value: "96",
-        countTo: 96,
-        label: "de PageSpeed, desde 34",
-        context: "Migración de sitio público — LCP de 8.3 s a 2.5 s",
-        cite: "webMigration",
-      },
-      {
-        value: "40+",
-        countTo: 40,
-        suffix: "+",
-        label: "usuarios en un dashboard financiero",
-        context: "L'Oréal — perfiles de negocio no técnicos, operación México",
-        cite: "lorealDashboard",
+        label: "unidades de negocio atendidas",
+        context: "Líneas de negocio distintas dentro del grupo, bajo acuerdo de confidencialidad",
+        cite: "businessUnits",
       },
     ],
   },
@@ -111,12 +109,15 @@ const es: Dictionary = {
           "Responsable técnico de las soluciones de IA generativa en producción, de extremo a extremo: arquitectura, integración con los sistemas de negocio, despliegue, seguridad, evaluación y monitoreo.",
         highlights: [
           "Recibí un sistema de más de 180 nodos donde la lógica estaba repartida, se perdía contexto entre saltos y los errores no eran reproducibles. Lo reconstruí sobre un orquestador único y trazable con estado explícito: el costo mensual de operación bajó 92%.",
+          "El proceso operativo pasó de consumir 48 horas semanales a 10.",
+          "Los sistemas que opero dan servicio a cuatro unidades de negocio distintas del grupo.",
           "Cuatro agentes conversacionales con tráfico real de clientes sobre WhatsApp Business API, cada uno con su propio estado de sesión, catálogo de herramientas y almacén de conversación.",
           "Tool calling sobre n8n autohospedado en Kubernetes con Claude vía la API de Anthropic en Azure AI Foundry: más de una docena de herramientas propias en endpoints HTTP, salidas estructuradas con JSON Schema, enrutamiento por máquina de estados y escalamiento a humano.",
           "Estrategia de evaluación desde cero: una suite offline anclada en modos de falla reales de producción que corre ante cada cambio y decide si un cambio de prompt sale o se revierte.",
           "Guardarraíles anti-alucinación con validación de salida que bloquea respuestas no sustentadas en el resultado de una herramienta, más agentes revisores que auditan antes de que el cliente vea nada.",
           "Un servidor MCP en Node sobre Cloud Run con OAuth y permisos por rol, que expone sistemas internos como conector para consulta en lenguaje natural.",
           "Una máquina de estados determinista sobre Cloud Functions para los procesos contables que exigen reproducibilidad, deliberadamente sin modelo de por medio.",
+          "Antes del sistema, el cálculo de márgenes no tenía trazabilidad: no se podía reconstruir cómo se había llegado a una cifra, así que la tasa de error era inmedible. El motor lo dejó con historial auditable, que es la condición para siquiera poder medirla.",
           "Control de acceso de toda la arquitectura: RBAC granular, permisos mínimos por herramienta, aislamiento por tenant y OAuth 2.0 / JWT en cada integración que toca datos de clientes.",
         ],
       },
