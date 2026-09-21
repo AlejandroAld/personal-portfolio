@@ -113,29 +113,6 @@ body {
   height: 100%;
 }
 
-/* ===========================================================================
-   Entrada progresiva de secciones
-   ---------------------------------------------------------------------------
-   IntersectionObserver añade `.is-visible`. Sólo `opacity` y `transform`, que
-   son propiedades de compositor: no provocan layout ni repaint del documento.
-   Sin JS, el <noscript> del layout lo deja todo visible; con
-   prefers-reduced-motion no hay animación, no una más corta.
-   =========================================================================== */
-
-.reveal {
-  opacity: 0;
-  transform: translateY(14px);
-}
-
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: var(--reveal-delay, 0ms);
-}
-
 /* Las cifras no deben cambiar de ancho mientras el contador corre. */
 .tnum {
   font-variant-numeric: tabular-nums;
@@ -143,51 +120,42 @@ body {
 }
 
 /* ===========================================================================
-   Evidencia
+   Trazabilidad en hover
    ---------------------------------------------------------------------------
-   El enlace a la línea exacta. Se lee como una nota al pie, no como un botón:
-   la página se comporta como el agente, que no afirma nada que no sustente.
+   La página ya no lleva una cita bajo cada bloque: el pie explica de una vez
+   que todo se genera desde un YAML. Lo que queda es esto, para quien quiera
+   comprobar un número concreto.
+
+   `absolute` para que no ocupe espacio en reposo, y visible al pasar el cursor
+   por el bloque o al llegar con el teclado. Sigue en el orden de tabulación:
+   no está escondido, está en reposo.
    =========================================================================== */
 
-.evidence {
+.source-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   line-height: 1;
-  color: var(--color-subtle);
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--color-border-strong);
-  transition: color 160ms ease, text-decoration-color 160ms ease;
   white-space: nowrap;
+  color: var(--color-subtle);
+  padding: 0.25rem 0.375rem;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  opacity: 0;
+  transition: opacity 160ms ease, color 160ms ease;
 }
 
-.evidence:hover,
-.evidence:focus-visible {
+/* `:focus` y no sólo `:focus-visible`: un elemento enfocable que no se ve es
+   un fallo de foco visible, llegue el foco como llegue. */
+.group:hover > .source-link,
+.group:focus-within > .source-link,
+.source-link:hover,
+.source-link:focus {
+  opacity: 1;
   color: var(--color-accent);
-  text-decoration-color: currentColor;
-}
-
-/* ===========================================================================
-   Apertura de casos de estudio
-   ---------------------------------------------------------------------------
-   grid-template-rows 0fr → 1fr anima la altura sin medir nada en JS y sin
-   `max-height` inventado que corte el contenido largo.
-   =========================================================================== */
-
-.collapsible {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 420ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.collapsible[data-open="true"] {
-  grid-template-rows: 1fr;
-}
-
-.collapsible > * {
-  overflow: hidden;
-  min-height: 0;
 }
 
 /* ===========================================================================
@@ -210,12 +178,4 @@ body {
     transition-delay: 0ms !important;
   }
 
-  .reveal {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  .collapsible {
-    transition: none !important;
-  }
 }

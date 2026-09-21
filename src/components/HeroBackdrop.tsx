@@ -32,9 +32,11 @@ export default function HeroBackdrop() {
     // Movimiento reducido: no es una animación más corta, es ninguna.
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
 
-    // Un equipo modesto tiene mejores cosas que hacer con su GPU que pintar
-    // un degradado decorativo detrás de un texto que ya se lee bien.
-    if ((navigator.hardwareConcurrency ?? 8) <= 4) return;
+    // Sólo se descarta de entrada lo verdaderamente mínimo. Cuatro núcleos
+    // descartaba equipos que pintan esto sin despeinarse —y, de paso, la
+    // máquina donde se mide—. El corte de verdad no lo pone este número sino
+    // la medición de fps de glow.ts, que aborta si el shader no rinde.
+    if ((navigator.hardwareConcurrency ?? 8) <= 2) return;
 
     let stop: (() => void) | null = null;
     let cancelled = false;

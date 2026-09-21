@@ -1,0 +1,97 @@
+import type { Dictionary } from "@/content/dictionary";
+import { perfil, terms } from "@/content/perfil";
+import ProjectCard from "./ProjectCard";
+import SectionHeading from "./SectionHeading";
+import { Stagger } from "./Reveal";
+
+/**
+ * Los siete proyectos.
+ *
+ * El agente de CV es UNA tarjeta. Ocupa dos columnas y lleva sus viñetas
+ * porque es el que más dice de cómo trabajo, no porque la página sea sobre él.
+ *
+ * El orden y los stacks salen de perfil.json; agregar un proyecto al YAML lo
+ * mete aquí solo, en cuanto tenga su prosa en el diccionario.
+ */
+export default function Projects({ dict }: { dict: Dictionary }) {
+  // El destacado primero; el resto en el orden del perfil.
+  const ordered = [...perfil.proyectos].sort((a, b) => {
+    const fa = dict.projects.items[a.id]?.featured ? 0 : 1;
+    const fb = dict.projects.items[b.id]?.featured ? 0 : 1;
+    return fa - fb;
+  });
+
+  return (
+    <section id="projects" className="scroll-mt-20 border-t border-border px-4 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto max-w-5xl">
+        <SectionHeading
+          eyebrow={dict.projects.eyebrow}
+          title={dict.projects.title}
+          intro={dict.projects.intro}
+        />
+
+        <Stagger className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" step={0.05}>
+          {ordered.map((proyecto) => {
+            const copy = dict.projects.items[proyecto.id];
+            if (!copy) return null;
+            const stack = terms(proyecto.stack, dict);
+
+            return (
+              <ProjectCard key={proyecto.id} featured={copy.featured}>
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-base font-semibold tracking-tight text-fg text-balance">
+                    {copy.title}
+                  </h3>
+                  {copy.featured && (
+                    <span className="shrink-0 rounded bg-accent/10 px-2 py-0.5 font-mono text-[0.625rem] text-accent">
+                      {dict.projects.inProgress}
+                    </span>
+                  )}
+                </div>
+
+                <p className="mt-3 text-sm leading-relaxed text-muted text-pretty">{copy.summary}</p>
+
+                {copy.bullets && (
+                  <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+                    {copy.bullets.map((b) => (
+                      <li key={b} className="flex gap-2 text-xs leading-relaxed text-subtle">
+                        <span aria-hidden="true" className="mt-[0.4rem] h-1 w-1 shrink-0 rounded-full bg-accent" />
+                        <span className="text-pretty">{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                <ul className="mt-5 flex flex-wrap gap-1.5">
+                  {stack.map((tech) => (
+                    <li
+                      key={tech}
+                      className="rounded border border-border px-2 py-1 font-mono text-[0.6875rem] text-subtle"
+                    >
+                      {tech}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-5 flex items-center gap-4 border-t border-border pt-4">
+                  {copy.href ? (
+                    <a
+                      href={copy.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-xs text-accent transition-colors hover:text-accent-soft"
+                    >
+                      {copy.hrefLabel ?? dict.projects.viewCode} ↗
+                    </a>
+                  ) : (
+                    <span className="font-mono text-xs text-subtle">{dict.projects.privateRepo}</span>
+                  )}
+                </div>
+              </ProjectCard>
+            );
+          })}
+        </Stagger>
+      </div>
+    </section>
+  );
+}

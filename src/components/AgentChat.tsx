@@ -29,13 +29,85 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
  * reenvía la transcripción completa en cada turno.
  */
 
-import type { Dictionary } from "@/content/dictionary";
+import type { Locale } from "@/content/dictionary";
+
+export interface ChatStrings {
+  launch: string;
+  placeholder: string;
+  send: string;
+  sending: string;
+  suggestionsLabel: string;
+  suggestions: readonly string[];
+  you: string;
+  agent: string;
+  thinking: string;
+  reset: string;
+  liveLabel: string;
+  errorGeneric: string;
+  errorRateLimit: string;
+  errorOffline: string;
+  transcriptLabel: string;
+  disclaimer: string;
+}
 
 /**
- * Las cadenas salen del diccionario, no de una interfaz paralela: así el
- * contenido y el cliente no pueden desincronizarse mientras la demo espera.
+ * Las cadenas viven aquí y no en el diccionario porque la demo no está
+ * publicada: mantener un bloque muerto en los dos archivos de contenido sería
+ * ruido para quien los edita. Al publicarla, o se mueven al diccionario o se
+ * usan tal cual desde aquí; en ninguno de los dos casos hay que reescribirlas.
  */
-export type ChatStrings = Dictionary["demo"]["chat"];
+export const CHAT_STRINGS: Record<Locale, ChatStrings> = {
+  en: {
+    launch: "Start the conversation",
+    placeholder: "Ask about experience, stack, or a specific role…",
+    send: "Send",
+    sending: "Sending",
+    suggestionsLabel: "Try one of these",
+    suggestions: [
+      "What can't you do?",
+      "Do you have experience integrating with a banking core?",
+      "Evaluate me against this role: Kubernetes, Terraform, banking core",
+      "What's the most expensive technical mistake you've made?",
+    ],
+    you: "You",
+    agent: "Agent",
+    thinking: "Thinking",
+    reset: "Start over",
+    liveLabel: "Live",
+    errorGeneric: "The agent couldn't answer. Try again in a moment.",
+    errorRateLimit:
+      "You've hit the hourly limit for this public demo. It's capped per IP because a web page can't hold a credential — the cost, not the identity, is what gets protected.",
+    errorOffline: "The agent is unreachable right now.",
+    transcriptLabel: "Conversation with the CV agent",
+    disclaimer:
+      "The demo endpoint takes no credential and is rate-limited per IP. The Bearer-protected endpoint is for Open Responses clients, not for this page.",
+  },
+  es: {
+    launch: "Empezar la conversación",
+    placeholder: "Pregunta por experiencia, stack o una vacante concreta…",
+    send: "Enviar",
+    sending: "Enviando",
+    suggestionsLabel: "Prueba con una de estas",
+    suggestions: [
+      "¿Qué no sabes hacer?",
+      "¿Tienes experiencia integrando con un core bancario?",
+      "Evalúa mi vacante: Kubernetes, Terraform, core bancario",
+      "¿Cuál ha sido tu error técnico más caro?",
+    ],
+    you: "Tú",
+    agent: "Agente",
+    thinking: "Pensando",
+    reset: "Empezar de nuevo",
+    liveLabel: "En vivo",
+    errorGeneric: "El agente no pudo responder. Inténtalo en un momento.",
+    errorRateLimit:
+      "Llegaste al límite por hora de esta demo pública. Está topada por IP porque una página web no puede guardar una credencial: lo que se protege es el costo, no la identidad.",
+    errorOffline: "El agente no responde ahora mismo.",
+    transcriptLabel: "Conversación con el agente de CV",
+    disclaimer:
+      "El endpoint de la demo no lleva credencial y está limitado por IP. El endpoint protegido por Bearer es para clientes de Open Responses, no para esta página.",
+  },
+};
 
 const MAX_CHARS = 1200;
 
@@ -214,7 +286,7 @@ export default function AgentChat({
           <div>
             <p className="font-mono text-xs text-subtle">{strings.suggestionsLabel}</p>
             <ul className="mt-3 flex flex-col gap-2">
-              {strings.suggestions.map((s) => (
+              {strings.suggestions.map((s: string) => (
                 <li key={s}>
                   <button
                     type="button"

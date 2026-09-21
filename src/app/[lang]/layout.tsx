@@ -6,6 +6,7 @@ import "../globals.css";
 import type { Locale } from "@/content/dictionary";
 import { contacto, educacion, persona, publicacion } from "@/content/perfil";
 import { CV_AGENT_URL } from "@/lib/evidence";
+import MotionProvider from "@/components/Motion";
 import {
   LOCALES,
   SITE_URL,
@@ -79,7 +80,7 @@ function jsonLd(lang: Locale) {
     "@type": "Person",
     name: persona.nombre,
     alternateName: persona.alias,
-    jobTitle: dict.hero.thesis,
+    jobTitle: `${dict.hero.positioning} ${dict.hero.positioningAccent}`,
     description: dict.meta.description,
     url: absoluteUrl(`/${lang}`),
     email: `mailto:${contacto.email}`,
@@ -132,10 +133,16 @@ export default async function LocaleLayout({
           Sin JS las secciones siguen visibles. La entrada progresiva es una
           mejora, nunca un requisito para leer la página.
         */}
+        {/*
+          `motion` serializa el estado inicial como estilo en línea, así que sin
+          JS los bloques animados se quedarían invisibles. Una regla con
+          !important sí gana a un estilo en línea: la entrada progresiva es una
+          mejora, nunca un requisito para leer la página.
+        */}
         <noscript>
           <style
             dangerouslySetInnerHTML={{
-              __html: ".reveal{opacity:1!important;transform:none!important}",
+              __html: "[data-reveal]{opacity:1!important;transform:none!important}",
             }}
           />
         </noscript>
@@ -151,7 +158,7 @@ export default async function LocaleLayout({
         >
           {dict.nav.skipToContent}
         </a>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

@@ -1,97 +1,114 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import * as m from "motion/react-m";
+import { useReducedMotion, type Variants } from "motion/react";
+import type { ElementType, ReactNode } from "react";
 
 /**
- * Entrada progresiva al entrar en pantalla.
+ * Entrada al hacer scroll, y el escalonado de las listas de tarjetas.
  *
- * Un solo IntersectionObserver para toda la página, compartido a nivel de
- * módulo: cuarenta bloques no necesitan cuarenta observers. Cada elemento se
- * deja de observar en cuanto aparece, así que el costo termina con el scroll.
+ * `whileInView` con `once: true` anima una sola vez y se olvida: no hay estado
+ * que mantener ni observador que siga corriendo después.
  *
- * Tres salvaguardas, porque el modo de falla de este patrón es dejar contenido
- * permanentemente invisible, y eso es mucho peor que no animar:
- *
- *   1. Si el elemento ya está en pantalla al montar, se revela sin esperar al
- *      observer. Lo de arriba del pliegue no depende de una devolución de
- *      llamada asíncrona.
- *   2. El margen positivo revela un poco ANTES de entrar, así que el bloque ya
- *      está listo cuando llega la vista. Además evita que un scroll rápido lo
- *      salte: el observer calcula intersecciones al entregar, no de continuo.
- *   3. Con prefers-reduced-motion o sin IntersectionObserver, visible de
- *      inmediato. Sin JS, lo hace el <noscript> del layout.
+ * Con movimiento reducido las variantes se sustituyen por unas que no mueven
+ * ni funden nada. El elemento aparece en su estado final y ya.
  */
 
-let observer: IntersectionObserver | null = null;
+const EASE = [0.22, 1, 0.36, 1] as const;
 
-function reveal(el: Element) {
-  el.classList.add("is-visible");
-}
+const ENTER: Variants = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+};
 
-function sharedObserver(): IntersectionObserver | null {
-  if (observer) return observer;
-  if (typeof IntersectionObserver === "undefined") return null;
-  observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        reveal(entry.target);
-        observer?.unobserve(entry.target);
-      }
-    },
-    { rootMargin: "120px 0px 120px 0px", threshold: 0 },
-  );
-  return observer;
-}
+const STILL: Variants = {
+  hidden: { opacity: 1, y: 0 },
+  show: { opacity: 1, y: 0, transition: { duration: 0 } },
+};
 
-export default function Reveal({
+const VIEWPORT = { once: true, margin: "0px 0px -60px 0px" } as const;
+
+export function Reveal({
   children,
   delay = 0,
-  className = "",
+  className,
 }: {
   children: ReactNode;
-  /** Escalonado, en ms. Se usa con moderación: es ritmo, no decoración. */
+  /** Escalonado manual, en ms. Para listas prefiere `Stagger`. */
   delay?: number;
   className?: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const reduced =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (reduced) {
-      reveal(el);
-      return;
-    }
-
-    const box = el.getBoundingClientRect();
-    if (box.top < window.innerHeight && box.bottom > 0) {
-      reveal(el);
-      return;
-    }
-
-    const o = sharedObserver();
-    if (!o) {
-      reveal(el);
-      return;
-    }
-
-    o.observe(el);
-    return () => o.unobserve(el);
-  }, []);
-
+  const reduced = useReducedMotion();
   return (
-    <div
-      ref={ref}
-      className={`reveal ${className}`}
-      style={delay ? ({ "--reveal-delay": `${delay}ms` } as CSSProperties) : undefined}
+    <m.div
+      data-reveal=""
+      className={className}
+      variants={reduced ? STILL : ENTER}
+      initial="hidden"
+      whileInView="show"
+      viewport={VIEWPORT}
+      transition={reduced ? undefined : { delay: delay / 1000 }}
     >
       {children}
-    </div>
+    </m.div>
   );
 }
+
+/**
+ * Contenedor de una lista escalonada. Los hijos deben ser `StaggerItem`: el
+ * retraso lo reparte el padre, así que agregar o quitar tarjetas no obliga a
+ * recalcular ningún número a mano.
+ */
+export function Stagger({
+  children,
+  className,
+  as = "ul",
+  step = 0.06,
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: "ul" | "ol" | "div";
+  step?: number;
+}) {
+  const reduced = useReducedMotion();
+  const Tag = m[as] as ElementType;
+
+  return (
+    <Tag
+      data-reveal=""
+      className={className}
+      initial="hidden"
+      whileInView="show"
+      viewport={VIEWPORT}
+      variants={{
+        hidden: {},
+        show: { transition: { staggerChildren: reduced ? 0 : step } },
+      }}
+    >
+      {children}
+    </Tag>
+  );
+}
+
+export function StaggerItem({
+  children,
+  className,
+  as = "li",
+  id,
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: "li" | "div";
+  id?: string;
+}) {
+  const reduced = useReducedMotion();
+  const Tag = m[as] as ElementType;
+
+  return (
+    <Tag id={id} data-reveal="" className={className} variants={reduced ? STILL : ENTER}>
+      {children}
+    </Tag>
+  );
+}
+
+export default Reveal;

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 /**
@@ -23,7 +24,7 @@ export default function Nav({
 }: {
   links: readonly NavLink[];
   labels: { menu: string; close: string };
-  cta: NavLink;
+  cta: NavLink | null;
   languageSwitch: NavLink | null;
 }) {
   const [open, setOpen] = useState(false);
@@ -74,22 +75,27 @@ export default function Nav({
         </ul>
 
         <div className="flex items-center gap-2">
+          {/* `Link` y no `<a>`: la navegación entre idiomas es del cliente, y
+              eso es lo que deja que template.tsx la anime en vez de recargar
+              la página entera con un parpadeo. */}
           {languageSwitch && (
-            <a
+            <Link
               href={languageSwitch.href}
               hrefLang={languageSwitch.href.replace("/", "")}
-              className="hidden rounded px-2 py-1.5 font-mono text-xs text-muted transition-colors hover:text-fg sm:block"
+              className="rounded px-2 py-1.5 font-mono text-xs text-muted transition-colors hover:text-fg"
             >
               {languageSwitch.label}
-            </a>
+            </Link>
           )}
 
-          <a
-            href={cta.href}
-            className="hidden rounded border border-accent/60 px-3.5 py-1.5 font-mono text-xs text-accent transition-colors hover:bg-accent/10 sm:inline-block"
-          >
-            {cta.label}
-          </a>
+          {cta && (
+            <a
+              href={cta.href}
+              className="hidden rounded border border-accent/60 px-3.5 py-1.5 font-mono text-xs text-accent transition-colors hover:bg-accent/10 sm:inline-block"
+            >
+              {cta.label}
+            </a>
+          )}
 
           <button
             type="button"
@@ -113,7 +119,7 @@ export default function Nav({
       {open && (
         <div id="mobile-nav" className="border-t border-border bg-bg/95 backdrop-blur-md md:hidden">
           <ul className="mx-auto flex max-w-5xl flex-col gap-1 px-4 py-3 sm:px-6">
-            {[...links, cta].map((link) => (
+            {[...links, ...(cta ? [cta] : [])].map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
@@ -124,17 +130,6 @@ export default function Nav({
                 </a>
               </li>
             ))}
-            {languageSwitch && (
-              <li>
-                <a
-                  href={languageSwitch.href}
-                  className="block rounded px-2 py-2.5 font-mono text-xs text-muted transition-colors hover:bg-surface hover:text-fg"
-                  onClick={() => setOpen(false)}
-                >
-                  {languageSwitch.label}
-                </a>
-              </li>
-            )}
           </ul>
         </div>
       )}

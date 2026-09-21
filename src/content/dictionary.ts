@@ -6,8 +6,8 @@
  *   perfil.json  →  los HECHOS estructurales: fechas, empresas, puestos,
  *                   stacks, habilidades, estudios, publicación. Nunca se
  *                   reescriben a mano; salen de perfil.yaml.
- *   Dictionary   →  la PROSA: tesis, encabezados, el marco de cada caso de
- *                   estudio, los modos de falla, y las traducciones.
+ *   Dictionary   →  la PROSA: posicionamiento, encabezados, el titular de
+ *                   cada puesto, los proyectos, y las traducciones.
  *
  * Así una fecha mal puesta se arregla en el YAML y se corrige en los dos
  * idiomas a la vez, y ningún dato vive en dos lugares.
@@ -17,7 +17,7 @@ import type { CiteKey } from "@/lib/evidence";
 
 export type Locale = "en" | "es";
 
-/** Una métrica de portada. El contador anima hacia `countTo`. */
+/** Un número de la tira. TODOS salen de perfil.yaml: ninguno se inventa. */
 export interface Metric {
   /** Lo que se renderiza en HTML antes de que corra el contador. */
   readonly value: string;
@@ -25,33 +25,43 @@ export interface Metric {
   readonly prefix?: string;
   readonly suffix?: string;
   readonly label: string;
-  readonly detail: string;
+  /** De dónde viene: empresa o proyecto. Da contexto sin inflar el número. */
+  readonly context: string;
   readonly cite: CiteKey;
 }
 
-export interface CaseStudy {
-  readonly id: string;
-  /** id dentro de `proyectos` de perfil.json, de donde sale el stack. */
-  readonly perfilId?: string;
+/** Prosa de un puesto, indexada por el id de perfil.json. */
+export interface RoleCopy {
+  /**
+   * El titular. Cuando el puesto tiene métrica, va la MÉTRICA, no el nombre
+   * del proyecto: un resultado se lee en un segundo y un nombre propio no.
+   */
+  readonly headline: string;
+  readonly summary: string;
+  readonly highlights: readonly string[];
+}
+
+/** Prosa de un proyecto, indexada por el id de perfil.json. */
+export interface ProjectCopy {
   readonly title: string;
-  readonly kicker: string;
-  readonly problem: string;
-  readonly decision: string;
-  readonly result: string;
-  /** Sólo cuando el stack no viene de un proyecto del perfil. */
-  readonly stack?: readonly string[];
-  readonly repo?: string;
-  readonly cite: CiteKey;
+  readonly summary: string;
+  /** Enlace externo cuando lo hay: repo público, artículo, sitio. */
+  readonly href?: string;
+  readonly hrefLabel?: string;
+  /**
+   * Una tarjeta puede ocupar dos columnas y llevar más texto. Es para el
+   * proyecto que más dice de mí, no para el que más me gusta.
+   */
+  readonly featured?: boolean;
+  /** Sólo en la tarjeta destacada: qué va a poder verse cuando salga. */
+  readonly bullets?: readonly string[];
 }
 
 export interface FailureMode {
   readonly id: string;
   readonly title: string;
-  /** Qué se rompió, en concreto. */
   readonly symptom: string;
-  /** Qué hice. */
   readonly fix: string;
-  /** Por qué generaliza más allá de este bug. */
   readonly lesson: string;
   readonly cites: readonly CiteKey[];
 }
@@ -59,8 +69,7 @@ export interface FailureMode {
 export interface Dictionary {
   /**
    * `false` mientras la traducción esté a medias: el idioma queda fuera del
-   * sitemap y de los hreflang, y se marca noindex. Es preferible a publicar
-   * media página en el idioma equivocado y que un buscador la indexe así.
+   * sitemap y de los hreflang, y se marca noindex.
    */
   readonly complete: boolean;
   readonly locale: Locale;
@@ -75,11 +84,10 @@ export interface Dictionary {
   };
 
   readonly nav: {
-    readonly work: string;
-    readonly agent: string;
-    readonly cases: string;
-    readonly thinking: string;
-    readonly track: string;
+    readonly experience: string;
+    readonly projects: string;
+    readonly publication: string;
+    readonly skills: string;
     readonly contact: string;
     readonly menu: string;
     readonly close: string;
@@ -89,92 +97,60 @@ export interface Dictionary {
 
   readonly hero: {
     readonly eyebrow: string;
-    readonly thesis: string;
-    readonly thesisAccent: string;
+    /** Una frase de posicionamiento. Dos partes sólo para poder resaltar. */
+    readonly positioning: string;
+    readonly positioningAccent: string;
     readonly summary: string;
     readonly availability: string;
-    readonly ctaPrimary: string;
-    readonly ctaSecondary: string;
+    readonly ctaContact: string;
+    readonly ctaProjects: string;
     readonly ctaResume: string;
     readonly portraitAlt: string;
-    readonly metrics: readonly Metric[];
-    readonly evidenceNote: string;
   };
 
-  /**
-   * La sección del agente. Hoy es un teaser: el cliente de chat existe en la
-   * rama pero no se publica todavía, así que esta sección vende lo que viene
-   * en vez de disculparse por lo que falta.
-   *
-   * `chat` se conserva intacto para el día que la demo salga: encenderla es
-   * volver a importar el cliente en DemoSection, no reescribir contenido.
-   */
-  readonly demo: {
+  readonly metrics: {
+    readonly sourceNote: string;
+    readonly items: readonly Metric[];
+  };
+
+  readonly experience: {
+    readonly eyebrow: string;
+    readonly title: string;
+    readonly present: string;
+    readonly roles: Readonly<Record<string, RoleCopy>>;
+  };
+
+  readonly projects: {
     readonly eyebrow: string;
     readonly title: string;
     readonly intro: string;
-
-    /** Las etapas del flujo interno que la demo va a exponer. */
-    readonly stagesTitle: string;
-    readonly stages: readonly { readonly title: string; readonly body: string }[];
-
-    readonly whyTitle: string;
-    readonly why: string;
-
-    readonly ctaRepo: string;
-    readonly ctaRepoNote: string;
-
-    readonly exampleTitle: string;
-    readonly exampleNote: string;
-    /**
-     * Un intercambio real. Las respuestas son las que el perfil ya fija para
-     * esas preguntas, no redactadas para esta página.
-     */
-    readonly example: readonly { readonly q: string; readonly a: string }[];
-
-    readonly architectureTitle: string;
-    readonly architecture: readonly {
-      readonly title: string;
-      readonly body: string;
-      readonly cite: CiteKey;
-    }[];
-
-    /** Cadenas del cliente de chat. Sin uso mientras la demo no se publique. */
-    readonly chat: {
-      readonly launch: string;
-      readonly placeholder: string;
-      readonly send: string;
-      readonly sending: string;
-      readonly suggestionsLabel: string;
-      readonly suggestions: readonly string[];
-      readonly you: string;
-      readonly agent: string;
-      readonly thinking: string;
-      readonly reset: string;
-      readonly liveLabel: string;
-      readonly errorGeneric: string;
-      readonly errorRateLimit: string;
-      readonly errorOffline: string;
-      readonly transcriptLabel: string;
-      readonly disclaimer: string;
-    };
-  };
-
-  readonly cases: {
-    readonly eyebrow: string;
-    readonly title: string;
-    readonly intro: string;
-    readonly problem: string;
-    readonly decision: string;
-    readonly result: string;
-    readonly stack: string;
-    readonly expand: string;
-    readonly collapse: string;
+    readonly inProgress: string;
     readonly viewCode: string;
-    readonly privateCode: string;
-    readonly alsoTitle: string;
-    readonly items: readonly CaseStudy[];
-    readonly also: readonly { readonly title: string; readonly body: string; readonly cite: CiteKey }[];
+    readonly readPaper: string;
+    readonly privateRepo: string;
+    readonly items: Readonly<Record<string, ProjectCopy>>;
+  };
+
+  readonly publication: {
+    readonly eyebrow: string;
+    readonly title: string;
+    readonly body: string;
+    readonly limitations: string;
+    readonly readPaper: string;
+    readonly results: readonly { readonly value: string; readonly label: string }[];
+  };
+
+  readonly skills: {
+    readonly eyebrow: string;
+    readonly title: string;
+  };
+
+  readonly certifications: {
+    readonly eyebrow: string;
+    readonly title: string;
+    readonly inProgress: string;
+    readonly education: string;
+    readonly gpa: string;
   };
 
   readonly thinking: {
@@ -184,23 +160,7 @@ export interface Dictionary {
     readonly symptom: string;
     readonly fix: string;
     readonly lesson: string;
-    readonly evidence: string;
     readonly items: readonly FailureMode[];
-  };
-
-  readonly track: {
-    readonly eyebrow: string;
-    readonly title: string;
-    readonly present: string;
-    readonly education: string;
-    readonly publication: string;
-    readonly readPaper: string;
-    readonly certifications: string;
-    readonly inProgress: string;
-    readonly stackTitle: string;
-    readonly gpa: string;
-    /** Prosa por puesto, indexada por el id de perfil.json. */
-    readonly roles: Readonly<Record<string, { readonly summary: string; readonly highlights: readonly string[] }>>;
   };
 
   readonly contact: {
@@ -208,24 +168,25 @@ export interface Dictionary {
     readonly title: string;
     readonly body: string;
     readonly email: string;
+    readonly location: string;
     readonly linkedin: string;
     readonly github: string;
-    readonly availability: string;
+    readonly resume: string;
+    readonly languages: string;
   };
 
   readonly footer: {
-    readonly sourceNote: string;
+    /** La única mención a la fuente de verdad en toda la página. */
+    readonly generated: string;
+    readonly generatedLink: string;
     readonly builtWith: string;
-    readonly rights: string;
   };
 
   readonly months: readonly string[];
 
   /**
    * Traducción de los términos en prosa que vienen de perfil.yaml. Lo que no
-   * esté aquí pasa tal cual, que es lo correcto para "PyTorch", "Redis" o
-   * "LangGraph". Así agregar una tecnología al YAML no exige tocar el
-   * diccionario.
+   * esté aquí pasa tal cual, que es lo correcto para "PyTorch" o "Redis".
    */
   readonly terms: Readonly<Record<string, string>>;
 }

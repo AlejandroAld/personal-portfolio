@@ -24,7 +24,7 @@ export default async function Image({ params }: { params: Promise<{ lang: string
 
   // El guion menos tipográfico no está en todas las fuentes del renderizador;
   // en la tarjeta se usa uno ASCII para que nunca salga un cuadro vacío.
-  const metrics = dict.hero.metrics.map((m) => ({
+  const metrics = dict.metrics.items.map((m: (typeof dict.metrics.items)[number]) => ({
     value: m.value.replace("−", "-"),
     label: m.label,
   }));
@@ -60,12 +60,12 @@ export default async function Image({ params }: { params: Promise<{ lang: string
               maxWidth: 940,
             }}
           >
-            {`${dict.hero.thesis} ${dict.hero.thesisAccent}`}
+            {`${dict.hero.positioning} ${dict.hero.positioningAccent}`}
           </div>
         </div>
 
         <div style={{ display: "flex", gap: 32, alignItems: "flex-end" }}>
-          {metrics.map((m) => (
+          {metrics.map((m: { value: string; label: string }) => (
             <div
               key={m.label}
               style={{ display: "flex", flexDirection: "column", flex: 1, minWidth: 0 }}

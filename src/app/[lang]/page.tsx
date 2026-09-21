@@ -1,14 +1,17 @@
 import { notFound } from "next/navigation";
 
-import CaseStudies from "@/components/CaseStudies";
 import Contact from "@/components/Contact";
-import DemoSection from "@/components/DemoSection";
+import Credentials from "@/components/Credentials";
+import Experience from "@/components/Experience";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
+import Metrics from "@/components/Metrics";
 import Nav from "@/components/Nav";
+import Projects from "@/components/Projects";
+import Publication from "@/components/Publication";
+import Skills from "@/components/Skills";
 import Thinking from "@/components/Thinking";
-import Track from "@/components/Track";
-import { LOCALES, getDictionary, isLocale, publishedLocales } from "@/lib/site";
+import { LOCALES, RESUME_URL, getDictionary, isLocale, publishedLocales } from "@/lib/site";
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
@@ -19,9 +22,6 @@ export default async function Page({ params }: { params: Promise<{ lang: string 
   if (!isLocale(lang)) notFound();
   const dict = getDictionary(lang);
 
-  // Sólo se ofrece cambiar a un idioma que esté terminado. Mientras el español
-  // esté a medias la ruta /es existe y se puede revisar a mano, pero no se
-  // anuncia: enviar a alguien a media traducción es peor que no ofrecerla.
   // La etiqueta sale del idioma ACTUAL, no del destino: `switchTo` es el texto
   // que esta página muestra para irse al otro idioma, y va escrito en ese otro
   // idioma. Tomarlo del destino hacía que /es ofreciera "Ver en español".
@@ -32,22 +32,27 @@ export default async function Page({ params }: { params: Promise<{ lang: string 
     <>
       <Nav
         links={[
-          { href: "#cases", label: dict.nav.cases },
-          { href: "#thinking", label: dict.nav.thinking },
-          { href: "#track", label: dict.nav.track },
+          { href: "#experience", label: dict.nav.experience },
+          { href: "#projects", label: dict.nav.projects },
+          { href: "#publication", label: dict.nav.publication },
+          { href: "#skills", label: dict.nav.skills },
           { href: "#contact", label: dict.nav.contact },
         ]}
         labels={{ menu: dict.nav.menu, close: dict.nav.close }}
-        cta={{ href: "#agent", label: dict.nav.agent }}
+        // Apagado hasta que exista el PDF: ver RESUME_URL en src/lib/site.ts.
+        cta={RESUME_URL ? { href: RESUME_URL, label: dict.hero.ctaResume } : null}
         languageSwitch={languageSwitch}
       />
 
       <main id="main">
         <Hero dict={dict} />
-        <DemoSection dict={dict} />
-        <CaseStudies dict={dict} />
+        <Metrics dict={dict} />
+        <Experience dict={dict} />
+        <Projects dict={dict} />
+        <Publication dict={dict} />
+        <Skills dict={dict} />
+        <Credentials dict={dict} />
         <Thinking dict={dict} />
-        <Track dict={dict} />
         <Contact dict={dict} />
       </main>
 

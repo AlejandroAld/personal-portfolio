@@ -1,7 +1,7 @@
 # Portafolio — José Alejandro Aldama Ramos
 
 Sitio personal de AI Engineer. Next.js 16 (App Router), TypeScript estricto,
-Tailwind v4. Bilingüe, estático, sin librerías de animación.
+Tailwind v4. Bilingüe, estático.
 
 **En vivo:** https://josealejandroaldamaramos.vercel.app
 
@@ -38,7 +38,8 @@ src/
     robots.ts          los pendientes van a Disallow
     globals.css        tokens, evidencia, revelado, reduced-motion
   components/          secciones + islas de cliente:
-                         Nav, Counter, Reveal, HeroBackdrop
+                         Nav, Counter, Reveal/Stagger, ProjectCard,
+                         HeroBackdrop, Motion (LazyMotion)
                          AgentChat, AgentDemo  ← escritos, SIN publicar
   content/
     perfil.json        GENERADO — no editar a mano
@@ -58,42 +59,51 @@ tests/
 
 ---
 
-## El agente: teaser, no demo
+## Arquitectura de información
 
-La sección del agente vende lo que viene —el flujo interno en pantalla: la
-entrada, las llamadas a herramienta, el razonamiento y los tokens saliendo— y
-enlaza al código, que ya es público. **Sin fecha prometida.**
+El orden es el de un portafolio, no el de un proyecto:
 
-El cliente de chat existe, está probado y **no se publica todavía**:
+1. **Héroe** — una frase de posicionamiento y dos salidas: contacto y trabajo.
+2. **Métricas** — cuatro números de cuatro empleadores y proyectos distintos.
+3. **Experiencia** — los cuatro puestos. Cada uno titulado con su RESULTADO
+   cuando el perfil lo cuantifica; Grupo TI México no tiene métrica en el
+   YAML, así que se titula por lo que resolvió.
+4. **Proyectos** — los siete, en grid, con badges de tecnología y enlaces.
+5. **Publicación** — sección propia, con sus números y las limitaciones.
+6. **Habilidades** — las nueve categorías de perfil.yaml.
+7. **Credenciales** — estudios y certificaciones.
+8. **Cómo pienso** — tres modos de falla: uno de investigación, uno de
+   producción, uno del agente.
+9. **Contacto**.
 
-- `src/components/AgentChat.tsx` y `AgentDemo.tsx` se conservan en la rama.
-- `DemoSection.tsx` NO los importa, así que Next no los mete en ningún chunk
-  servido. Verificado en el build: ni `response.output_text.delta`, ni
-  `agent-input`, ni el hostname del agente aparecen en `.next/static/`.
-- Las cadenas del cliente siguen en el diccionario, completas y en los dos
-  idiomas, bajo `demo.chat`.
+### El agente de CV es una tarjeta
+
+Destaca —ocupa dos columnas y lleva sus viñetas— pero es una entre siete. El
+cliente de chat existe, está probado y **no se publica todavía**:
+
+- `src/components/AgentChat.tsx` y `AgentDemo.tsx` se conservan en la rama,
+  con sus cadenas en los dos idiomas dentro del propio archivo.
+- Nada los importa, así que Next no los mete en ningún chunk servido.
+  Verificado en cada build: ni `response.output_text.delta`, ni `agent-input`,
+  ni el hostname del agente aparecen en `.next/static/`.
 - Las pruebas están en `tests/agent-demo/`, con su README.
 
-**Para encenderla:** importar `AgentDemo` en `DemoSection`, pasarle
-`dict.demo.chat` y `AGENT_CHAT_ENDPOINT`. Nada más.
+La arquitectura de la demo ya está decidida: el navegador hablará **directo**
+con `/api/chat`, sin proxy y sin credencial. `/v1/responses` exige Bearer y no
+se toca desde el sitio, porque una página web no puede guardar una llave en
+secreto: la protección es por consumo, con tope por IP. Un route handler en
+medio habría escondido un hostname que no es secreto a cambio de romper esa
+protección, porque todo saldría con la IP del servidor.
 
-### La arquitectura que ya está decidida
+## Trazabilidad
 
-El navegador hablará **directo** con `/api/chat` del agente desplegado. Sin
-proxy y sin credencial en ninguna parte.
+La página no lleva una cita bajo cada bloque: eso era ruido. El pie lo explica
+una vez, con enlace al YAML. Para comprobar un número concreto, cada bloque con
+métrica tiene un enlace a su línea exacta que aparece al pasar el cursor o al
+llegar con el teclado, y que en reposo no ocupa espacio.
 
-`/v1/responses` exige Bearer y no se toca desde el sitio: una página web no
-puede guardar una llave en secreto. La demo no se protege por identidad sino
-por consumo, con un tope por IP en el backend.
-
-Se descartó meter un route handler de Next en medio. Habría escondido el
-hostname —que no es un secreto y ya se publica en `/.well-known/agent-card.json`—
-a cambio de romper la protección real: todas las peticiones saldrían con la IP
-del servidor y el tope por IP se volvería un cubo global para todo el sitio.
-Reenviar `X-Forwarded-For` tampoco sirve, porque el cliente puede falsificarlo.
-
-`/api/chat` es **sin estado**: descarta `previous_response_id`, así que el
-cliente reenvía la transcripción completa en cada turno.
+Los enlaces van fijados a un SHA, nunca a `main`: un enlace a `main` apunta a
+la línea equivocada en cuanto el archivo cambia.
 
 ## Bilingüe
 
@@ -113,43 +123,56 @@ una línea de arquitectura.
 
 ## Animación
 
-Sin librerías: ni framer-motion, ni three.js, ni nada. La capa de animación de
-secciones son unos 2 KB de JS; el fondo del héroe, 2.2 KB más en un chunk que
-sólo se pide cuando se va a usar.
-
 | Qué | Cómo |
 |---|---|
-| Contadores | El valor final se renderiza en el servidor; el JS sólo anima desde cero al entrar en pantalla. Existe sin JS y no hay salto de ancho (`tabular-nums`). |
-| Entrada de secciones | Un solo `IntersectionObserver` para toda la página. Sólo `opacity` y `transform`. |
-| Casos de estudio | `grid-template-rows: 0fr → 1fr`: altura animada sin medir nada en JS. |
-| Fondo del héroe | Un shader de fragmento en WebGL crudo (WebGL2 con respaldo a WebGL1), sin three.js. Ver abajo. |
+| Entrada al hacer scroll | `motion` con `whileInView` y `once: true`, con escalonado en las listas de tarjetas. |
+| Contadores | Implementación propia, 600 bytes: el valor final se renderiza en el servidor —existe sin JS y lo indexa un buscador— y el JS sólo anima desde cero al entrar en pantalla. |
+| Tarjetas de proyecto | Elevación corta en hover, más el borde que se enciende. |
+| Cambio de idioma | `template.tsx` con un fundido corto. La primera carga NO se anima. |
+| Fondo del héroe | Un shader de fragmento en WebGL crudo, sin three.js. Ver abajo. |
+
+`motion` se carga con `LazyMotion` + `domAnimation` y el componente `m` desde
+`motion/react-m`, con `strict` activo para que usar `motion.div` en vez de
+`m.div` rompa en desarrollo: sin ese guarda, un import distraído vuelve a meter
+el paquete entero y nadie se entera hasta que alguien mide.
+
+**Dos detalles que no son opcionales:**
+
+`motion` serializa el estado inicial como estilo en línea, así que un
+`initial={{ opacity: 0 }}` acaba en el HTML del servidor. Por eso el `<h1>` no
+va envuelto en nada animado —el LCP es ese texto— y por eso el `template` no
+anima la primera carga: envolver la página entera habría metido `opacity:0` en
+el HTML, retrasando el LCP hasta la hidratación y dejando la página invisible
+sin JS. Para el resto, los bloques animados llevan `data-reveal` y un
+`<noscript>` con `!important` los devuelve a la vista.
+
+Con `prefers-reduced-motion: reduce` las variantes se sustituyen por unas que
+no mueven ni funden nada, y el fundido entre idiomas se salta entero.
 
 ### El fondo del héroe
 
 Un triángulo a pantalla completa y un shader de ruido que se mueve muy despacio.
-**2 235 bytes gzip** añadidos al sitio completo, de los cuales 1 950 son un
-chunk aparte que sólo se pide si de verdad se va a usar.
+**2 235 bytes gzip**, de los cuales 1 950 son un chunk aparte que no está en el
+HTML inicial.
 
-Fuera de la ruta crítica: el LCP es el texto de la tesis y se pinta sin esperar
-a nada; la importación del shader arranca en `requestIdleCallback`.
+Fuera de la ruta crítica: la importación arranca en `requestIdleCallback`.
 
 Se cae al degradado CSS —que está siempre debajo y es una composición
 terminada, no un hueco— si no hay WebGL, si se pierde el contexto, con
-`prefers-reduced-motion: reduce`, o si `hardwareConcurrency <= 4`. En esos casos
-**no se descargan los bytes**: el respaldo no es cargar y no usar.
+`prefers-reduced-motion`, o con `hardwareConcurrency <= 2`. En esos casos **no
+se descargan los bytes**.
 
-El bucle se detiene cuando la pestaña no está visible y cuando el canvas sale
-del viewport. El canvas va con `aria-hidden` y no toca el árbol de
-accesibilidad.
+El corte de verdad no lo pone el número de núcleos, que es un proxy pobre, sino
+una **medición real**: tras cinco vueltas de calentamiento se miden treinta, y
+si no llegan a 24 fps el shader se apaga solo y se queda el degradado.
+
+El bucle se detiene con la pestaña oculta y con el canvas fuera del viewport.
+El canvas va con `aria-hidden` y no toca el árbol de accesibilidad.
 
 El tope de brillo del shader no es una decisión estética, es de contraste: el
 color más claro que puede producir está calculado para que todo color de texto
 de la página siga pasando AA encima de él. Los números están en
 `src/lib/glow.ts`; si se sube el tinte, hay que recalcularlos.
-
-Con `prefers-reduced-motion: reduce` no hay animación, no una más corta. Sin JS,
-un `<noscript>` deja todo visible: la entrada progresiva es una mejora, nunca un
-requisito para leer la página.
 
 ---
 
@@ -159,29 +182,28 @@ Lighthouse móvil contra `next build && next start`, mediana de 3 corridas:
 
 | Ruta | Rendimiento | Accesibilidad | Buenas prácticas | SEO |
 |---|---|---|---|---|
-| `/en` | **97** | **100** | **100** | **100** |
-| `/es` | **99** | **100** | **100** | **100** |
+| `/en` | **99** | **100** | **100** | **100** |
+| `/es` | **97** | **100** | **100** | **100** |
 
-FCP 0.91 s · LCP 1.87–2.46 s · TBT 78–98 ms · CLS ≤ 0.001
+FCP 0.91 s · LCP 2.27–2.57 s · TBT 27–29 ms · CLS 0.001
 
-Coste del shader, aislado (misma página, 3 corridas cada una):
+Costo de `motion`, medido con dos builds del mismo contenido:
 
-| | Rendimiento (mediana) | LCP (mediana) |
+| | JS servido (gzip) | Rendimiento (mediana) |
 |---|---|---|
-| Sin shader | 97 | 2.48 s |
-| Con shader activo | 99 | 1.86 s |
+| Sin motion | 175 156 B | 97 |
+| Con motion | 217 008 B | 96–99 |
 
-Las tres condiciones se solapan dentro del ruido de la máquina de medición: el
-shader no tiene coste medible. El umbral que se aplicó fue que por debajo de 95
-se retiraba.
+**41 852 bytes gzip (40.9 KB).** Es caro para lo que hace, y es el número, no
+una estimación.
 
 Cero violaciones de WCAG 2.1 AA con axe-core, en **los dos idiomas** y en todos
-los estados interactivos: inicial, casos expandidos, menú móvil, escritorio y
-movimiento reducido. Diez auditorías, cero violaciones. El recorrido de teclado
-empieza en el skip link en ambos idiomas y ningún elemento enfocable se queda
-sin anillo de foco.
+los estados: inicial, menú móvil, hover de tarjeta y movimiento reducido. Ocho
+auditorías, cero violaciones. El recorrido de teclado empieza en el skip link
+en ambos idiomas, ningún elemento enfocable se queda sin anillo de foco, y los
+enlaces de fuente ocultos se hacen visibles al recibir el foco.
 
----
+Sin JavaScript: 55 bloques animados, **0 invisibles**.
 
 ## Correr en local
 

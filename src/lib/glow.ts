@@ -143,6 +143,19 @@ export function start(canvas: HTMLCanvasElement): (() => void) | null {
   const t0 = performance.now();
   let last = 0;
 
+  // --- Medición de las primeras vueltas -------------------------------------
+  // Contar núcleos es un proxy pobre: hay equipos de dos núcleos que pintan
+  // esto sin despeinarse y portátiles de ocho con la GPU saturada. Lo que sí
+  // dice la verdad es cuánto tarda en dibujar de verdad, en este equipo y en
+  // este momento. Se descartan las primeras vueltas —compilación del shader y
+  // primer pintado no son representativos— y se miden las siguientes; si no
+  // llega al mínimo, se apaga y se queda el degradado CSS.
+  const WARMUP = 5;
+  const SAMPLE = 30;
+  const MIN_FPS = 24;
+  let drawn = 0;
+  let sampleStart = 0;
+
   const frameLoop = (now: number) => {
     raf = requestAnimationFrame(frameLoop);
     // 30 fps bastan de sobra para algo que se mueve así de lento, y es la
@@ -152,6 +165,17 @@ export function start(canvas: HTMLCanvasElement): (() => void) | null {
     resize();
     gl.uniform1f(uT, (now - t0) * 0.000018);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    drawn += 1;
+    if (drawn === WARMUP) {
+      sampleStart = now;
+    } else if (drawn === WARMUP + SAMPLE) {
+      const fps = (SAMPLE * 1000) / Math.max(1, now - sampleStart);
+      if (fps < MIN_FPS) {
+        cleanup();
+        canvas.style.display = "none";
+      }
+    }
   };
 
   const run = () => {

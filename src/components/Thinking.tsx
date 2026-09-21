@@ -1,14 +1,14 @@
 import type { Dictionary } from "@/content/dictionary";
-import Evidence from "./Evidence";
-import Reveal from "./Reveal";
 import SectionHeading from "./SectionHeading";
+import SourceLink from "./SourceLink";
+import { Stagger, StaggerItem } from "./Reveal";
 
 /**
- * Cómo pienso: modos de falla resueltos en producción.
+ * Cómo pienso: tres modos de falla resueltos.
  *
- * Nada de esto se despliega ni se esconde tras un botón. Es la sección que más
- * dice sobre cómo trabajo, así que se lee de corrido: qué se rompió, qué hice,
- * y a qué generaliza. Cada una enlaza a la línea exacta.
+ * Eran cinco y cuatro venían del agente de CV, que era justo el problema de
+ * la versión anterior. Ahora hay uno por frente: la investigación, la
+ * producción en Dalton, y el agente. La trazabilidad va en hover.
  */
 export default function Thinking({ dict }: { dict: Dictionary }) {
   return (
@@ -20,63 +20,40 @@ export default function Thinking({ dict }: { dict: Dictionary }) {
           intro={dict.thinking.intro}
         />
 
-        <ol className="mt-12 space-y-12">
-          {dict.thinking.items.map((item, i) => (
-            <li key={item.id} id={item.id} className="scroll-mt-24">
-              <Reveal>
-                <article className="grid gap-6 border-l-2 border-border pl-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-8 sm:border-l-0 sm:pl-0">
-                  <div className="sm:w-32">
-                    <span className="font-mono text-xs text-subtle tnum">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                  </div>
+        <Stagger as="ol" className="mt-10 grid gap-6 lg:grid-cols-3" step={0.07}>
+          {dict.thinking.items.map((item) => (
+            <StaggerItem
+              key={item.id}
+              id={item.id}
+              className="group relative scroll-mt-24 rounded-lg border border-border bg-surface/40 p-6"
+            >
+              <h3 className="text-base font-semibold tracking-tight text-fg text-balance">{item.title}</h3>
 
-                  <div>
-                    <h3 className="text-lg font-semibold tracking-tight text-fg text-balance">
-                      {item.title}
-                    </h3>
+              <div className="mt-5 space-y-4">
+                <div>
+                  <h4 className="font-mono text-[0.6875rem] tracking-wide text-subtle uppercase">
+                    {dict.thinking.symptom}
+                  </h4>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted text-pretty">{item.symptom}</p>
+                </div>
+                <div>
+                  <h4 className="font-mono text-[0.6875rem] tracking-wide text-accent uppercase">
+                    {dict.thinking.fix}
+                  </h4>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted text-pretty">{item.fix}</p>
+                </div>
+                <div>
+                  <h4 className="font-mono text-[0.6875rem] tracking-wide text-subtle uppercase">
+                    {dict.thinking.lesson}
+                  </h4>
+                  <p className="mt-1.5 text-sm leading-relaxed text-fg text-pretty">{item.lesson}</p>
+                </div>
+              </div>
 
-                    <div className="mt-5 space-y-5">
-                      <div>
-                        <h4 className="font-mono text-[0.6875rem] tracking-wide text-subtle uppercase">
-                          {dict.thinking.symptom}
-                        </h4>
-                        <p className="mt-2 text-sm leading-relaxed text-muted text-pretty">
-                          {item.symptom}
-                        </p>
-                      </div>
-                      <div>
-                        <h4 className="font-mono text-[0.6875rem] tracking-wide text-accent uppercase">
-                          {dict.thinking.fix}
-                        </h4>
-                        <p className="mt-2 text-sm leading-relaxed text-muted text-pretty">
-                          {item.fix}
-                        </p>
-                      </div>
-                      <div>
-                        <h4 className="font-mono text-[0.6875rem] tracking-wide text-subtle uppercase">
-                          {dict.thinking.lesson}
-                        </h4>
-                        <p className="mt-2 text-sm leading-relaxed text-fg text-pretty">
-                          {item.lesson}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border pt-4">
-                      <span className="font-mono text-[0.6875rem] tracking-wide text-subtle uppercase">
-                        {dict.thinking.evidence}
-                      </span>
-                      {item.cites.map((cite) => (
-                        <Evidence key={cite} cite={cite} />
-                      ))}
-                    </div>
-                  </div>
-                </article>
-              </Reveal>
-            </li>
+              {item.cites[0] && <SourceLink cite={item.cites[0]} />}
+            </StaggerItem>
           ))}
-        </ol>
+        </Stagger>
       </div>
     </section>
   );

@@ -92,7 +92,7 @@ export function terms(values: readonly string[], dict: Dictionary): string[] {
 /** "2025-11" → "Nov 2025". "actual" → la palabra del diccionario. */
 export function formatMonth(value: string, dict: Dictionary): string {
   const m = /^(\d{4})-(\d{2})$/.exec(value);
-  if (!m) return dict.track.present;
+  if (!m) return dict.experience.present;
   const mes = dict.months[Number(m[2]) - 1];
   return mes ? `${mes} ${m[1]}` : m[1];
 }

@@ -47,6 +47,7 @@ export const CITES = {
   evalSuite: { label: "evals/golden.yaml", href: source("evals/golden.yaml") },
   publication: { label: "perfil.yaml:132", href: perfil(132) },
   publicationMetrics: { label: "perfil.yaml:130", href: perfil(130) },
+  lorealDashboard: { label: "perfil.yaml:114", href: perfil(114) },
 
   // --- Modo de falla: el 400 de `temperature` -----------------------------
   temperatureDocstring: { label: "app/llm.py:83-89", href: source("app/llm.py", [83, 89]) },

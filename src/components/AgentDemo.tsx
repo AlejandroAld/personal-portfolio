@@ -39,7 +39,7 @@ export default function AgentDemo({
     <div className="flex min-h-[19rem] flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border bg-surface px-6 py-10 text-center">
       <p className="max-w-sm text-sm text-muted">{strings.suggestionsLabel}</p>
       <ul className="flex flex-wrap justify-center gap-2">
-        {strings.suggestions.slice(0, 3).map((s) => (
+        {strings.suggestions.slice(0, 3).map((s: string) => (
           <li key={s}>
             <span className="inline-block rounded border border-border px-2.5 py-1 text-xs text-subtle">
               {s}
