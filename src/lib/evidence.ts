@@ -12,7 +12,7 @@
  */
 
 export const CV_AGENT_REPO = "AlejandroAld/cv-agent";
-export const CV_AGENT_SHA = "576e0047834d054542acfa0b76676d2420c244a3";
+export const CV_AGENT_SHA = "551b2fb3343dd95e002e0181f3386da15d0e65e6";
 export const CV_AGENT_URL = `https://github.com/${CV_AGENT_REPO}`;
 
 /** Una línea suelta, o un rango [desde, hasta]. */
@@ -41,16 +41,17 @@ export type Cite = { readonly label: string; readonly href: string };
  */
 export const CITES = {
   // --- Métricas de portada ------------------------------------------------
-  costReduction: { label: "perfil.yaml:76", href: perfil(76) },
+  costReduction: { label: "perfil.yaml:77", href: perfil(77) },
   processHours: { label: "perfil.yaml:73", href: perfil(73) },
   businessUnits: { label: "perfil.yaml:74", href: perfil(74) },
-  marginTraceability: { label: "perfil.yaml:86", href: perfil(86) },
+  internalBot: { label: "perfil.yaml:75", href: perfil(75) },
+  marginTraceability: { label: "perfil.yaml:87", href: perfil(87) },
   fourAgents: { label: "perfil.yaml:72", href: perfil(72) },
   contractTests: { label: "tests/test_contract.py", href: source("tests/test_contract.py") },
   evalSuite: { label: "evals/golden.yaml", href: source("evals/golden.yaml") },
-  publication: { label: "perfil.yaml:136", href: perfil(136) },
-  publicationMetrics: { label: "perfil.yaml:134", href: perfil(134) },
-  lorealDashboard: { label: "perfil.yaml:118", href: perfil(118) },
+  publication: { label: "perfil.yaml:137", href: perfil(137) },
+  publicationMetrics: { label: "perfil.yaml:135", href: perfil(135) },
+  lorealDashboard: { label: "perfil.yaml:119", href: perfil(119) },
 
   // --- Modo de falla: el 400 de `temperature` -----------------------------
   temperatureDocstring: { label: "app/llm.py:83-89", href: source("app/llm.py", [83, 89]) },
@@ -69,12 +70,12 @@ export const CITES = {
   noRagRationale: { label: "README.md", href: `${CV_AGENT_URL}/blob/${CV_AGENT_SHA}/README.md#contexto-completo-en-el-prompt-no-rag` },
 
   // --- Modo de falla: la fuga de datos en mi propio paper -----------------
-  paperLimitations: { label: "perfil.yaml:306-317", href: perfil([306, 317]) },
+  paperLimitations: { label: "perfil.yaml:307-318", href: perfil([307, 318]) },
   paperJournal: { label: "Computación y Sistemas", href: "https://www.cys.cic.ipn.mx/ojs/index.php/CyS/article/view/5887" },
 
   // --- Modo de falla: el falso negativo también miente --------------------
   falseNegativeSearch: { label: "app/core.py:329-347", href: source("app/core.py", [329, 347]) },
-  guardrailLayers: { label: "perfil.yaml:79", href: perfil(79) },
+  guardrailLayers: { label: "perfil.yaml:80", href: perfil(80) },
 
   // --- Arquitectura de la demo --------------------------------------------
   demoEndpoint: { label: "app/main.py:609", href: source("app/main.py", [609, 615]) },
@@ -87,19 +88,19 @@ export const CITES = {
   agentRepo: { label: "AlejandroAld/cv-agent", href: CV_AGENT_URL },
 
   // --- Casos de estudio ----------------------------------------------------
-  whatsappSuite: { label: "perfil.yaml:142-157", href: perfil([142, 157]) },
-  humanInTheLoop: { label: "perfil.yaml:159-177", href: perfil([159, 177]) },
-  deterministicEngine: { label: "perfil.yaml:180-194", href: perfil([180, 194]) },
-  webMigration: { label: "perfil.yaml:210-221", href: perfil([210, 221]) },
-  mcpServer: { label: "perfil.yaml:80", href: perfil(80) },
-  evalStrategy: { label: "perfil.yaml:77", href: perfil(77) },
-  redisConcurrency: { label: "perfil.yaml:82", href: perfil(82) },
-  cvAgentProject: { label: "perfil.yaml:224-234", href: perfil([224, 234]) },
-  saasFlotillas: { label: "perfil.yaml:197-207", href: perfil([197, 207]) },
-  cotizador: { label: "perfil.yaml:237-248", href: perfil([237, 248]) },
-  research: { label: "perfil.yaml:122-137", href: perfil([122, 137]) },
-  education: { label: "perfil.yaml:270-273", href: perfil([270, 273]) },
-  certifications: { label: "perfil.yaml:285-291", href: perfil([285, 291]) },
+  whatsappSuite: { label: "perfil.yaml:143-158", href: perfil([143, 158]) },
+  humanInTheLoop: { label: "perfil.yaml:160-178", href: perfil([160, 178]) },
+  deterministicEngine: { label: "perfil.yaml:181-195", href: perfil([181, 195]) },
+  webMigration: { label: "perfil.yaml:211-222", href: perfil([211, 222]) },
+  mcpServer: { label: "perfil.yaml:81", href: perfil(81) },
+  evalStrategy: { label: "perfil.yaml:78", href: perfil(78) },
+  redisConcurrency: { label: "perfil.yaml:83", href: perfil(83) },
+  cvAgentProject: { label: "perfil.yaml:225-235", href: perfil([225, 235]) },
+  saasFlotillas: { label: "perfil.yaml:198-208", href: perfil([198, 208]) },
+  cotizador: { label: "perfil.yaml:238-249", href: perfil([238, 249]) },
+  research: { label: "perfil.yaml:123-138", href: perfil([123, 138]) },
+  education: { label: "perfil.yaml:271-274", href: perfil([271, 274]) },
+  certifications: { label: "perfil.yaml:286-292", href: perfil([286, 292]) },
   availability: { label: "perfil.yaml:21", href: perfil(21) },
   thesis: { label: "perfil.yaml:45-57", href: perfil([45, 57]) },
 } as const satisfies Record<string, Cite>;

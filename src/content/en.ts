@@ -60,7 +60,6 @@ const en: Dictionary = {
     ctaContact: "Get in touch",
     ctaProjects: "See the work",
     ctaResume: "Download CV",
-    portraitAlt: "Portrait of José Alejandro Aldama Ramos",
   },
 
   metrics: {
@@ -89,11 +88,15 @@ const en: Dictionary = {
         cite: "processHours",
       },
       {
-        value: "4",
-        countTo: 4,
-        label: "business units served",
-        context: "Separate lines of business inside the group, under NDA",
-        cite: "businessUnits",
+        // "Miles" y "alcance nacional" se quedan vagos a propósito: es una
+        // decisión de confidencialidad, no una cifra pendiente. Por eso este
+        // cuadro no lleva contador: no hay número que animar, y fabricar uno
+        // para que la tira quede simétrica sería exactamente lo que el resto
+        // de la página promete no hacer.
+        value: "Thousands",
+        label: "of advisors, nationwide",
+        context: "An internal communications bot across the group. The reach stays unquantified, by NDA.",
+        cite: "internalBot",
       },
     ],
   },
@@ -111,6 +114,7 @@ const en: Dictionary = {
           "Inherited a system of more than 180 nodes where logic was scattered, context was lost between hops and errors weren't reproducible. Rebuilt it onto a single traceable orchestrator with explicit state — monthly operating cost fell 92%.",
           "The operational process went from taking 48 hours a week to 10.",
           "The systems I run serve four separate business units inside the group.",
+          "The internal communications bot runs nationwide and reaches thousands of advisors across the group.",
           "Four conversational agents with real customer traffic on WhatsApp Business API, each with its own session state, tool catalog and conversation store.",
           "Tool calling on self-hosted n8n over Kubernetes with Claude via the Anthropic API on Azure AI Foundry: a dozen-plus custom tools on HTTP endpoints, structured output with JSON Schema, state-machine routing and human escalation.",
           "Evaluation strategy from scratch: an offline suite anchored in real production failure modes that runs on every change and decides whether a prompt change ships or gets reverted.",

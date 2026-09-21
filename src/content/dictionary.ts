@@ -112,7 +112,6 @@ export interface Dictionary {
     readonly ctaContact: string;
     readonly ctaProjects: string;
     readonly ctaResume: string;
-    readonly portraitAlt: string;
   };
 
   readonly metrics: {

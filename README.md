@@ -64,7 +64,11 @@ tests/
 El orden es el de un portafolio, no el de un proyecto:
 
 1. **Héroe** — una frase de posicionamiento y dos salidas: contacto y trabajo.
-2. **Métricas** — tres números del rol actual, todos cuantificados en el YAML.
+2. **Métricas** — tres datos del rol actual, los tres en el YAML. El tercero
+   va sin cifra a propósito: el alcance del bot interno se declara como
+   "miles, alcance nacional" por confidencialidad, y fabricar un número para
+   que la tira quede simétrica sería justo lo que el resto de la página
+   promete no hacer.
 3. **Experiencia** — los cuatro puestos. Cada uno titulado con su RESULTADO
    cuando el perfil lo cuantifica; Grupo TI México no tiene métrica en el
    YAML, así que se titula por lo que resolvió.
@@ -182,10 +186,10 @@ Lighthouse móvil contra `next build && next start`, mediana de 3 corridas:
 
 | Ruta | Rendimiento | Accesibilidad | Buenas prácticas | SEO |
 |---|---|---|---|---|
-| `/en` | **99** | **100** | **100** | **100** |
-| `/es` | **97** | **100** | **100** | **100** |
+| `/en` | **96** | **100** | **100** | **100** |
+| `/es` | **99** | **100** | **100** | **100** |
 
-FCP 0.91 s · LCP 2.16–2.57 s · TBT 27–39 ms · CLS 0.001
+FCP 0.91 s · LCP 2.26–2.81 s · TBT 26–27 ms · CLS 0.001
 
 Costo de `motion`, medido con dos builds del mismo contenido:
 
@@ -232,12 +236,13 @@ npm run sync:perfil    # re-sincroniza perfil.yaml al SHA fijado en evidence.ts
 
 ## Banderas pendientes
 
-En `src/lib/site.ts`, construidas y apagadas:
+Queda una. `PORTRAIT_URL` se eliminó del código —no va a haber foto, y una
+bandera muerta es deuda—, así que el héroe ya no tiene hueco reservado ni
+condicional que mantener.
 
 | Bandera | Para encenderla |
 |---|---|
-| `RESUME_URL` | Sube el PDF a `public/` y pon su ruta. Aparece el botón de descarga en el héroe. |
-| `PORTRAIT_URL` | Pon la ruta de la foto. El hueco ya está reservado en el héroe y en la imagen OG. |
+| `RESUME_URL` | Sube el PDF a `public/` y pon su ruta en `src/lib/site.ts`. Aparece el botón de descarga en el héroe, en contacto y en el nav. |
 | `AGENT_URL` | Se puede sobreescribir con `NEXT_PUBLIC_AGENT_URL`. Es pública por definición: nunca pongas aquí la llave del endpoint Bearer. |
 
 ---

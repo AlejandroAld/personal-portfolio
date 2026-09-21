@@ -60,7 +60,6 @@ const es: Dictionary = {
     ctaContact: "Hablemos",
     ctaProjects: "Ver el trabajo",
     ctaResume: "Descargar CV",
-    portraitAlt: "Retrato de José Alejandro Aldama Ramos",
   },
 
   metrics: {
@@ -89,11 +88,15 @@ const es: Dictionary = {
         cite: "processHours",
       },
       {
-        value: "4",
-        countTo: 4,
-        label: "unidades de negocio atendidas",
-        context: "Líneas de negocio distintas dentro del grupo, bajo acuerdo de confidencialidad",
-        cite: "businessUnits",
+        // "Miles" y "alcance nacional" se quedan vagos a propósito: es una
+        // decisión de confidencialidad, no una cifra pendiente. Por eso este
+        // cuadro no lleva contador: no hay número que animar, y fabricar uno
+        // para que la tira quede simétrica sería exactamente lo que el resto
+        // de la página promete no hacer.
+        value: "Miles",
+        label: "de asesores, alcance nacional",
+        context: "Bot de comunicación interna del grupo. El alcance se deja sin cifra, por confidencialidad.",
+        cite: "internalBot",
       },
     ],
   },
@@ -111,6 +114,7 @@ const es: Dictionary = {
           "Recibí un sistema de más de 180 nodos donde la lógica estaba repartida, se perdía contexto entre saltos y los errores no eran reproducibles. Lo reconstruí sobre un orquestador único y trazable con estado explícito: el costo mensual de operación bajó 92%.",
           "El proceso operativo pasó de consumir 48 horas semanales a 10.",
           "Los sistemas que opero dan servicio a cuatro unidades de negocio distintas del grupo.",
+          "El bot de comunicación interna tiene alcance nacional y llega a miles de asesores del grupo.",
           "Cuatro agentes conversacionales con tráfico real de clientes sobre WhatsApp Business API, cada uno con su propio estado de sesión, catálogo de herramientas y almacén de conversación.",
           "Tool calling sobre n8n autohospedado en Kubernetes con Claude vía la API de Anthropic en Azure AI Foundry: más de una docena de herramientas propias en endpoints HTTP, salidas estructuradas con JSON Schema, enrutamiento por máquina de estados y escalamiento a humano.",
           "Estrategia de evaluación desde cero: una suite offline anclada en modos de falla reales de producción que corre ante cada cambio y decide si un cambio de prompt sale o se revierte.",

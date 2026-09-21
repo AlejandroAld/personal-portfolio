@@ -25,12 +25,6 @@ export const AGENT_CHAT_ENDPOINT = `${AGENT_URL.replace(/\/$/, "")}/api/chat`;
  */
 export const RESUME_URL: string | null = null;
 
-/**
- * El retrato todavía no existe. El hueco está reservado en el héroe y en la
- * imagen OG, así que agregarlo después no rehace ningún layout.
- */
-export const PORTRAIT_URL: string | null = null;
-
 export const LOCALES = ["en", "es"] as const;
 export const DEFAULT_LOCALE: Locale = "en";
 
