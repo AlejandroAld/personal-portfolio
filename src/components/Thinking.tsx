@@ -1,7 +1,7 @@
 import type { Dictionary } from "@/content/dictionary";
 import SectionHeading from "./SectionHeading";
 import SourceLink from "./SourceLink";
-import { Stagger, StaggerItem } from "./Reveal";
+import Reveal from "./Reveal";
 
 /**
  * Cómo pienso: tres modos de falla resueltos.
@@ -20,13 +20,9 @@ export default function Thinking({ dict }: { dict: Dictionary }) {
           intro={dict.thinking.intro}
         />
 
-        <Stagger as="ol" className="mt-heading grid gap-6 lg:grid-cols-3" step={0.07}>
-          {dict.thinking.items.map((item) => (
-            <StaggerItem
-              key={item.id}
-              id={item.id}
-              className="card group relative p-6"
-            >
+        <ol className="mt-heading grid gap-6 lg:grid-cols-3">
+          {dict.thinking.items.map((item, i) => (
+            <Reveal as="li" key={item.id} id={item.id} index={i} className="card group relative p-6">
               <h3 className="text-base font-semibold tracking-tight text-fg text-balance">{item.title}</h3>
 
               <div className="mt-5 space-y-4">
@@ -51,9 +47,9 @@ export default function Thinking({ dict }: { dict: Dictionary }) {
               </div>
 
               {item.cites[0] && <SourceLink cite={item.cites[0]} ariaLabel={dict.footer.sourceAria} />}
-            </StaggerItem>
+            </Reveal>
           ))}
-        </Stagger>
+        </ol>
       </div>
     </section>
   );

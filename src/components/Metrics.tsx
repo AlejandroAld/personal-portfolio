@@ -1,7 +1,7 @@
 import type { Dictionary } from "@/content/dictionary";
 import Counter from "./Counter";
 import SourceLink from "./SourceLink";
-import { Stagger, StaggerItem } from "./Reveal";
+import Reveal from "./Reveal";
 
 /**
  * La tira de métricas.
@@ -22,9 +22,9 @@ export default function Metrics({ dict }: { dict: Dictionary }) {
       className="border-y border-border bg-card px-4 py-12 sm:px-6 sm:py-14"
     >
       <div className="mx-auto max-w-5xl">
-        <Stagger className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-          {dict.metrics.items.map((metric) => (
-            <StaggerItem key={metric.cite} className="group relative">
+        <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+          {dict.metrics.items.map((metric, i) => (
+            <Reveal as="li" key={metric.cite} index={i} className="group relative">
               <p className="text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
                 {metric.countTo === undefined ? (
                   metric.value
@@ -35,9 +35,9 @@ export default function Metrics({ dict }: { dict: Dictionary }) {
               <p className="mt-2 text-sm font-medium text-fg text-pretty">{metric.label}</p>
               <p className="mt-1.5 text-xs leading-relaxed text-subtle text-pretty">{metric.context}</p>
               <SourceLink cite={metric.cite} ariaLabel={dict.footer.sourceAria} />
-            </StaggerItem>
+            </Reveal>
           ))}
-        </Stagger>
+        </ul>
       </div>
     </section>
   );

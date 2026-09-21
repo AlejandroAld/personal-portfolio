@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import LanguageLink from "./LanguageLink";
 import { useEffect, useState } from "react";
 
 /**
@@ -49,7 +49,7 @@ export default function Nav({
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 transition-colors ${
         scrolled || open ? "border-b border-border bg-nav backdrop-blur-md" : "border-b border-transparent"
       }`}
     >
@@ -66,7 +66,7 @@ export default function Nav({
             <li key={link.href}>
               <a
                 href={link.href}
-                className="text-sm text-muted transition-colors hover:text-fg"
+                className="nav-link"
               >
                 {link.label}
               </a>
@@ -75,17 +75,13 @@ export default function Nav({
         </ul>
 
         <div className="flex items-center gap-2">
-          {/* `Link` y no `<a>`: la navegación entre idiomas es del cliente, y
-              eso es lo que deja que template.tsx la anime en vez de recargar
-              la página entera con un parpadeo. */}
+          {/* Navegación del cliente con fundido cruzado: ver LanguageLink. */}
           {languageSwitch && (
-            <Link
+            <LanguageLink
               href={languageSwitch.href}
-              hrefLang={languageSwitch.href.replace("/", "")}
+              label={languageSwitch.label}
               className="rounded-sm px-2 py-1.5 font-mono text-xs text-muted transition-colors hover:text-fg"
-            >
-              {languageSwitch.label}
-            </Link>
+            />
           )}
 
           {cta && (

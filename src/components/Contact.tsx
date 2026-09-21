@@ -2,7 +2,7 @@ import type { Dictionary } from "@/content/dictionary";
 import { contacto, persona } from "@/content/perfil";
 import { RESUME_URL } from "@/lib/site";
 import SectionHeading from "./SectionHeading";
-import { Reveal, Stagger, StaggerItem } from "./Reveal";
+import Reveal from "./Reveal";
 
 /**
  * Contacto.
@@ -31,8 +31,8 @@ export default function Contact({ dict }: { dict: Dictionary }) {
           intro={dict.contact.body}
         />
 
-        <Stagger className="mt-heading grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
-          {entries.map((entry) => {
+        <ul className="mt-heading grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+          {entries.map((entry, i) => {
             const inner = (
               <>
                 <span className="label block">
@@ -45,7 +45,7 @@ export default function Contact({ dict }: { dict: Dictionary }) {
             );
 
             return (
-              <StaggerItem key={entry.label} className="bg-bg">
+              <Reveal as="li" key={entry.label} index={i} className="bg-bg">
                 {entry.href ? (
                   <a
                     href={entry.href}
@@ -58,10 +58,10 @@ export default function Contact({ dict }: { dict: Dictionary }) {
                 ) : (
                   <div className="px-5 py-5">{inner}</div>
                 )}
-              </StaggerItem>
+              </Reveal>
             );
           })}
-        </Stagger>
+        </ul>
 
         <Reveal>
           <div className="mt-8 flex flex-wrap items-center gap-4">

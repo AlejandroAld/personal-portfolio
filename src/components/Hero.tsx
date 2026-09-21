@@ -19,19 +19,19 @@ export default function Hero({ dict }: { dict: Dictionary }) {
 
       <div className="relative z-10 mx-auto max-w-5xl">
         <div className="max-w-3xl">
-          <p className="eyebrow">{dict.hero.eyebrow}</p>
+          <p className="eyebrow rise">{dict.hero.eyebrow}</p>
 
-          <h1 className="mt-5 text-display-sm font-semibold tracking-tight text-balance sm:text-display-md lg:text-display">
+          <h1 className="rise mt-5 text-display-sm font-semibold tracking-tight text-balance sm:text-display-md lg:text-display">
             {dict.hero.positioning} <span className="text-muted">{dict.hero.positioningAccent}</span>
           </h1>
 
-          <p className="mt-6 max-w-2xl leading-relaxed text-muted text-pretty">{dict.hero.summary}</p>
+          <p className="rise rise-2 mt-6 max-w-2xl leading-relaxed text-muted text-pretty">{dict.hero.summary}</p>
 
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-subtle text-pretty">
+          <p className="rise rise-3 mt-4 max-w-2xl text-sm leading-relaxed text-subtle text-pretty">
             {dict.hero.availability}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="rise rise-4 mt-8 flex flex-wrap items-center gap-3">
             <a
               href="#contact"
               className="btn btn-primary"

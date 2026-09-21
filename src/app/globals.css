@@ -75,6 +75,22 @@
   --spacing-anchor: 5rem;
   /* Columna de fechas y empresa en la trayectoria. */
   --spacing-meta: 11rem;
+
+  /* --- Movimiento --------------------------------------------------------- */
+  /* Exactamente estos, y ninguno más. src/lib/motion.ts los espeja para
+     `motion`, y `npm run lint` comprueba que sigan iguales. */
+  --duration-fast: 150ms; /* hover, foco, cambios de estado */
+  --duration-base: 300ms; /* entradas de elementos */
+  --duration-slow: 500ms; /* transiciones de sección */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* entradas */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* transiciones */
+  /* Desplazamiento de una entrada. El tope es 20px. */
+  --distance-sm: 12px; /* entradas por scroll */
+  --distance: 16px; /* el héroe */
+  /* Las utilidades transition-* de Tailwind heredan los tokens de estado:
+     un hover cambia de color en 150 ms con la curva de entrada, siempre. */
+  --default-transition-duration: var(--duration-fast);
+  --default-transition-timing-function: var(--ease-out);
 }
 
 :root {
@@ -194,6 +210,83 @@ body {
   .dot {
     @apply mt-[0.55em] h-1 w-1 shrink-0 rounded-full bg-accent;
   }
+
+  /* Enlace del nav: el subrayado crece desde la izquierda. Es un transform
+     sobre un pseudoelemento, no un ancho que cambie. */
+  .nav-link {
+    @apply relative text-sm text-muted transition-colors hover:text-fg;
+  }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: calc(var(--spacing) * -1);
+    height: 1px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
+
+/* ===========================================================================
+   Entrada del héroe
+   ---------------------------------------------------------------------------
+   En CSS y no en `motion`: el <h1> es el LCP, y un estado inicial serializado
+   en línea por JS lo escondería hasta la hidratación. Una animación CSS
+   arranca en el primer pintado y corre igual sin JavaScript.
+
+   Sólo en la primera carga: al cambiar de idioma <html> lleva
+   `data-navigated`, y el héroe nuevo llega con el fundido, no con esto.
+
+   El escalonado es de 60 ms por elemento (valor del plan): el último arranca
+   a 180 ms, por debajo del tope de 400.
+   =========================================================================== */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--distance));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise var(--duration-base) var(--ease-out) both;
+}
+.rise-2 {
+  animation-delay: 60ms;
+}
+.rise-3 {
+  animation-delay: 120ms;
+}
+.rise-4 {
+  animation-delay: 180ms;
+}
+html[data-navigated] .rise {
+  animation: none;
+}
+
+/* ===========================================================================
+   Cambio de idioma
+   ---------------------------------------------------------------------------
+   Fundido cruzado del documento entero con la View Transitions API; lo
+   dispara LanguageLink. Los 200 ms son del plan: es el único valor de
+   movimiento fuera de la escala de tokens, y está aquí a propósito, no
+   repartido.
+   =========================================================================== */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+  animation-timing-function: var(--ease-in-out);
 }
 
 /* ===========================================================================
@@ -248,7 +341,9 @@ body {
   @apply absolute top-0 right-0 z-10 rounded-sm bg-nav px-1.5 py-1 font-mono text-micro whitespace-nowrap text-subtle;
   line-height: 1;
   opacity: 0;
-  transition: opacity 160ms ease, color 160ms ease;
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
 }
 
 /* `:focus` y no sólo `:focus-visible`: un elemento enfocable que no se ve es

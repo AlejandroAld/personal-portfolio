@@ -2,7 +2,6 @@ import type { Dictionary } from "@/content/dictionary";
 import { perfil, terms } from "@/content/perfil";
 import ProjectCard from "./ProjectCard";
 import SectionHeading from "./SectionHeading";
-import { Stagger } from "./Reveal";
 
 /**
  * Los siete proyectos.
@@ -30,8 +29,8 @@ export default function Projects({ dict }: { dict: Dictionary }) {
           intro={dict.projects.intro}
         />
 
-        <Stagger className="mt-heading grid gap-5 sm:grid-cols-2 lg:grid-cols-3" step={0.05}>
-          {ordered.map((proyecto) => {
+        <ul className="mt-heading grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {ordered.map((proyecto, i) => {
             const copy = dict.projects.items[proyecto.id];
             if (!copy) return null;
             const stack = terms(proyecto.stack, dict);
@@ -40,7 +39,7 @@ export default function Projects({ dict }: { dict: Dictionary }) {
             const href = proyecto.repo || copy.href;
 
             return (
-              <ProjectCard key={proyecto.id} featured={copy.featured}>
+              <ProjectCard key={proyecto.id} index={i} featured={copy.featured}>
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-base font-semibold tracking-tight text-fg text-balance">
                     {copy.title}
@@ -93,7 +92,7 @@ export default function Projects({ dict }: { dict: Dictionary }) {
               </ProjectCard>
             );
           })}
-        </Stagger>
+        </ul>
       </div>
     </section>
   );

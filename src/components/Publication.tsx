@@ -1,7 +1,7 @@
 import type { Dictionary } from "@/content/dictionary";
 import { publicacion, term } from "@/content/perfil";
 import SectionHeading from "./SectionHeading";
-import { Reveal, Stagger, StaggerItem } from "./Reveal";
+import Reveal from "./Reveal";
 
 /**
  * La publicación arbitrada, con sección propia.
@@ -36,14 +36,14 @@ export default function Publication({ dict }: { dict: Dictionary }) {
             </p>
           </Reveal>
 
-          <Stagger className="grid grid-cols-3 gap-6 self-start lg:col-span-2 lg:grid-cols-1 lg:gap-8">
-            {dict.publication.results.map((r) => (
-              <StaggerItem key={r.label}>
+          <ul className="grid grid-cols-3 gap-6 self-start lg:col-span-2 lg:grid-cols-1 lg:gap-8">
+            {dict.publication.results.map((r, i) => (
+              <Reveal as="li" key={r.label} index={i}>
                 <p className="text-2xl font-semibold tracking-tight text-fg tnum sm:text-3xl">{r.value}</p>
                 <p className="mt-1 text-xs text-subtle text-pretty">{r.label}</p>
-              </StaggerItem>
+              </Reveal>
             ))}
-          </Stagger>
+          </ul>
         </div>
       </div>
     </section>

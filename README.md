@@ -153,12 +153,26 @@ un componente que no se publica no debe meter clases en el CSS servido.
 
 ## Animación
 
+Los tokens de movimiento son exactamente seis, en el `@theme` de
+`globals.css`: `duration-fast` (150 ms: hover, foco, estado), `duration-base`
+(300 ms: entradas), `duration-slow` (500 ms: transiciones de sección, sin uso
+todavía), `ease-out` `cubic-bezier(0.16, 1, 0.3, 1)` para entradas,
+`ease-in-out` `cubic-bezier(0.65, 0, 0.35, 1)` para transiciones, y la
+distancia (`distance-sm` 12 px, `distance` 16 px; tope 20). `src/lib/motion.ts`
+los espeja para `motion`, y `npm run lint` falla si los dos se separan.
+
+**Regla dura:** todo lo que se mueve anima sólo `transform` y `opacity`. Los
+hovers cambian color, que no dispara layout. Nada anima ancho, alto, posición,
+margen ni relleno, y se puede comprobar en el CSS compilado: un solo
+`@keyframes`, y ninguna `transition` fuera de color, opacidad y transform.
+
 | Qué | Cómo |
 |---|---|
-| Entrada al hacer scroll | `motion` con `whileInView` y `once: true`, con escalonado en las listas de tarjetas. |
-| Contadores | Implementación propia, 600 bytes: el valor final se renderiza en el servidor —existe sin JS y lo indexa un buscador— y el JS sólo anima desde cero al entrar en pantalla. |
-| Tarjetas de proyecto | Elevación corta en hover, más el borde que se enciende. |
-| Cambio de idioma | `template.tsx` con un fundido corto. La primera carga NO se anima. |
+| Entrada del héroe | Una animación CSS, no `motion`: el `<h1>` es el LCP y un estado inicial serializado por JS lo escondería hasta la hidratación. Fade + 16 px, 300 ms, ease-out; párrafo, disponibilidad y botones a 60 ms cada uno (el último arranca a 180 ms). Sólo en la primera carga: al cambiar de idioma `<html>` lleva `data-navigated` y el héroe nuevo llega con el fundido. |
+| Contadores | Implementación propia: el valor final se renderiza en el servidor —existe sin JS y lo indexa un buscador— y el JS cuenta desde cero en 800 ms con la curva de entrada cuando el 30 % de la cifra entra en pantalla, una vez. "Miles" no es número: entra con fade como todo lo demás. |
+| Entradas por scroll | `motion` con `whileInView` y `once: true`: cada bloque de experiencia y cada tarjeta se observa a sí misma y entra —fade + 12 px, 300 ms— al cruzar el 20 % inferior del viewport. Los hijos de una lista se escalonan 50 ms por índice, y a partir del cuarto ya no esperan más. No se usa `animation-timeline: view()`: una línea de tiempo de scroll se deshace al subir, y re-animar al subir está prohibido. |
+| Hovers | Tarjetas: 2 px hacia arriba y el borde encendido, 150 ms. Enlaces del nav: un subrayado que crece desde la izquierda, que es un `scaleX` sobre un pseudoelemento. Botones: fondo, 150 ms. Las utilidades `transition-*` de Tailwind heredan los tokens de estado. |
+| Cambio de idioma | Fundido cruzado de 200 ms con la View Transitions API, disparado por `LanguageLink`: sin recarga, sin blanco en medio, y la posición de lectura se conserva. Los 200 ms son del plan y son el único valor de movimiento fuera de la escala de tokens; viven en `globals.css`, no repartidos. Sin la API, el enlace navega como siempre. |
 | Fondo del héroe | Un shader de fragmento en WebGL crudo, sin three.js. Ver abajo. |
 
 `motion` se carga con `LazyMotion` + `domAnimation` y el componente `m` desde
@@ -166,18 +180,13 @@ un componente que no se publica no debe meter clases en el CSS servido.
 `m.div` rompa en desarrollo: sin ese guarda, un import distraído vuelve a meter
 el paquete entero y nadie se entera hasta que alguien mide.
 
-**Dos detalles que no son opcionales:**
+**Un detalle que no es opcional:** `motion` serializa el estado inicial como
+estilo en línea, así que un `initial={{ opacity: 0 }}` acaba en el HTML del
+servidor. Por eso el héroe no pasa por `motion`, y por eso los bloques animados
+llevan `data-reveal` y un `<noscript>` con `!important` los devuelve a la vista.
 
-`motion` serializa el estado inicial como estilo en línea, así que un
-`initial={{ opacity: 0 }}` acaba en el HTML del servidor. Por eso el `<h1>` no
-va envuelto en nada animado —el LCP es ese texto— y por eso el `template` no
-anima la primera carga: envolver la página entera habría metido `opacity:0` en
-el HTML, retrasando el LCP hasta la hidratación y dejando la página invisible
-sin JS. Para el resto, los bloques animados llevan `data-reveal` y un
-`<noscript>` con `!important` los devuelve a la vista.
-
-Con `prefers-reduced-motion: reduce` las variantes se sustituyen por unas que
-no mueven ni funden nada, y el fundido entre idiomas se salta entero.
+Con `prefers-reduced-motion: reduce` las animaciones se quitan —no se acortan—
+y el fundido entre idiomas se salta entero.
 
 ### El fondo del héroe
 

@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint && node scripts/check-motion-tokens.mjs",
     "sync:perfil": "node scripts/sync-perfil.mjs"
   },
   "dependencies": {

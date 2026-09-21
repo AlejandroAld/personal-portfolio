@@ -1,7 +1,7 @@
 import type { Dictionary } from "@/content/dictionary";
 import { educacion, educacionPeriodo, perfil, term } from "@/content/perfil";
 import SectionHeading from "./SectionHeading";
-import { Reveal, Stagger, StaggerItem } from "./Reveal";
+import Reveal from "./Reveal";
 
 /** Estudios y certificaciones. Las tres van "En curso": decirlo es lo honesto. */
 export default function Credentials({ dict }: { dict: Dictionary }) {
@@ -33,19 +33,21 @@ export default function Credentials({ dict }: { dict: Dictionary }) {
             <h3 className="label">
               {dict.certifications.list}
             </h3>
-            <Stagger className="mt-4 space-y-2">
-              {perfil.certificaciones.map((cert) => (
-                <StaggerItem
+            <ul className="mt-4 space-y-2">
+              {perfil.certificaciones.map((cert, i) => (
+                <Reveal
+                  as="li"
                   key={cert.nombre}
+                  index={i}
                   className="flex flex-wrap items-center justify-between gap-2 rounded-sm border border-border px-3 py-2.5"
                 >
                   <span className="text-sm text-muted text-pretty">{cert.nombre}</span>
                   <span className="badge shrink-0">
                     {dict.certifications.inProgress}
                   </span>
-                </StaggerItem>
+                </Reveal>
               ))}
-            </Stagger>
+            </ul>
           </div>
         </div>
       </div>

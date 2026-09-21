@@ -3,22 +3,38 @@
 import * as m from "motion/react-m";
 import { useReducedMotion, type Variants } from "motion/react";
 import type { ElementType, ReactNode } from "react";
+import { DISTANCE, DURATION, EASE_OUT, STAGGER, STAGGER_MAX } from "@/lib/motion";
 
 /**
- * Entrada al hacer scroll, y el escalonado de las listas de tarjetas.
+ * Entrada al hacer scroll.
  *
- * `whileInView` con `once: true` anima una sola vez y se olvida: no hay estado
- * que mantener ni observador que siga corriendo después.
+ * Cada bloque se observa a sí mismo: entra al cruzar el 20 % inferior del
+ * viewport, una sola vez, y no vuelve a animarse al subir. Los hijos de una
+ * lista se escalonan por `index`, y a partir del cuarto ya no esperan más: un
+ * escalonado largo retrasa la lectura, que es lo contrario de lo que quiere.
+ *
+ * No se usa `animation-timeline: view()`: una línea de tiempo de scroll va
+ * atada a la posición, así que la entrada se deshace al subir, y eso está
+ * prohibido a propósito. Un IntersectionObserver de una sola vez es lo que
+ * pide el comportamiento, y es lo que `whileInView` con `once` hace.
  *
  * Con movimiento reducido las variantes se sustituyen por unas que no mueven
  * ni funden nada. El elemento aparece en su estado final y ya.
  */
 
-const EASE = [0.22, 1, 0.36, 1] as const;
+const VIEWPORT = { once: true, margin: "0px 0px -20% 0px" } as const;
 
 const ENTER: Variants = {
-  hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+  hidden: { opacity: 0, y: DISTANCE.sm },
+  show: (index: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: DURATION.base,
+      ease: EASE_OUT,
+      delay: Math.min(index, STAGGER_MAX - 1) * STAGGER,
+    },
+  }),
 };
 
 const STILL: Variants = {
@@ -26,86 +42,40 @@ const STILL: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0 } },
 };
 
-const VIEWPORT = { once: true, margin: "0px 0px -60px 0px" } as const;
-
 export function Reveal({
   children,
-  delay = 0,
+  index = 0,
+  as = "div",
   className,
+  id,
+  hover = false,
 }: {
   children: ReactNode;
-  /** Escalonado manual, en ms. Para listas prefiere `Stagger`. */
-  delay?: number;
+  /** Posición en su lista, para el escalonado. Fuera de una lista, 0. */
+  index?: number;
+  as?: "div" | "li";
   className?: string;
-}) {
-  const reduced = useReducedMotion();
-  return (
-    <m.div
-      data-reveal=""
-      className={className}
-      variants={reduced ? STILL : ENTER}
-      initial="hidden"
-      whileInView="show"
-      viewport={VIEWPORT}
-      transition={reduced ? undefined : { delay: delay / 1000 }}
-    >
-      {children}
-    </m.div>
-  );
-}
-
-/**
- * Contenedor de una lista escalonada. Los hijos deben ser `StaggerItem`: el
- * retraso lo reparte el padre, así que agregar o quitar tarjetas no obliga a
- * recalcular ningún número a mano.
- */
-export function Stagger({
-  children,
-  className,
-  as = "ul",
-  step = 0.06,
-}: {
-  children: ReactNode;
-  className?: string;
-  as?: "ul" | "ol" | "div";
-  step?: number;
+  id?: string;
+  /** Tarjetas: elevación corta al pasar el cursor. */
+  hover?: boolean;
 }) {
   const reduced = useReducedMotion();
   const Tag = m[as] as ElementType;
 
   return (
     <Tag
+      id={id}
       data-reveal=""
       className={className}
+      custom={index}
+      variants={reduced ? STILL : ENTER}
       initial="hidden"
       whileInView="show"
       viewport={VIEWPORT}
-      variants={{
-        hidden: {},
-        show: { transition: { staggerChildren: reduced ? 0 : step } },
-      }}
+      whileHover={
+        hover && !reduced ? { y: -2, transition: { duration: DURATION.fast, ease: EASE_OUT } } : undefined
+      }
     >
-      {children}
-    </Tag>
-  );
-}
-
-export function StaggerItem({
-  children,
-  className,
-  as = "li",
-  id,
-}: {
-  children: ReactNode;
-  className?: string;
-  as?: "li" | "div";
-  id?: string;
-}) {
-  const reduced = useReducedMotion();
-  const Tag = m[as] as ElementType;
-
-  return (
-    <Tag id={id} data-reveal="" className={className} variants={reduced ? STILL : ENTER}>
       {children}
     </Tag>
   );
