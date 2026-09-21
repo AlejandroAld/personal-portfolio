@@ -38,7 +38,7 @@ src/
     robots.ts          los pendientes van a Disallow
     globals.css        tokens (@theme), clases de componente, evidencia, reduced-motion
   components/          secciones + islas de cliente:
-                         Nav, Counter, Reveal/Stagger, ProjectCard,
+                         Nav, LanguageLink, Counter, Reveal,
                          HeroBackdrop, Motion (LazyMotion)
                          AgentChat, AgentDemo  ← escritos, SIN publicar
   content/
@@ -50,9 +50,11 @@ src/
   lib/
     evidence.ts        SHA fijado + todas las citas, en un solo lugar
     glow.ts            el shader del héroe, en chunk aparte
+    motion.ts          espejo en JS de los tokens de movimiento
     site.ts            dominio, endpoint del agente, idiomas, banderas
 scripts/
   sync-perfil.mjs      trae perfil.yaml del repo del agente
+  check-motion-tokens.mjs  falla el lint si CSS y JS se separan
 tests/
   agent-demo/          pruebas del cliente del agente, con su README
 ```
@@ -217,14 +219,20 @@ de la página siga pasando AA encima de él. Los números están en
 
 ## Medido, no estimado
 
-Lighthouse móvil contra `next build && next start`, mediana de 3 corridas:
+Lighthouse móvil contra `next build && next start`, 3 corridas por ruta,
+medido antes y después del sistema de movimiento:
 
-| Ruta | Rendimiento | Accesibilidad | Buenas prácticas | SEO |
+| Ruta | Rendimiento (antes → después) | Accesibilidad | Buenas prácticas | SEO |
 |---|---|---|---|---|
-| `/en` | **96** | **100** | **100** | **100** |
-| `/es` | **99** | **100** | **100** | **100** |
+| `/en` | 96 / 96 / 99 → **96 / 99 / 99** | **100** | **100** | **100** |
+| `/es` | 99 / 96 / 99 → **96 / 99 / 96** | **100** | **100** | **100** |
 
-FCP 0.91 s · LCP 2.26–2.81 s · TBT 26–27 ms · CLS 0.001
+Cada corrida sale 96 o 99, según el LCP caiga en 2.2 s o en 2.8 s, y eso
+oscila entre corridas de la misma build: las doce juntas son seis 96 y seis
+99, tres y tres antes y tres y tres después. El movimiento no costó
+rendimiento, y la entrada del héroe en CSS no retrasó el LCP de forma medible.
+
+FCP 0.91 s · LCP 2.18–2.84 s · TBT 37 ms · CLS 0.000
 
 Costo de `motion`, medido con dos builds del mismo contenido:
 
@@ -234,7 +242,8 @@ Costo de `motion`, medido con dos builds del mismo contenido:
 | Con motion | 217 008 B | 96–99 |
 
 **41 852 bytes gzip (40.9 KB).** Es caro para lo que hace, y es el número, no
-una estimación.
+una estimación. Hoy el JS servido en `/en` son **207 103 bytes gzip**: quitar
+`template.tsx` y el escalonado por contenedor devolvió unos 10 KB.
 
 Cero violaciones de WCAG 2.1 AA con axe-core, en **los dos idiomas** y en todos
 los estados: inicial, menú móvil, hover de tarjeta y movimiento reducido. Ocho
