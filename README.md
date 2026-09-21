@@ -242,7 +242,10 @@ auditorías, cero violaciones. El recorrido de teclado empieza en el skip link
 en ambos idiomas, ningún elemento enfocable se queda sin anillo de foco, y los
 enlaces de fuente ocultos se hacen visibles al recibir el foco.
 
-Sin JavaScript: 55 bloques animados, **0 invisibles**.
+Sin JavaScript: 46 bloques animados más el héroe, **0 invisibles**. Con
+`prefers-reduced-motion: reduce`: entrada del héroe apagada, 46 bloques
+visibles sin desplazar nada, contadores quietos, tarjetas sin elevación, cambio
+de idioma sin fundido, y el chunk del shader ni se pide.
 
 ## Correr en local
 

@@ -359,7 +359,11 @@ html[data-navigated] .rise {
 /* ===========================================================================
    prefers-reduced-motion
    ---------------------------------------------------------------------------
-   No "menos animación": ninguna. Los elementos aparecen en su estado final.
+   Las animaciones se quitan, no se acortan. `animation: none` deja cada
+   elemento en su estado final —el héroe aparece entero, sin entrada— y
+   `transition: none` hace que un hover cambie de color sin interpolar. Lo que
+   mueve `motion` se apaga en JS con useReducedMotion, y el contador se queda
+   en su cifra. El fondo WebGL ni se descarga.
    =========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
@@ -370,10 +374,16 @@ html[data-navigated] .rise {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0ms !important;
+    animation: none !important;
+    transition: none !important;
   }
 
+  /* El fundido entre idiomas: a los pseudoelementos del view transition no
+     los alcanza el selector universal. LanguageLink además no lo dispara. */
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

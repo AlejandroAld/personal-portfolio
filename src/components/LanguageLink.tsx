@@ -49,10 +49,13 @@ export default function LanguageLink({
   const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
     // Modificadores o botón central: pestaña nueva, que lo haga el navegador.
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-    if (typeof document.startViewTransition !== "function" || href === pathname) return;
+    navigated = true;
+    // Con movimiento reducido no hay fundido: el Link navega y la página
+    // cambia de golpe, que es lo que esa preferencia pide.
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || typeof document.startViewTransition !== "function" || href === pathname) return;
 
     e.preventDefault();
-    navigated = true;
     document.documentElement.dataset.navigated = "";
     document.startViewTransition(
       () =>
