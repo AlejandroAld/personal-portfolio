@@ -55,6 +55,7 @@ src/
 scripts/
   sync-perfil.mjs      trae perfil.yaml del repo del agente
   check-motion-tokens.mjs  falla el lint si CSS y JS se separan
+  a11y.mjs             axe-core contra la página construida, 2 idiomas × 4 estados
 tests/
   agent-demo/          pruebas del cliente del agente, con su README
 ```
@@ -245,11 +246,28 @@ Costo de `motion`, medido con dos builds del mismo contenido:
 una estimación. Hoy el JS servido en `/en` son **207 103 bytes gzip**: quitar
 `template.tsx` y el escalonado por contenedor devolvió unos 10 KB.
 
-Cero violaciones de WCAG 2.1 AA con axe-core, en **los dos idiomas** y en todos
-los estados: inicial, menú móvil, hover de tarjeta y movimiento reducido. Ocho
-auditorías, cero violaciones. El recorrido de teclado empieza en el skip link
-en ambos idiomas, ningún elemento enfocable se queda sin anillo de foco, y los
-enlaces de fuente ocultos se hacen visibles al recibir el foco.
+Accesibilidad, con herramientas y no con impresión:
+
+- **Lighthouse, pestaña Accessibility: 100** en `/en` y `/es` (Lighthouse
+  13.5, axe 4.13): 24 auditorías pasan, 0 fallan, 10 son manuales, 41 no
+  aplican. `color-contrast` pasa con 0 elementos señalados.
+- **axe-core 4.13 desde el proyecto** (`npm run a11y`): 0 violaciones WCAG 2.x
+  A/AA y 0 de best-practice en 8 estados (2 idiomas × móvil, menú abierto,
+  hover de tarjeta, movimiento reducido); 25 reglas pasan. La única regla "por
+  revisar" es `color-contrast` sobre los nodos que están encima del canvas del
+  héroe, porque axe no mide contra un fondo que no es un color plano. Esos se
+  miden aparte, abajo.
+- **Teclado, con Tab de verdad:** 26 paradas por idioma, las 26 con anillo de
+  foco y opacidad ≥ 0.9, orden vertical monótono (el DOM es el orden visual),
+  Shift+Tab lo recorre al revés, sin trampas de foco. El skip link es la
+  primera parada y lleva a `#main`; el menú móvil abre con Enter y cierra con
+  Esc sin soltar el foco.
+- **Contraste del texto del héroe, medido en píxeles renderizados** con el
+  shader corriendo (se oculta el texto y se lee el fondo bajo su caja, y se
+  toma el píxel más claro): párrafo `muted` **7.41:1** en escritorio y
+  **7.42:1** en móvil (7.72:1 contra el fondo plano; 6.65:1 contra el color
+  más claro que el shader puede producir); línea de disponibilidad `subtle`
+  5.63:1; eyebrow `accent` 5.32:1. AA pide 4.5:1; AAA, 7:1.
 
 Sin JavaScript: 46 bloques animados más el héroe, **0 invisibles**. Con
 `prefers-reduced-motion: reduce`: entrada del héroe apagada, 46 bloques
@@ -267,8 +285,10 @@ Otros comandos:
 
 ```bash
 npm run build          # estático, ambos idiomas
-npm run lint
+npm run lint           # eslint + comprobación de que los tokens de movimiento coinciden
 npm run sync:perfil    # re-sincroniza perfil.yaml al SHA fijado en evidence.ts
+npm run a11y           # axe-core contra http://localhost:3100 (A11Y_URL para otro origen);
+                       # necesita `npx playwright install chromium` o CHROME_PATH
 ```
 
 ### Subir a un commit nuevo del agente
