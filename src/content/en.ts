@@ -10,6 +10,7 @@
  */
 
 import type { Dictionary } from "./dictionary";
+import { educacion } from "./perfil";
 
 const en: Dictionary = {
   complete: true,
@@ -396,7 +397,13 @@ const en: Dictionary = {
     "Ingeniero Junior de Inteligencia Artificial": "Junior Artificial Intelligence Engineer",
     "Beauty Tech Intern (TI y Datos)": "Beauty Tech Intern (IT & Data)",
     "Investigador en IA Aplicada — NLP y Deep Learning": "Applied AI Researcher — NLP & Deep Learning",
-    "Ingeniería en Inteligencia Artificial": "B.S. Artificial Intelligence Engineering",
+    // El nivel ("B.S.") es un dato del YAML, no una interpretación de aquí.
+    "Ingeniería en Inteligencia Artificial": `${educacion.nivel.en} Artificial Intelligence Engineering`,
+    "Español": "Spanish",
+    "Inglés": "English",
+    // El titular del YAML, para los datos estructurados de la página en inglés.
+    "Ingeniero en Inteligencia Artificial — agentes en producción, evaluación e integración con sistemas de negocio":
+      "AI Engineer — agents in production, evaluation and integration with business systems",
     "Guadalajara, Jalisco": "Guadalajara, Jalisco, Mexico",
     "Ciudad de México": "Mexico City, Mexico",
     "Guadalajara, Jalisco, México": "Guadalajara, Jalisco, Mexico",

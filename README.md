@@ -37,9 +37,8 @@ src/
     sitemap.ts         sólo los idiomas terminados
     robots.ts          los pendientes van a Disallow
     globals.css        tokens (@theme), clases de componente, evidencia, reduced-motion
-  components/          secciones + islas de cliente:
-                         Nav, LanguageLink, Counter, Reveal,
-                         HeroBackdrop, Motion (LazyMotion)
+  components/          secciones + tres islas de cliente:
+                         Nav, LanguageLink, Counter, HeroBackdrop
                          AgentChat, AgentDemo  ← escritos, SIN publicar
   content/
     perfil.json        GENERADO — no editar a mano
@@ -50,11 +49,13 @@ src/
   lib/
     evidence.ts        SHA fijado + todas las citas, en un solo lugar
     glow.ts            el shader del héroe, en chunk aparte
-    motion.ts          espejo en JS de los tokens de movimiento
+    tokens.ts          la curva de entrada, en JS, para el contador
+    bezier.ts          cubic-bezier() como función, 40 líneas
     site.ts            dominio, endpoint del agente, idiomas, banderas
 scripts/
   sync-perfil.mjs      trae perfil.yaml del repo del agente
-  check-motion-tokens.mjs  falla el lint si CSS y JS se separan
+  check-tokens.mjs     lint: la curva del JS es la del CSS y ningún token está muerto
+  check-claims.mjs     lint: cada número y nombre propio de la prosa está en perfil.yaml
   a11y.mjs             axe-core contra la página construida, 2 idiomas × 4 estados
 tests/
   agent-demo/          pruebas del cliente del agente, con su README
@@ -115,7 +116,9 @@ la línea equivocada en cuanto el archivo cambia.
 ## Bilingüe
 
 `/en` y `/es`, ambas estáticas vía `generateStaticParams`, con `hreflang` y
-`x-default`. El selector es un `<a>` al camino espejo: cero JS.
+`x-default`. El selector es un enlace al camino espejo que, cuando el navegador
+tiene la View Transitions API, funde una página en la otra sin recargar; sin
+ella navega como cualquier enlace.
 
 La bandera `complete` de cada diccionario manda. Mientras sea `false`, ese idioma
 queda fuera del sitemap y de los hreflang, se marca `noindex`, y el selector no
@@ -131,15 +134,15 @@ una línea de arquitectura.
 ## Tokens
 
 Todo valor de diseño vive en `src/app/globals.css`, en un solo `@theme`:
-colores (incluidos `card`, `nav`, `accent-line` y `accent-tint`, que antes
-eran cuatro transparencias distintas repartidas por los componentes), los
-tamaños `micro` y `display-*`, y el ritmo vertical (`section`, `heading`,
-`anchor`, `meta`). Ningún componente lleva un número suelto: si hace falta uno
-nuevo, se nombra ahí.
+colores (incluidos `card`, `nav` y `accent-tint`, que antes eran
+transparencias sueltas repartidas por los componentes), los tamaños `micro` y
+`display-*`, y el ritmo vertical (`section`, `heading`, `anchor`, `meta`).
+Ningún componente lleva un número suelto: si hace falta uno nuevo, se nombra
+ahí, y si uno deja de usarse, se borra.
 
 Debajo del `@theme` van las clases de componente, una por rol: `.section`,
-`.role-grid`, `.eyebrow`, `.label`, `.tag`, `.badge`, `.card`, `.btn` con sus
-tres variantes, y `.dot`. Cuando dos elementos significan lo mismo —un eyebrow,
+`.role-grid`, `.eyebrow`, `.label`, `.tag`, `.badge`, `.card` y `.card-hover`,
+`.btn` con sus tres variantes, `.dot`, `.nav-link` y `.rise`. Cuando dos elementos significan lo mismo —un eyebrow,
 una etiqueta de campo, un badge de estado— llevan la misma clase, y el sitio no
 puede tener dos versiones de la misma pieza sin que se note ahí. El "En curso"
 de la tarjeta del agente y el de las certificaciones eran dos badges de dos
@@ -156,40 +159,36 @@ un componente que no se publica no debe meter clases en el CSS servido.
 
 ## Animación
 
-Los tokens de movimiento viven en el `@theme` de `globals.css`, y son sólo
-los que algo usa: `duration-fast` (150 ms: hover, foco, estado),
-`duration-base` (300 ms: entradas y el cambio de idioma), `ease-out`
-`cubic-bezier(0.16, 1, 0.3, 1)` para entradas, `ease-in-out`
-`cubic-bezier(0.65, 0, 0.35, 1)` para transiciones, y la distancia
-(`distance-sm` 12 px, `distance` 16 px; tope 20). `src/lib/motion.ts` los
-espeja para `motion`, y `npm run lint` falla si los dos se separan.
+Hay un solo momento orquestado —la entrada del héroe al cargar— y lo demás
+responde a lo que hace la persona. No hay entradas por scroll ni tarjetas que
+se eleven: cada bloque renderiza visible por defecto, sin ningún estado inicial
+que dependa de JavaScript para resolverse, y no hay librería de animación. El
+JS servido bajó de 207 130 a **172 733 bytes gzip** al quitarla.
+
+Los tokens de movimiento viven en el `@theme` de `globals.css` y son sólo los
+que algo usa: `duration-fast` (150 ms: hover, foco, estado), `duration-base`
+(300 ms: la entrada del héroe, el borde de una tarjeta, el cambio de idioma),
+`ease-out` `cubic-bezier(0.16, 1, 0.3, 1)`, `ease-in-out`
+`cubic-bezier(0.65, 0, 0.35, 1)` y `distance` (16 px; tope 20). `npm run lint`
+falla si un token se queda sin uso, y comprueba que la curva que usa el JS
+(`src/lib/tokens.ts`) sea la misma que `--ease-out`.
 
 **Regla dura:** todo lo que se mueve anima sólo `transform` y `opacity`. Los
-hovers cambian color, que no dispara layout. Nada anima ancho, alto, posición,
-margen ni relleno, y se puede comprobar en el CSS compilado: un solo
-`@keyframes`, y ninguna `transition` fuera de color, opacidad y transform.
+hovers cambian color, que no dispara layout. Se puede comprobar en el CSS
+compilado: un solo `@keyframes`, y ninguna `transition` fuera de color,
+opacidad y transform.
 
 | Qué | Cómo |
 |---|---|
-| Entrada del héroe | Una animación CSS, no `motion`: el `<h1>` es el LCP y un estado inicial serializado por JS lo escondería hasta la hidratación. Fade + 16 px, 300 ms, ease-out; párrafo, disponibilidad y botones a 60 ms cada uno (el último arranca a 180 ms). Sólo en la primera carga: al cambiar de idioma `<html>` lleva `data-navigated` y el héroe nuevo llega con el fundido. |
-| Contadores | Implementación propia: el valor final se renderiza en el servidor —existe sin JS y lo indexa un buscador— y el JS cuenta desde cero en 800 ms con la curva de entrada cuando el 30 % de la cifra entra en pantalla, una vez. "Miles" no es número: entra con fade como todo lo demás. |
-| Entradas por scroll | `motion` con `whileInView` y `once: true`: cada bloque de experiencia y cada tarjeta se observa a sí misma y entra —fade + 12 px, 300 ms— al cruzar el 20 % inferior del viewport. Los hijos de una lista se escalonan 50 ms por índice, y a partir del cuarto ya no esperan más. No se usa `animation-timeline: view()`: una línea de tiempo de scroll se deshace al subir, y re-animar al subir está prohibido. |
-| Hovers | Tarjetas: 2 px hacia arriba y el borde encendido, 150 ms. Enlaces del nav: un subrayado que crece desde la izquierda, que es un `scaleX` sobre un pseudoelemento. Botones: fondo, 150 ms. Las utilidades `transition-*` de Tailwind heredan los tokens de estado. |
+| Entrada del héroe | Una animación CSS: fade + 16 px, 300 ms, ease-out; párrafo, disponibilidad y botones a 60 ms cada uno (el último arranca a 180 ms). Corre sin JS y arranca en el primer pintado, así que no retrasa el LCP. Sólo en la primera carga: al cambiar de idioma `<html>` lleva `data-navigated` y el héroe nuevo llega con el fundido. |
+| Contadores | Lo único que anima desde JavaScript: el valor final se renderiza en el servidor —existe sin JS y lo indexa un buscador— y un `requestAnimationFrame` cuenta desde cero en 800 ms con la curva de entrada cuando el 30 % de la cifra entra en pantalla, una vez. La curva es `cubic-bezier()` resuelta en 40 líneas propias (`src/lib/bezier.ts`); medida contra la implementación de la librería que se quitó, difiere en menos de 0.001 y da los mismos enteros en los mismos instantes. |
+| Hovers | Tarjetas: el borde pasa del gris fino al acento en 300 ms, sólo color. Enlaces del nav: un subrayado que crece desde la izquierda, que es un `scaleX` sobre un pseudoelemento. Botones: fondo, 150 ms. Las utilidades `transition-*` de Tailwind heredan los tokens de estado. |
 | Cambio de idioma | Fundido cruzado con la View Transitions API a `duration-base`, disparado por `LanguageLink`: sin recarga, sin blanco en medio. La posición de lectura se conserva a propósito (`scroll: false` en las dos rutas): las dos páginas tienen la misma estructura, y el mismo desplazamiento muestra la misma sección en el otro idioma. Sin la API, el enlace navega como siempre. |
 | Fondo del héroe | Un shader de fragmento en WebGL crudo, sin three.js. Ver abajo. |
 
-`motion` se carga con `LazyMotion` + `domAnimation` y el componente `m` desde
-`motion/react-m`, con `strict` activo para que usar `motion.div` en vez de
-`m.div` rompa en desarrollo: sin ese guarda, un import distraído vuelve a meter
-el paquete entero y nadie se entera hasta que alguien mide.
-
-**Un detalle que no es opcional:** `motion` serializa el estado inicial como
-estilo en línea, así que un `initial={{ opacity: 0 }}` acaba en el HTML del
-servidor. Por eso el héroe no pasa por `motion`, y por eso los bloques animados
-llevan `data-reveal` y un `<noscript>` con `!important` los devuelve a la vista.
-
-Con `prefers-reduced-motion: reduce` las animaciones se quitan —no se acortan—
-y el fundido entre idiomas se salta entero.
+Con `prefers-reduced-motion: reduce` las animaciones se quitan —no se acortan—:
+el héroe aparece entero, el contador se queda en su cifra, el borde de la
+tarjeta cambia de golpe, y el fundido entre idiomas se salta entero.
 
 ### El fondo del héroe
 
@@ -220,31 +219,31 @@ de la página siga pasando AA encima de él. Los números están en
 
 ## Medido, no estimado
 
-Lighthouse móvil contra `next build && next start`, 3 corridas por ruta,
-medido antes y después del sistema de movimiento:
+Lighthouse móvil contra `next build && next start`, 3 corridas por ruta, en
+tres momentos: antes del movimiento, con la librería, y sin ella:
 
-| Ruta | Rendimiento (antes → después) | Accesibilidad | Buenas prácticas | SEO |
-|---|---|---|---|---|
-| `/en` | 96 / 96 / 99 → **96 / 99 / 99** | **100** | **100** | **100** |
-| `/es` | 99 / 96 / 99 → **96 / 99 / 96** | **100** | **100** | **100** |
+| Ruta | Sin animación | Con `motion` | **Sin librería (hoy)** | Accesibilidad | Buenas prácticas | SEO |
+|---|---|---|---|---|---|---|
+| `/en` | 96 / 96 / 99 | 96 / 99 / 99 | **98 / 99 / 100** | **100** | **100** | **100** |
+| `/es` | 99 / 96 / 99 | 96 / 99 / 96 | **100 / 100 / 98** | **100** | **100** | **100** |
 
-Cada corrida sale 96 o 99, según el LCP caiga en 2.2 s o en 2.8 s, y eso
-oscila entre corridas de la misma build: las doce juntas son seis 96 y seis
-99, tres y tres antes y tres y tres después. El movimiento no costó
-rendimiento, y la entrada del héroe en CSS no retrasó el LCP de forma medible.
+Con la librería cada corrida salía 96 o 99 según el LCP cayera en 2.2 s o en
+2.8 s. Sin ella el LCP baja a **1.86–1.96 s** y las corridas salen 98–100: los
+34 KB de JS que se fueron eran justo los que se ejecutaban antes del primer
+pintado útil.
 
-FCP 0.91 s · LCP 2.18–2.84 s · TBT 37 ms · CLS 0.000
+FCP 0.91 s · LCP 1.86–1.96 s · TBT 39 ms · CLS 0.000–0.003
 
-Costo de `motion`, medido con dos builds del mismo contenido:
+JS servido en `/en`, gzip, medido chunk por chunk contra `next start`:
 
-| | JS servido (gzip) | Rendimiento (mediana) |
-|---|---|---|
-| Sin motion | 175 156 B | 97 |
-| Con motion | 217 008 B | 96–99 |
+| | JS servido (gzip) |
+|---|---|
+| Con `motion` (entradas por scroll, elevación de tarjetas) | 207 130 B |
+| Sin librería: héroe en CSS, contador con `requestAnimationFrame` | **172 733 B** |
 
-**41 852 bytes gzip (40.9 KB).** Es caro para lo que hace, y es el número, no
-una estimación. Hoy el JS servido en `/en` son **207 103 bytes gzip**: quitar
-`template.tsx` y el escalonado por contenedor devolvió unos 10 KB.
+**34 397 bytes gzip menos.** `motion` no aparece en `package.json`, en ningún
+import ni en el bundle compilado; la única palabra "motion" que queda es
+`prefers-reduced-motion`.
 
 Accesibilidad, con herramientas y no con impresión:
 
@@ -269,10 +268,19 @@ Accesibilidad, con herramientas y no con impresión:
   más claro que el shader puede producir); línea de disponibilidad `subtle`
   5.63:1; eyebrow `accent` 5.32:1. AA pide 4.5:1; AAA, 7:1.
 
-Sin JavaScript: 46 bloques animados más el héroe, **0 invisibles**. Con
-`prefers-reduced-motion: reduce`: entrada del héroe apagada, 46 bloques
-visibles sin desplazar nada, contadores quietos, tarjetas sin elevación, cambio
-de idioma sin fundido, y el chunk del shader ni se pide.
+  **La paleta del shader es una dependencia de contraste.** Ese 7.41:1 está
+  medido contra el píxel más claro que el shader produce hoy, y el tope de
+  brillo está calculado en `src/lib/glow.ts` para que todo texto del héroe
+  siga en AA encima. Si cambia el tinte, la intensidad o la posición de la
+  fuente de luz, hay que volver a medir: no lo cubre ningún script, es una
+  captura con el shader corriendo.
+
+Sin JavaScript: de los 334 nodos de texto de `<main>`, **0 ocultos** en los
+dos idiomas; lo único con opacidad 0 en reposo son los nueve enlaces de fuente,
+que aparecen al pasar el cursor o al enfocarlos también sin JS. Con
+`prefers-reduced-motion: reduce`: entrada del héroe apagada, contadores quietos,
+borde de tarjeta sin transición, cambio de idioma sin fundido, y el chunk del
+shader ni se pide.
 
 ## Correr en local
 
@@ -285,7 +293,7 @@ Otros comandos:
 
 ```bash
 npm run build          # estático, ambos idiomas
-npm run lint           # eslint + comprobación de que los tokens de movimiento coinciden
+npm run lint           # eslint + tokens vivos y coincidentes + prosa anclada a perfil.yaml
 npm run sync:perfil    # re-sincroniza perfil.yaml al SHA fijado en evidence.ts
 npm run a11y           # axe-core contra http://localhost:3100 (A11Y_URL para otro origen);
                        # necesita `npx playwright install chromium` o CHROME_PATH

@@ -1,7 +1,6 @@
 import type { Dictionary } from "@/content/dictionary";
 import { educacion, educacionPeriodo, perfil, term } from "@/content/perfil";
 import SectionHeading from "./SectionHeading";
-import Reveal from "./Reveal";
 
 /** Estudios y certificaciones. Las tres van "En curso": decirlo es lo honesto. */
 export default function Credentials({ dict }: { dict: Dictionary }) {
@@ -13,7 +12,7 @@ export default function Credentials({ dict }: { dict: Dictionary }) {
         <SectionHeading eyebrow={dict.certifications.eyebrow} title={dict.certifications.title} />
 
         <div className="mt-heading grid gap-10 sm:grid-cols-2 sm:gap-14">
-          <Reveal>
+          <div>
             <h3 className="label">
               {dict.certifications.education}
             </h3>
@@ -27,25 +26,23 @@ export default function Credentials({ dict }: { dict: Dictionary }) {
                 </span>
               )}
             </p>
-          </Reveal>
+          </div>
 
           <div>
             <h3 className="label">
               {dict.certifications.list}
             </h3>
             <ul className="mt-4 space-y-2">
-              {perfil.certificaciones.map((cert, i) => (
-                <Reveal
-                  as="li"
+              {perfil.certificaciones.map((cert) => (
+                <li
                   key={cert.nombre}
-                  index={i}
                   className="flex flex-wrap items-center justify-between gap-2 rounded-sm border border-border px-3 py-2.5"
                 >
                   <span className="text-sm text-muted text-pretty">{cert.nombre}</span>
                   <span className="badge shrink-0">
                     {dict.certifications.inProgress}
                   </span>
-                </Reveal>
+                </li>
               ))}
             </ul>
           </div>

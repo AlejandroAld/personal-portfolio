@@ -4,9 +4,8 @@ import { notFound } from "next/navigation";
 
 import "../globals.css";
 import type { Locale } from "@/content/dictionary";
-import { contacto, educacion, persona, publicacion } from "@/content/perfil";
+import { contacto, educacion, perfil, persona, publicacion, term } from "@/content/perfil";
 import { CV_AGENT_URL } from "@/lib/evidence";
-import MotionProvider from "@/components/Motion";
 import {
   LOCALES,
   SITE_URL,
@@ -56,8 +55,6 @@ export async function generateMetadata({
       : { index: false, follow: true },
     openGraph: {
       type: "profile",
-      firstName: "José Alejandro",
-      lastName: "Aldama Ramos",
       title: dict.meta.title,
       description: dict.meta.description,
       url: absoluteUrl(`/${lang}`),
@@ -72,45 +69,41 @@ export async function generateMetadata({
   };
 }
 
-/** Datos estructurados. Sin teléfono y sin dirección: sólo la ciudad. */
+/**
+ * Datos estructurados. Sin teléfono y sin dirección: sólo la ciudad.
+ *
+ * Todo lo que afirma sale de perfil.yaml: el puesto es el `titular`, la
+ * ciudad, el estado y el país son los tres tramos de `ubicacion`, los temas
+ * son las categorías de habilidades, y la revista es lo que va antes de la
+ * primera coma en `medio`. La descripción es la meta de la página, que es
+ * prosa editorial anclada como el resto.
+ */
 function jsonLd(lang: Locale) {
   const dict = getDictionary(lang);
+  const [addressLocality, addressRegion, addressCountry] = persona.ubicacion.split(",").map((s) => s.trim());
   return {
     "@context": "https://schema.org",
     "@type": "Person",
     name: persona.nombre,
     alternateName: persona.alias,
-    jobTitle: `${dict.hero.positioning} ${dict.hero.positioningAccent}`,
+    jobTitle: term(persona.titular, dict),
     description: dict.meta.description,
     url: absoluteUrl(`/${lang}`),
     email: `mailto:${contacto.email}`,
     sameAs: [contacto.linkedin, contacto.github, CV_AGENT_URL],
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Guadalajara",
-      addressRegion: "Jalisco",
-      addressCountry: "MX",
-    },
+    address: { "@type": "PostalAddress", addressLocality, addressRegion, addressCountry },
     alumniOf: {
       "@type": "CollegeOrUniversity",
       name: educacion.institucion,
     },
-    knowsLanguage: persona.idiomas.map((i) => i.idioma),
-    knowsAbout: [
-      "AI engineering",
-      "LLM agents in production",
-      "Agent evaluation",
-      "Tool calling",
-      "Model Context Protocol",
-      "Retrieval-augmented generation",
-      "Natural language processing",
-    ],
+    knowsLanguage: persona.idiomas.map((i) => term(i.idioma, dict)),
+    knowsAbout: perfil.habilidades.map((g) => term(g.categoria, dict)),
     subjectOf: {
       "@type": "ScholarlyArticle",
       name: publicacion.titulo,
       url: publicacion.url,
       inLanguage: "en",
-      isPartOf: { "@type": "Periodical", name: "Computación y Sistemas" },
+      isPartOf: { "@type": "Periodical", name: publicacion.medio.split(",")[0].trim() },
     },
   };
 }
@@ -129,23 +122,6 @@ export default async function LocaleLayout({
   return (
     <html lang={dict.htmlLang}>
       <head>
-        {/*
-          Sin JS las secciones siguen visibles. La entrada progresiva es una
-          mejora, nunca un requisito para leer la página.
-        */}
-        {/*
-          `motion` serializa el estado inicial como estilo en línea, así que sin
-          JS los bloques animados se quedarían invisibles. Una regla con
-          !important sí gana a un estilo en línea: la entrada progresiva es una
-          mejora, nunca un requisito para leer la página.
-        */}
-        <noscript>
-          <style
-            dangerouslySetInnerHTML={{
-              __html: "[data-reveal]{opacity:1!important;transform:none!important}",
-            }}
-          />
-        </noscript>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd(lang)) }}
@@ -158,7 +134,7 @@ export default async function LocaleLayout({
         >
           {dict.nav.skipToContent}
         </a>
-        <MotionProvider>{children}</MotionProvider>
+        {children}
       </body>
     </html>
   );

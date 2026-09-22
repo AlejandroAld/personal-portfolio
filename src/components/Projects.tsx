@@ -30,7 +30,7 @@ export default function Projects({ dict }: { dict: Dictionary }) {
         />
 
         <ul className="mt-heading grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {ordered.map((proyecto, i) => {
+          {ordered.map((proyecto) => {
             const copy = dict.projects.items[proyecto.id];
             if (!copy) return null;
             const stack = terms(proyecto.stack, dict);
@@ -39,7 +39,7 @@ export default function Projects({ dict }: { dict: Dictionary }) {
             const href = proyecto.repo || copy.href;
 
             return (
-              <ProjectCard key={proyecto.id} index={i} featured={copy.featured}>
+              <ProjectCard key={proyecto.id} featured={copy.featured}>
                 <div className="flex items-start justify-between gap-3">
                   <h3 className="text-base font-semibold tracking-tight text-fg text-balance">
                     {copy.title}

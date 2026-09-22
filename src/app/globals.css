@@ -46,8 +46,7 @@
   --color-accent-soft: #93b9fb;
   --color-accent-solid: #2563eb;
   --color-accent-solid-hover: #1d4ed8;
-  /* El acento cuando es borde (hover de tarjeta) y cuando es fondo (badge). */
-  --color-accent-line: rgb(59 130 246 / 45%);
+  /* El acento cuando es fondo (badge). Como borde va el acento entero. */
   --color-accent-tint: rgb(59 130 246 / 10%);
 
   /* --- Tipografía --------------------------------------------------------- */
@@ -77,15 +76,14 @@
   --spacing-meta: 11rem;
 
   /* --- Movimiento --------------------------------------------------------- */
-  /* Exactamente estos, y ninguno más. src/lib/motion.ts los espeja para
-     `motion`, y `npm run lint` comprueba que sigan iguales. */
+  /* Sólo los que algo usa: `npm run lint` falla si uno se queda sin uso, y
+     comprueba que la curva del contador (src/lib/tokens.ts) sea `--ease-out`. */
   --duration-fast: 150ms; /* hover, foco, cambios de estado */
-  --duration-base: 300ms; /* entradas de elementos y el cambio de idioma */
+  --duration-base: 300ms; /* la entrada del héroe, el borde de una tarjeta, el cambio de idioma */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* entradas */
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* transiciones */
-  /* Desplazamiento de una entrada. El tope es 20px. */
-  --distance-sm: 12px; /* entradas por scroll */
-  --distance: 16px; /* el héroe */
+  /* Desplazamiento de la entrada del héroe. El tope es 20px. */
+  --distance: 16px;
   /* Las utilidades transition-* de Tailwind heredan los tokens de estado:
      un hover cambia de color en 150 ms con la curva de entrada, siempre. */
   --default-transition-duration: var(--duration-fast);
@@ -188,6 +186,14 @@ body {
   /* Tarjeta: proyectos, modos de falla. */
   .card {
     @apply rounded-lg border border-border bg-card;
+  }
+  /* Tarjeta con hover: el borde pasa del gris fino al acento. Sólo color,
+     nada se mueve ni proyecta sombra. */
+  .card-hover {
+    transition: border-color var(--duration-base) var(--ease-out);
+  }
+  .card-hover:hover {
+    border-color: var(--color-accent);
   }
 
   /* Botones. Los tres cambian sólo color, y a la misma velocidad. */
@@ -359,9 +365,9 @@ html[data-navigated] .rise {
    ---------------------------------------------------------------------------
    Las animaciones se quitan, no se acortan. `animation: none` deja cada
    elemento en su estado final —el héroe aparece entero, sin entrada— y
-   `transition: none` hace que un hover cambie de color sin interpolar. Lo que
-   mueve `motion` se apaga en JS con useReducedMotion, y el contador se queda
-   en su cifra. El fondo WebGL ni se descarga.
+   `transition: none` hace que un hover cambie de color sin interpolar. El
+   contador consulta la preferencia y se queda en su cifra. El fondo WebGL ni
+   se descarga.
    =========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {

@@ -52,7 +52,13 @@ export interface Perfil {
   readonly experiencia: readonly PerfilRol[];
   readonly proyectos: readonly PerfilProyecto[];
   readonly habilidades: readonly PerfilHabilidad[];
-  readonly educacion: readonly { readonly titulo: string; readonly institucion: string; readonly periodo: string }[];
+  readonly educacion: readonly {
+    readonly titulo: string;
+    /** Nivel del grado por idioma. El sitio lo antepone al título traducido. */
+    readonly nivel: { readonly es: string; readonly en: string };
+    readonly institucion: string;
+    readonly periodo: string;
+  }[];
   readonly publicaciones: readonly {
     readonly titulo: string;
     readonly medio: string;

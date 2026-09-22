@@ -87,7 +87,7 @@ export default function Nav({
           {cta && (
             <a
               href={cta.href}
-              className="hidden rounded-sm border border-accent-line px-3.5 py-1.5 font-mono text-xs text-accent transition-colors hover:bg-accent-tint sm:inline-block"
+              className="hidden rounded-sm border border-accent px-3.5 py-1.5 font-mono text-xs text-accent transition-colors hover:bg-accent-tint sm:inline-block"
             >
               {cta.label}
             </a>

@@ -6,13 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint && node scripts/check-motion-tokens.mjs",
+    "lint": "eslint && node scripts/check-tokens.mjs && node scripts/check-claims.mjs",
     "sync:perfil": "node scripts/sync-perfil.mjs",
-    "a11y": "node scripts/a11y.mjs"
+    "a11y": "node scripts/a11y.mjs",
+    "check:claims": "node scripts/check-claims.mjs"
   },
   "dependencies": {
-    "lucide-react": "^0.564.0",
-    "motion": "^13.4.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"

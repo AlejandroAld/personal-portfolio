@@ -4,7 +4,7 @@ import { LOCALES, getDictionary, isLocale } from "@/lib/site";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "José Alejandro Aldama Ramos — AI Engineer";
+export const alt = persona.nombre;
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));

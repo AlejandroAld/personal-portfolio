@@ -1,7 +1,6 @@
 import type { Dictionary } from "@/content/dictionary";
 import { publicacion, term } from "@/content/perfil";
 import SectionHeading from "./SectionHeading";
-import Reveal from "./Reveal";
 
 /**
  * La publicación arbitrada, con sección propia.
@@ -17,7 +16,7 @@ export default function Publication({ dict }: { dict: Dictionary }) {
         <SectionHeading eyebrow={dict.publication.eyebrow} title={dict.publication.title} />
 
         <div className="mt-heading grid gap-10 lg:grid-cols-5 lg:gap-14">
-          <Reveal className="lg:col-span-3">
+          <div className="lg:col-span-3">
             <p className="text-sm font-medium text-muted">{term(publicacion.medio, dict)}</p>
             <p className="mt-4 leading-relaxed text-muted text-pretty">{dict.publication.body}</p>
             <p className="mt-4 rounded-sm border-l-2 border-border-strong bg-card px-4 py-3 text-sm leading-relaxed text-subtle text-pretty">
@@ -34,14 +33,14 @@ export default function Publication({ dict }: { dict: Dictionary }) {
                 <span aria-hidden="true">↗</span>
               </a>
             </p>
-          </Reveal>
+          </div>
 
           <ul className="grid grid-cols-3 gap-6 self-start lg:col-span-2 lg:grid-cols-1 lg:gap-8">
-            {dict.publication.results.map((r, i) => (
-              <Reveal as="li" key={r.label} index={i}>
+            {dict.publication.results.map((r) => (
+              <li key={r.label}>
                 <p className="text-2xl font-semibold tracking-tight text-fg tnum sm:text-3xl">{r.value}</p>
                 <p className="mt-1 text-xs text-subtle text-pretty">{r.label}</p>
-              </Reveal>
+              </li>
             ))}
           </ul>
         </div>

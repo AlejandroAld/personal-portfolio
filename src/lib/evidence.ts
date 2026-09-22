@@ -12,7 +12,7 @@
  */
 
 export const CV_AGENT_REPO = "AlejandroAld/cv-agent";
-export const CV_AGENT_SHA = "a69a0f93afb9840e844bd8f31d75e670d697e226";
+export const CV_AGENT_SHA = "bec5dbb3736181082c7fecf003b1a21612892f3d";
 export const CV_AGENT_URL = `https://github.com/${CV_AGENT_REPO}`;
 
 /** Una línea suelta, o un rango [desde, hasta]. */
@@ -70,7 +70,7 @@ export const CITES = {
   noRagRationale: { label: "README.md", href: `${CV_AGENT_URL}/blob/${CV_AGENT_SHA}/README.md#contexto-completo-en-el-prompt-no-rag` },
 
   // --- Modo de falla: la fuga de datos en mi propio paper -----------------
-  paperLimitations: { label: "perfil.yaml:317-328", href: perfil([317, 328]) },
+  paperLimitations: { label: "perfil.yaml:321-332", href: perfil([321, 332]) },
   paperJournal: { label: "Computación y Sistemas", href: "https://www.cys.cic.ipn.mx/ojs/index.php/CyS/article/view/5887" },
 
   // --- Modo de falla: el falso negativo también miente --------------------
@@ -99,8 +99,8 @@ export const CITES = {
   saasFlotillas: { label: "perfil.yaml:208-218", href: perfil([208, 218]) },
   cotizador: { label: "perfil.yaml:248-259", href: perfil([248, 259]) },
   research: { label: "perfil.yaml:133-148", href: perfil([133, 148]) },
-  education: { label: "perfil.yaml:281-284", href: perfil([281, 284]) },
-  certifications: { label: "perfil.yaml:296-302", href: perfil([296, 302]) },
+  education: { label: "perfil.yaml:281-288", href: perfil([281, 288]) },
+  certifications: { label: "perfil.yaml:300-306", href: perfil([300, 306]) },
   presentation: { label: "perfil.yaml:21", href: perfil(21) },
   availability: { label: "perfil.yaml:31", href: perfil(31) },
   thesis: { label: "perfil.yaml:55-67", href: perfil([55, 67]) },

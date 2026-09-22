@@ -2,7 +2,6 @@ import type { Dictionary } from "@/content/dictionary";
 import { formatPeriod, perfil, term } from "@/content/perfil";
 import SectionHeading from "./SectionHeading";
 import SourceLink from "./SourceLink";
-import Reveal from "./Reveal";
 
 /** La cita de cada puesto, para la trazabilidad en hover. */
 const CITE_BY_ROLE = {
@@ -28,15 +27,13 @@ export default function Experience({ dict }: { dict: Dictionary }) {
         <SectionHeading eyebrow={dict.experience.eyebrow} title={dict.experience.title} />
 
         <ol className="mt-heading">
-          {perfil.experiencia.map((rol, i) => {
+          {perfil.experiencia.map((rol) => {
             const copy = dict.experience.roles[rol.id];
             const cite = CITE_BY_ROLE[rol.id as keyof typeof CITE_BY_ROLE];
 
             return (
-              <Reveal
-                as="li"
+              <li
                 key={rol.id}
-                index={i}
                 className="group relative border-b border-border py-8 first:pt-0 last:border-b-0"
               >
                 <div className="role-grid">
@@ -86,7 +83,7 @@ export default function Experience({ dict }: { dict: Dictionary }) {
                 </div>
 
                 {cite && <SourceLink cite={cite} ariaLabel={dict.footer.sourceAria} />}
-              </Reveal>
+              </li>
             );
           })}
         </ol>

@@ -1,15 +1,16 @@
 "use client";
 
-import { cubicBezier } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { COUNT_DURATION, EASE_OUT } from "@/lib/motion";
+import { cubicBezier } from "@/lib/bezier";
+import { COUNT_DURATION, EASE_OUT } from "@/lib/tokens";
 
 /**
- * Contador de métrica.
+ * Contador de métrica. Es lo único de la página que anima desde JavaScript.
  *
  * El valor final se renderiza en el HTML del servidor: existe sin JS, lo lee un
  * buscador, y el ancho no salta porque la cifra usa `tabular-nums`. El JS sólo
- * cuenta desde cero cuando el 30 % de la cifra entra en pantalla, una vez.
+ * cuenta desde cero cuando el 30 % de la cifra entra en pantalla, una vez, con
+ * requestAnimationFrame y la curva de entrada; sin librería.
  *
  * Con prefers-reduced-motion no se anima nada: la cifra se queda en su valor,
  * que es lo que la métrica quiere comunicar de todas formas.
