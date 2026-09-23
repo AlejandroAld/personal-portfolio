@@ -42,7 +42,7 @@ const HALO = srgb(59, 130, 246);
 const EDGE = srgb(161, 161, 170);
 const EDGE_OPACITY = 0.05; // (161,161,170) al 5 % sobre #0a0a0a ≈ rgb(18,18,18), bajo el tope
 const CONTENT_MAX_PX = 64 * 16; // la columna de contenido: max-w-5xl
-const CHROME_PX = 84; // barra + marcador
+const CHROME_PX = 84; // barra + marcador, si aún no se ha medido
 
 function layout(width: number, height: number, mobile: boolean) {
   const aspect = width / height; // la cámara ve x ∈ [-aspect, aspect], y ∈ [-1, 1]
@@ -61,6 +61,7 @@ function Graph({ mobile, onReady }: { mobile: boolean; onReady: () => void }) {
   const target = useRef(getProgress());
   const shown = useRef({ value: target.current.value });
   const zones = useRef<[number, number][]>([]);
+  const chrome = useRef(CHROME_PX);
   const ready = useRef(false);
   const hidden = useRef(false);
 
@@ -81,12 +82,13 @@ function Graph({ mobile, onReady }: { mobile: boolean; onReady: () => void }) {
       const r = el.getBoundingClientRect();
       return [r.top, r.bottom];
     });
+    chrome.current = document.querySelector(".marker")?.getBoundingClientRect().bottom ?? CHROME_PX;
   };
   const underText = (x: number, y: number, z: number, radiusPx: number): boolean => {
     const v = new THREE.Vector3(x, y, z).project(camera);
     const px = ((v.x + 1) / 2) * size.width;
     const py = ((1 - v.y) / 2) * size.height;
-    if (py - radiusPx < CHROME_PX) return true;
+    if (py - radiusPx < chrome.current) return true;
     const columnHalf = Math.min(size.width, CONTENT_MAX_PX) / 2;
     const inColumn = Math.abs(px - size.width / 2) - radiusPx < columnHalf;
     if (!inColumn) return false;

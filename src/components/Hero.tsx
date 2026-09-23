@@ -51,7 +51,7 @@ export default function Hero({ dict, run }: { dict: Dictionary; run: Run }) {
               {dict.hero.positioning} <span className="text-muted">{dict.hero.positioningAccent}</span>
             </h1>
 
-            <ul className="rise rise-3 mt-6 grid grid-cols-3 gap-4 sm:gap-6" aria-label={dict.metrics.sourceNote}>
+            <ul className="rise rise-3 mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6" aria-label={dict.metrics.sourceNote}>
               {dict.metrics.items.map((metric) => (
                 <li key={metric.cite}>
                   <p className="text-2xl font-semibold tracking-tight text-fg tnum sm:text-3xl">{metric.value}</p>

@@ -53,7 +53,7 @@ export default function Nav({
         scrolled || open ? "border-b border-border bg-nav backdrop-blur-md" : "border-b border-transparent"
       }`}
     >
-      <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
+      <nav className="mx-auto flex h-(--spacing-nav) max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
         <a
           href="#top"
           className="font-mono text-sm font-semibold tracking-tight text-fg transition-colors hover:text-accent"
