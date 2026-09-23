@@ -49,7 +49,7 @@ export default function Context({ dict, run }: { dict: Dictionary; run: Run }) {
               <span>{dict.context.sources}:</span>
               {educacion.fuentes.map((f) => (
                 <a key={f.url} href={f.url} target="_blank" rel="noopener noreferrer" className="underline decoration-dotted underline-offset-2 transition-colors hover:text-accent">
-                  {f.descripcion}
+                  {term(f.descripcion, dict)}
                 </a>
               ))}
             </p>

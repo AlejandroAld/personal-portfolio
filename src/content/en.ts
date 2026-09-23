@@ -439,6 +439,10 @@ const en: Dictionary = {
     "Español": "Spanish",
     "Inglés": "English",
     Nativo: "Native",
+    "B2, competencia profesional de trabajo. Lectura y escritura técnica fluidas, con una publicación arbitrada escrita en inglés. Conversacional en nivel intermedio alto, en mejora activa.":
+      "B2, professional working proficiency. Fluent technical reading and writing, with a peer-reviewed publication written in English. Conversational at an upper-intermediate level, actively improving.",
+    "ESCOM (IPN), Ingeniería en Inteligencia Artificial, plan de estudios 2020": "ESCOM (IPN), Artificial Intelligence Engineering, 2020 curriculum",
+    "OpenAI, Introducing ChatGPT, 30 de noviembre de 2022": "OpenAI, Introducing ChatGPT, November 30, 2022",
     "30 de noviembre de 2022": "November 30, 2022",
     // El titular del YAML, para los datos estructurados de la página en inglés.
     "Ingeniero en Inteligencia Artificial — agentes en producción, evaluación e integración con sistemas de negocio":
