@@ -227,11 +227,7 @@ const es: Dictionary = {
   },
 
   certifications: {
-    eyebrow: "Estudios y certificaciones",
-    title: "Credenciales",
     inProgress: "En curso",
-    education: "Estudios",
-    list: "Certificaciones",
     gpa: "Promedio",
   },
 
@@ -289,8 +285,36 @@ const es: Dictionary = {
     linkedin: "LinkedIn",
     github: "GitHub",
     resume: "Descargar CV",
-    languages:
-      "Español (nativo) · Inglés (B2, competencia profesional de trabajo: lectura y escritura técnica fluidas, con una publicación arbitrada escrita en inglés).",
+  },
+
+  run: {
+    stepLabel: "Paso {n} de {total}",
+    stepNames: ["Petición", "Contexto", "Consulta", "Razonamiento", "Verificación", "Respuesta"],
+    toolsStepName: "Herramientas",
+    marker: {
+      pending: "sin grabación todavía",
+      run: "corrida",
+      tokens: "tok",
+      running: "en curso",
+      done: "completado",
+      announce: "Paso {n} de {total}: {name}",
+    },
+  },
+
+  context: {
+    title: "El perfil completo entra a la ventana de contexto, sin recuperación",
+    intro:
+      "No hay base vectorial ni recuperador: el agente aplana perfil.yaml a texto y lo manda entero en cada petición. El modo de falla más común de un bot de CV es que el recuperador no traiga el fragmento correcto y el modelo rellene el hueco; con el perfil entero en contexto, esa falla no puede ocurrir.",
+    window: "Ventana de contexto",
+    windowNote: "Cada bloque contado con el tokenizador {tokenizer} sobre el texto exacto del prompt; el proveedor cobró {total} tokens de entrada en esta corrida.",
+    tokens: "{n} tokens",
+    pendingBlocks: "Los tamaños de bloque aparecen cuando la corrida esté grabada.",
+    education: "Formación",
+    languages: "Idiomas",
+    certifications: "Certificaciones",
+    sources: "Fuentes",
+    contextLine: null,
+    blocks: {},
   },
 
   footer: {

@@ -10,7 +10,7 @@ import { perfil, persona } from "@/content/perfil";
  */
 export default function Footer({ dict }: { dict: Dictionary }) {
   return (
-    <footer className="border-t border-border px-4 py-10 sm:px-6">
+    <footer className="page border-t border-border px-4 py-10 sm:px-6">
       <div className="mx-auto flex max-w-5xl flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-xl">
           <p className="text-xs leading-relaxed text-subtle text-pretty">

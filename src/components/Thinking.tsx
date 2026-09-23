@@ -11,7 +11,7 @@ import SourceLink from "./SourceLink";
  */
 export default function Thinking({ dict }: { dict: Dictionary }) {
   return (
-    <section id="thinking" className="section">
+    <section id="thinking" data-step="4" className="section">
       <div className="mx-auto max-w-5xl">
         <SectionHeading
           eyebrow={dict.thinking.eyebrow}

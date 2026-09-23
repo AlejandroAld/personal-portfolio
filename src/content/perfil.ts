@@ -58,6 +58,9 @@ export interface Perfil {
     readonly nivel: { readonly es: string; readonly en: string };
     readonly institucion: string;
     readonly periodo: string;
+    /** El contexto del ingreso, con las fuentes que lo respaldan. */
+    readonly contexto: string;
+    readonly fuentes: readonly { readonly descripcion: string; readonly url: string }[];
   }[];
   readonly publicaciones: readonly {
     readonly titulo: string;

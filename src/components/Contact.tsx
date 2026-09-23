@@ -22,7 +22,7 @@ export default function Contact({ dict }: { dict: Dictionary }) {
   ];
 
   return (
-    <section id="contact" className="section">
+    <section id="contact" data-step="6" className="section">
       <div className="mx-auto max-w-5xl">
         <SectionHeading
           eyebrow={dict.contact.eyebrow}
@@ -83,9 +83,6 @@ export default function Contact({ dict }: { dict: Dictionary }) {
             )}
           </div>
 
-          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-subtle text-pretty">
-            {dict.contact.languages}
-          </p>
         </div>
       </div>
     </section>

@@ -22,7 +22,7 @@ const CITE_BY_ROLE = {
  */
 export default function Experience({ dict }: { dict: Dictionary }) {
   return (
-    <section id="experience" className="section border-t-0">
+    <section id="experience" data-step="3" className="section">
       <div className="mx-auto max-w-5xl">
         <SectionHeading eyebrow={dict.experience.eyebrow} title={dict.experience.title} />
 

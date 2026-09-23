@@ -69,9 +69,11 @@
   --spacing-section: 5rem;
   --spacing-section-lg: 6rem;
   --spacing-heading: 2.5rem;
-  /* Lo que la barra fija tapa al saltar a un ancla. Es el ÚNICO desplazamiento:
-     ninguna sección lleva scroll-margin propio encima de esto. */
-  --spacing-anchor: 5rem;
+  /* Lo que la barra fija y el marcador tapan al saltar a un ancla. Es el ÚNICO
+     desplazamiento: ninguna sección lleva scroll-margin propio encima de esto. */
+  --spacing-anchor: 5.5rem;
+  /* Alto de la barra de navegación: el marcador se cuelga justo debajo. */
+  --spacing-nav: 3.5rem;
   /* Columna de fechas y empresa en la trayectoria. */
   --spacing-meta: 11rem;
 
@@ -294,33 +296,165 @@ html[data-navigated] .rise {
 }
 
 /* ===========================================================================
-   Fondo del héroe
+   El escenario: el grafo del agente detrás de toda la página
    ---------------------------------------------------------------------------
-   El degradado está SIEMPRE, sin JS. El canvas de WebGL lo tapa cuando puede;
-   cuando no —sin WebGL, contexto perdido, movimiento reducido o equipo
-   modesto— esto es lo que se ve, y es una composición terminada.
+   Un solo lienzo fijo (src/components/agent). Empieza como SVG del servidor y
+   el WebGL lo releva cuando carga. El contenido va encima en su propio nivel.
 
-   Reproduce la misma composición que el shader: una fuente fría abajo a la
-   derecha sobre casi negro, con el mismo tope de brillo (#121b34) que mantiene
-   el contraste AA de todo el texto que va encima. Ese color no es un token:
-   está calculado contra el shader en src/lib/glow.ts, y se cambia allí.
+   PRESUPUESTO DE BRILLO. El cuerpo de texto (`muted`, #a1a1aa) tiene que
+   seguir en AAA (7:1) sobre lo que sea que haya detrás, y eso pone un tope al
+   píxel más claro bajo la columna de texto: rgb(14, 20, 38), luminancia 0.0085.
+   Todo lo que este escenario pinta bajo el contenido queda por debajo:
+   aristas de borde al 35 % (≈ rgb(20,20,23)), nodos de acento al 10–16 %
+   (≈ rgb(9,21,39)). En escritorio el token de la petición viaja por el margen
+   derecho, fuera de la columna, y sólo ahí enciende. Se mide con el shader
+   corriendo: ver README, "contraste".
    =========================================================================== */
 
-.hero-backdrop {
-  position: absolute;
+.page {
+  position: relative;
+  z-index: 1;
+}
+
+.stage {
+  position: fixed;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(115% 85% at 72% 108%, #121b34 0%, rgba(18, 27, 52, 0.38) 36%, transparent 70%),
-    var(--color-bg);
 }
 
-.hero-canvas {
-  display: block;
-  width: 100%;
+.stage-svg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+.stage-svg-off {
+  opacity: 0;
+}
+
+.diagram {
   height: 100%;
+  width: auto;
+  max-width: 100%;
+}
+.diagram line {
+  stroke: var(--color-border-strong);
+  stroke-opacity: 0.35;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  transition: stroke-opacity var(--duration-base) var(--ease-out);
+}
+.diagram circle {
+  fill: var(--color-accent);
+  fill-opacity: 0.1;
+  transition: fill-opacity var(--duration-base) var(--ease-out);
+}
+/* El paso activo, un poco más presente; sin JS se queda en el 1. */
+html:not([data-run-step]) .diagram [data-steps~="1"],
+html[data-run-step="1"] .diagram [data-steps~="1"],
+html[data-run-step="2"] .diagram [data-steps~="2"],
+html[data-run-step="3"] .diagram [data-steps~="3"],
+html[data-run-step="4"] .diagram [data-steps~="4"],
+html[data-run-step="5"] .diagram [data-steps~="5"],
+html[data-run-step="6"] .diagram [data-steps~="6"] {
+  fill-opacity: 0.16;
+  stroke: var(--color-accent);
+  stroke-opacity: 0.3;
+}
+
+.stage-canvas {
+  position: absolute !important;
+  inset: 0;
+}
+
+/* ===========================================================================
+   El marcador de la corrida
+   ---------------------------------------------------------------------------
+   Fijo bajo la barra, discreto, en monoespaciada. Lo alimenta la grabación.
+   =========================================================================== */
+
+.marker {
+  position: fixed;
+  top: var(--spacing-nav);
+  inset-inline: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  padding: 0.25rem 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1rem;
+  color: var(--color-subtle);
+  background: var(--color-nav);
+  border-bottom: 1px solid var(--color-border);
+  backdrop-filter: blur(12px);
+}
+.marker-inner {
+  display: flex;
+  gap: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.marker-sep {
+  color: var(--color-border-strong);
+}
+.marker-id {
+  color: var(--color-muted);
+}
+
+/* ===========================================================================
+   La petición (paso 1) y la ventana de contexto (paso 2)
+   =========================================================================== */
+
+.prompt {
+  @apply mt-4 max-w-2xl text-lg leading-snug text-fg sm:text-xl;
+}
+.prompt-caret {
+  color: var(--color-accent);
+}
+/* La pregunta se escribe palabra por palabra en la primera carga: sólo
+   opacidad, y el texto está entero en el HTML. */
+.prompt-word {
+  animation: word-in var(--duration-fast) var(--ease-out) both;
+}
+@keyframes word-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+html[data-navigated] .prompt-word {
+  animation: none;
+}
+
+.context-window {
+  display: grid;
+  gap: 0.625rem;
+}
+.context-track {
+  margin-top: 0.375rem;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-border);
+}
+/* La ventana se llena al entrar al paso 2: un bloque tras otro. Sin JS no hay
+   pasos, y las barras se ven llenas de entrada. */
+.context-bar {
+  height: 100%;
+  background: var(--color-accent);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform var(--duration-base) var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 40ms);
+}
+html:not([data-run-step="1"]) .context-bar {
+  transform: scaleX(1);
 }
 
 /* Las cifras no deben cambiar de ancho mientras el contador corre. */

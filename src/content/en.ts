@@ -229,11 +229,7 @@ const en: Dictionary = {
   },
 
   certifications: {
-    eyebrow: "Education & certifications",
-    title: "Credentials",
     inProgress: "In progress",
-    education: "Education",
-    list: "Certifications",
     gpa: "GPA",
   },
 
@@ -291,8 +287,49 @@ const en: Dictionary = {
     linkedin: "LinkedIn",
     github: "GitHub",
     resume: "Download CV",
-    languages:
-      "Spanish (native) · English (B2, professional working proficiency — fluent technical reading and writing, with a peer-reviewed publication written in English).",
+  },
+
+  run: {
+    stepLabel: "Step {n} of {total}",
+    stepNames: ["Request", "Context", "Query", "Reasoning", "Verification", "Answer"],
+    toolsStepName: "Tools",
+    marker: {
+      pending: "no recording yet",
+      run: "run",
+      tokens: "tok",
+      running: "running",
+      done: "completed",
+      announce: "Step {n} of {total}: {name}",
+    },
+  },
+
+  context: {
+    title: "The whole profile goes into the context window, without retrieval",
+    intro:
+      "There is no vector store and no retriever: the agent flattens perfil.yaml into text and sends it whole with every request. The most common failure of a CV bot is a retriever missing the right chunk and the model filling the gap; with the full profile in context, that failure cannot happen.",
+    window: "Context window",
+    windowNote: "Each block counted with the {tokenizer} tokenizer over the exact prompt text; the provider billed {total} input tokens for this run.",
+    tokens: "{n} tokens",
+    pendingBlocks: "Block sizes appear once the run is recorded.",
+    education: "Education",
+    languages: "Languages",
+    certifications: "Certifications",
+    sources: "Sources",
+    contextLine:
+      "I entered Artificial Intelligence Engineering in 2021, in one of the first cohorts of the IPN program: ESCOM created it with the 2020 curriculum, and ChatGPT came out on November 30, 2022, almost two years after I started.",
+    blocks: {
+      Identidad: "Identity",
+      "Contacto público": "Public contact",
+      Resumen: "Summary",
+      Experiencia: "Experience",
+      Proyectos: "Projects",
+      Habilidades: "Skills",
+      Educación: "Education",
+      Publicaciones: "Publications",
+      Certificaciones: "Certifications",
+      "Respuestas preparadas (úsalas casi literales cuando apliquen)": "Prepared answers",
+      "Datos que NO debes revelar": "Data that must not be revealed",
+    },
   },
 
   footer: {
@@ -401,6 +438,8 @@ const en: Dictionary = {
     "Ingeniería en Inteligencia Artificial": `${educacion.nivel.en} Artificial Intelligence Engineering`,
     "Español": "Spanish",
     "Inglés": "English",
+    Nativo: "Native",
+    "30 de noviembre de 2022": "November 30, 2022",
     // El titular del YAML, para los datos estructurados de la página en inglés.
     "Ingeniero en Inteligencia Artificial — agentes en producción, evaluación e integración con sistemas de negocio":
       "AI Engineer — agents in production, evaluation and integration with business systems",

@@ -145,12 +145,7 @@ export interface Dictionary {
   };
 
   readonly certifications: {
-    readonly eyebrow: string;
-    readonly title: string;
     readonly inProgress: string;
-    readonly education: string;
-    /** Subtítulo de la lista. No es `title`: repetir el h2 debajo del h2 confunde. */
-    readonly list: string;
     readonly gpa: string;
   };
 
@@ -173,7 +168,43 @@ export interface Dictionary {
     readonly linkedin: string;
     readonly github: string;
     readonly resume: string;
+  };
+
+  /** El recorrido de la corrida: nombres de paso y el marcador. */
+  readonly run: {
+    /** "Paso {n} de {total}" */
+    readonly stepLabel: string;
+    readonly stepNames: readonly string[];
+    /** El nombre del paso 3 cuando la corrida grabada sí llamó herramientas. */
+    readonly toolsStepName: string;
+    readonly marker: {
+      readonly pending: string;
+      readonly run: string;
+      readonly tokens: string;
+      readonly running: string;
+      readonly done: string;
+      /** "Paso {n} de {total}: {name}" — lo único que se anuncia al lector de pantalla. */
+      readonly announce: string;
+    };
+  };
+
+  /** Paso 2: formación, idiomas y la ventana de contexto. */
+  readonly context: {
+    readonly title: string;
+    readonly intro: string;
+    readonly window: string;
+    readonly windowNote: string;
+    /** "{n} tokens" */
+    readonly tokens: string;
+    readonly pendingBlocks: string;
+    readonly education: string;
     readonly languages: string;
+    readonly certifications: string;
+    readonly sources: string;
+    /** Traducción de `educacion.contexto`; en español va el YAML tal cual. */
+    readonly contextLine: string | null;
+    /** Nombres en inglés de los bloques del prompt; en español van tal cual. */
+    readonly blocks: Readonly<Record<string, string>>;
   };
 
   readonly footer: {
