@@ -1,6 +1,7 @@
 "use client";
 
 import LanguageLink from "./LanguageLink";
+import ModeToggle from "./ModeToggle";
 import { useEffect, useState } from "react";
 
 /**
@@ -14,6 +15,8 @@ import { useEffect, useState } from "react";
 export interface NavLink {
   readonly href: string;
   readonly label: string;
+  /** Nodo del mapa: en modo explorar el explorador vuela en vez de recargar. */
+  readonly enter?: string;
 }
 
 export default function Nav({
@@ -21,11 +24,14 @@ export default function Nav({
   labels,
   cta,
   languageSwitch,
+  home,
 }: {
   links: readonly NavLink[];
-  labels: { menu: string; close: string };
+  labels: { menu: string; close: string; mode: { cv: string; explore: string } };
   cta: NavLink | null;
   languageSwitch: NavLink | null;
+  /** La ruta del mapa: el logotipo vuelve ahí. */
+  home: string;
 }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -55,19 +61,17 @@ export default function Nav({
     >
       <nav className="mx-auto flex h-(--spacing-nav) max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
         <a
-          href="#top"
+          href={home}
+          data-enter=""
           className="font-mono text-sm font-semibold tracking-tight text-fg transition-colors hover:text-accent"
         >
           aldama<span className="text-accent">.</span>
         </a>
 
-        <ul className="hidden items-center gap-7 md:flex">
+        <ul className="hidden items-center gap-6 md:flex">
           {links.map((link) => (
             <li key={link.href}>
-              <a
-                href={link.href}
-                className="nav-link"
-              >
+              <a href={link.href} data-enter={link.enter} className="nav-link">
                 {link.label}
               </a>
             </li>
@@ -75,6 +79,9 @@ export default function Nav({
         </ul>
 
         <div className="flex items-center gap-2">
+          {/* Modo CV: la columna completa, sin 3D. Siempre a la vista. */}
+          <ModeToggle labels={labels.mode} />
+
           {/* Navegación del cliente con fundido cruzado: ver LanguageLink. */}
           {languageSwitch && (
             <LanguageLink
@@ -119,6 +126,7 @@ export default function Nav({
               <li key={link.href}>
                 <a
                   href={link.href}
+                  data-enter={link.enter}
                   className="block rounded-sm px-2 py-2.5 text-sm text-muted transition-colors hover:bg-surface hover:text-fg"
                   onClick={() => setOpen(false)}
                 >

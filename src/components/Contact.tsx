@@ -1,10 +1,9 @@
 import type { Dictionary } from "@/content/dictionary";
 import { contacto, persona } from "@/content/perfil";
 import { RESUME_URL } from "@/lib/site";
-import SectionHeading from "./SectionHeading";
 
 /**
- * Contacto.
+ * API · Contacto.
  *
  * Correo, ciudad, LinkedIn, GitHub y la descarga del CV. Sin teléfono y sin
  * dirección: el perfil los declara como datos no divulgables, y el sitio
@@ -22,69 +21,42 @@ export default function Contact({ dict }: { dict: Dictionary }) {
   ];
 
   return (
-    <section id="contact" data-step="6" className="section">
-      <div className="mx-auto max-w-5xl">
-        <SectionHeading
-          eyebrow={dict.contact.eyebrow}
-          title={dict.contact.title}
-          intro={dict.contact.body}
-        />
+    <>
+      <ul className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+        {entries.map((entry) => {
+          const inner = (
+            <>
+              <span className="label block">{entry.label}</span>
+              <span className="mt-1.5 block truncate text-sm text-fg transition-colors group-hover:text-accent">{entry.value}</span>
+            </>
+          );
 
-        <ul className="mt-heading grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
-          {entries.map((entry) => {
-            const inner = (
-              <>
-                <span className="label block">
-                  {entry.label}
-                </span>
-                <span className="mt-1.5 block truncate text-sm text-fg transition-colors group-hover:text-accent">
-                  {entry.value}
-                </span>
-              </>
-            );
+          return (
+            <li key={entry.label} className="bg-bg">
+              {entry.href ? (
+                <a href={entry.href} target={entry.external ? "_blank" : undefined} rel={entry.external ? "noopener noreferrer" : undefined} className="group block px-5 py-5 transition-colors hover:bg-surface">
+                  {inner}
+                </a>
+              ) : (
+                <div className="px-5 py-5">{inner}</div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
 
-            return (
-              <li key={entry.label} className="bg-bg">
-                {entry.href ? (
-                  <a
-                    href={entry.href}
-                    target={entry.external ? "_blank" : undefined}
-                    rel={entry.external ? "noopener noreferrer" : undefined}
-                    className="group block px-5 py-5 transition-colors hover:bg-surface"
-                  >
-                    {inner}
-                  </a>
-                ) : (
-                  <div className="px-5 py-5">{inner}</div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-
-        <div>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <a
-              href={`mailto:${contacto.email}`}
-              className="btn btn-primary"
-            >
-              {dict.hero.ctaContact}
-              <span aria-hidden="true">→</span>
-            </a>
-            {/* Apagado hasta que exista el PDF. */}
-            {RESUME_URL && (
-              <a
-                href={RESUME_URL}
-                download
-                className="btn btn-secondary"
-              >
-                {dict.contact.resume}
-              </a>
-            )}
-          </div>
-
-        </div>
+      <div className="mt-8 flex flex-wrap items-center gap-4">
+        <a href={`mailto:${contacto.email}`} className="btn btn-primary">
+          {dict.hero.ctaContact}
+          <span aria-hidden="true">→</span>
+        </a>
+        {/* Apagado hasta que exista el PDF. */}
+        {RESUME_URL && (
+          <a href={RESUME_URL} download className="btn btn-secondary">
+            {dict.contact.resume}
+          </a>
+        )}
       </div>
-    </section>
+    </>
   );
 }

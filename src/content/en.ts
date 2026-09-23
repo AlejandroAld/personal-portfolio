@@ -39,11 +39,6 @@ const en: Dictionary = {
   },
 
   nav: {
-    experience: "Experience",
-    projects: "Projects",
-    publication: "Publication",
-    skills: "Skills",
-    contact: "Contact",
     menu: "Open menu",
     close: "Close menu",
     skipToContent: "Skip to content",
@@ -60,8 +55,45 @@ const en: Dictionary = {
     availability:
       "Open to AI engineering roles in Mexico — on-site, hybrid or remote. Open to relocation.",
     ctaContact: "Get in touch",
-    ctaProjects: "See the work",
     ctaResume: "Download CV",
+  },
+
+  map: {
+    hint: "Scroll, or tap a node",
+    cvMode: "CV mode",
+    exploreMode: "Explore",
+    close: "Close (Esc)",
+    home: "alex",
+    routeAria: "Path",
+    mapAria: "Map",
+    nodes: {
+      core: { name: "Alex" },
+      prompt: { name: "Who I am" },
+      memory: { name: "Experience" },
+      outputs: { name: "Projects" },
+      tools: { name: "Stack" },
+      training: { name: "Education" },
+      api: { name: "Contact" },
+      hood: { name: "Under the hood" },
+    },
+  },
+
+  who: {
+    title: "Who I am and what I'm looking for",
+    lookingFor: "What I'm looking for",
+    since2021: "Since 2021",
+  },
+
+  training: {
+    title: "Education, research and certifications",
+  },
+
+  moment: {
+    caption:
+      "I inherited a system of more than 180 nodes with its logic scattered and errors that could not be reproduced. I rebuilt it on a single orchestrator with explicit state, and the monthly operating cost dropped 92% while the volume handled grew.",
+    before: "180+ nodes",
+    after: "1 orchestrator · 4 agents",
+    metric: "−92% monthly cost",
   },
 
   metrics: {
@@ -98,7 +130,6 @@ const en: Dictionary = {
   },
 
   experience: {
-    eyebrow: "Experience",
     title: "Four years, four rooms",
     present: "Present",
     roles: {
@@ -153,7 +184,6 @@ const en: Dictionary = {
   },
 
   projects: {
-    eyebrow: "Projects",
     title: "Seven things I built",
     intro:
       "Production systems at an automotive group, plus what I build on my own time. Code is linked where the repository is public; the rest is my employer's and stays private.",
@@ -224,7 +254,6 @@ const en: Dictionary = {
   },
 
   skills: {
-    eyebrow: "Skills",
     title: "What I work with",
   },
 
@@ -235,7 +264,6 @@ const en: Dictionary = {
 
   thinking: {
     eyebrow: "How I think",
-    title: "Failure modes I've fixed",
     intro:
       "The interesting part of a system isn't the architecture diagram, it's what broke and what changed because of it.",
     symptom: "What broke",
@@ -279,7 +307,6 @@ const en: Dictionary = {
   },
 
   contact: {
-    eyebrow: "Contact",
     title: "Let's talk",
     body: "If you're hiring for the stretch between pilot and production — where most AI projects stall — that's the work I've been doing. Happy to go as deep into the technical detail as you want.",
     email: "Email",
@@ -290,17 +317,19 @@ const en: Dictionary = {
   },
 
   run: {
-    stepLabel: "Step {n} of {total}",
-    stepNames: ["Request", "Context", "Query", "Reasoning", "Verification", "Answer"],
-    toolsStepName: "Tools",
-    marker: {
-      pending: "no recording yet",
-      run: "run",
-      tokens: "tok",
-      running: "running",
-      done: "completed",
-      announce: "Step {n} of {total}: {name}",
-    },
+    title: "Recorded run",
+    run: "run",
+    model: "model",
+    input: "input",
+    reasoning: "reasoning",
+    output: "output",
+    time: "time",
+    state: "state",
+    tokens: "{n} tok",
+    pending: "no recording yet",
+    done: "completed",
+    note: "Nothing runs live: what you see is a real run of the deployed agent, recorded once and replayed here. Every figure comes from that recording; if it isn't recorded, there is no figure.",
+    recordedFrom: "Recorded with",
   },
 
   context: {
@@ -336,7 +365,7 @@ const en: Dictionary = {
     sourceAria: "Source: {label} — opens in a new tab",
     generated: "Every fact on this page is generated from a single YAML file — the same source of truth my CV agent answers from.",
     generatedLink: "See perfil.yaml",
-    builtWith: "Next.js, TypeScript, Tailwind. Hero background is a hand-written WebGL shader.",
+    builtWith: "Next.js, TypeScript, Tailwind and three.js. The map is a single WebGL canvas behind the page; CV mode has none.",
   },
 
   months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],

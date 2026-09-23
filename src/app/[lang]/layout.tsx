@@ -120,11 +120,27 @@ export default async function LocaleLayout({
   const dict = getDictionary(lang);
 
   return (
-    <html lang={dict.htmlLang}>
+    // `data-mode` lo pone el script de abajo antes del primer pintado; React
+    // no lo conoce y no tiene que avisar de la diferencia.
+    <html lang={dict.htmlLang} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd(lang)) }}
+        />
+        {/*
+          El modo y el nivel, decididos antes de pintar para que no haya
+          salto: con JavaScript la página se explora (el mapa), salvo que la
+          persona haya elegido Modo CV, que se recuerda en este navegador; el
+          nivel sale de la URL (idioma / nodo / subnodo), igual que lo lee el
+          explorador después. Sin JavaScript no corre nada y el CSS muestra
+          la columna completa.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              '(function(){var d=document.documentElement;var n=location.pathname.split("/").filter(Boolean).length;d.dataset.level=n>=3?"sub":n===2?"node":"map";try{d.dataset.mode=localStorage.getItem("modo")==="cv"?"cv":"explore"}catch(e){d.dataset.mode="explore"}})()',
+          }}
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>

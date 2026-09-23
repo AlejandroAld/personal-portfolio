@@ -33,91 +33,137 @@ De ahí las dos piezas que definen la arquitectura:
 ```
 src/
   app/
-    [lang]/            layout raíz, página, imagen OG  (/en y /es, estáticas)
-    sitemap.ts         sólo los idiomas terminados
-    robots.ts          los pendientes van a Disallow
-    globals.css        tokens (@theme), clases de componente, evidencia, reduced-motion
-  components/          secciones + islas de cliente:
-                         Nav, LanguageLink
-                         agent/  RunMarker, AgentStage, AgentScene (WebGL), AgentDiagram (SVG)
-                         AgentChat, AgentDemo  ← escritos, SIN publicar
+    [lang]/                  layout raíz (pone el modo antes de pintar), imagen OG
+      page.tsx               el mapa            /en, /es
+      [node]/page.tsx        un nodo            /es/memoria, /en/memory…
+      [node]/[sub]/page.tsx  un subnodo         /es/memoria/dalton
+    sitemap.ts               sólo los idiomas terminados; cada nodo y subnodo
+    robots.ts                los pendientes van a Disallow
+    globals.css              tokens (@theme), clases de componente, los dos modos, reduced-motion
+  components/
+    Site.tsx                 la página entera, para cualquier ruta del mapa
+    Core.tsx                 el núcleo: la primera pantalla
+    map/                     el marco: Explorer (almacén), MapStage + MapScene (WebGL), MapDiagram (SVG),
+                             MapLabels, RouteBar, Room, RoomClose
+    rooms/                   WhoIAm, Training, Hood, DaltonMoment
+    Experience, Projects, Skills, Contact   el cuerpo de las salas
+    Nav, ModeToggle, LanguageLink
+    AgentChat, AgentDemo     ← escritos, SIN publicar
   content/
-    perfil.json        GENERADO — no editar a mano
-    perfil.ts          acceso tipado + formateo de fechas
-    runs/es.json       la corrida grabada del agente, por idioma (ver "La corrida")
+    perfil.json              GENERADO — no editar a mano
+    perfil.ts                acceso tipado + formateo de fechas
+    runs/es.json             la corrida grabada del agente, por idioma (ver "Bajo el capó")
     runs/en.json
-    runs.ts            acceso tipado a las corridas
-    dictionary.ts      la forma del contenido
-    en.ts              prosa en inglés  (completo)
-    es.ts              prosa en español (completo)
+    runs.ts                  acceso tipado a las corridas
+    dictionary.ts            la forma del contenido
+    en.ts                    prosa en inglés  (completo)
+    es.ts                    prosa en español (completo)
   lib/
-    evidence.ts        SHA fijado + todas las citas, en un solo lugar
-    agent-graph.ts     el grafo del agente: nodos, aristas y el camino por pasos
-    run-progress.ts    un solo observador del scroll: paso actual y avance
-    tokens.ts          la curva de entrada, en JS, para el marcador
-    bezier.ts          cubic-bezier() como función, 40 líneas
-    site.ts            dominio, endpoint del agente, idiomas, banderas
+    evidence.ts              SHA fijado + todas las citas, en un solo lugar
+    map-graph.ts             el mapa: nodos, slugs, aristas, tour, cámara
+    explorer.ts              el explorador: niveles, URLs, scroll, teclado, modo
+    tokens.ts                las curvas y el vuelo, en JS, iguales que en el CSS
+    bezier.ts                cubic-bezier() como función, 40 líneas
+    site.ts                  dominio, endpoint del agente, idiomas, banderas
 scripts/
-  sync-perfil.mjs      trae perfil.yaml del repo del agente
-  check-tokens.mjs     lint: la curva del JS es la del CSS y ningún token está muerto
-  check-claims.mjs     lint: cada número y nombre propio de la prosa está en perfil.yaml
-  check-runs.mjs       lint: las corridas grabadas tienen forma completa y son del agente desplegado
-  a11y.mjs             axe-core contra la página construida, 2 idiomas × 4 estados
+  sync-perfil.mjs            trae perfil.yaml del repo del agente
+  check-tokens.mjs           lint: las curvas y el vuelo del JS son los del CSS y ningún token está muerto
+  check-claims.mjs           lint: cada número y nombre propio de la prosa está en perfil.yaml
+  check-runs.mjs             lint: las corridas grabadas tienen forma completa y son del agente desplegado
+  a11y.mjs                   axe-core contra la página construida, 2 idiomas × 8 estados
 docs/
-  agent-run-map.md     lo que pasa de verdad en una corrida, con archivo:línea
+  agent-run-map.md           lo que pasa de verdad en una corrida, con archivo:línea
 tests/
-  agent-demo/          pruebas del cliente del agente, con su README
+  agent-demo/                pruebas del cliente del agente, con su README
 ```
 
 ---
 
-## La página es una corrida del agente
+## El perfil como un agente que se explora con zoom
 
-La página se cuenta como la ejecución de mi agente de CV respondiendo
-"¿Quién es Alex y por qué debería contratarlo?": seis pasos, una sección cada
-uno, y al hacer scroll se ve correr al agente. Dos condiciones mandan sobre
-todo lo demás:
+Mi CV vive en los nodos de un mapa; la mecánica de agentes vive en el marco.
+Tres principios mandan sobre todo lo demás:
 
-1. **Es verdad, no una simulación.** Cada paso es algo que el agente hace de
-   verdad, con su archivo y línea en `docs/agent-run-map.md`. Lo que se
-   reproduce es una corrida grabada contra el agente desplegado
-   (`scripts/grabar_corrida.py` en el repo del agente): eventos SSE con
-   tiempo, id, `usage`, herramientas y el contexto bloque por bloque. Nada
-   corre en vivo, cada visita cuesta cero, y cada número que la página
-   muestra —tokens, tiempos, id— sale de ese JSON. Si un dato no está en la
-   grabación, no se muestra: mientras `runs/*.json` está `pending`, el
-   marcador lo dice y no hay cifras.
-2. **Un reclutador con prisa entiende todo sin interactuar.** La primera
-   pantalla dice quién soy, qué hago, las tres cifras y cómo contactarme. Todo
-   es HTML del servidor: se lee sin JavaScript, sin WebGL y con el 3D todavía
-   cargando. La metáfora enmarca el contenido, no lo reemplaza.
+1. **Las dos historias van separadas.** Las salas son CV puro: ni una línea
+   sobre agentes. El vocabulario de agente aparece sólo en el marco —el nombre
+   de cada nodo (término de agente en inglés + término normal traducido:
+   "Memory · Experiencia") y la ruta— y la explicación de cómo funciona la
+   página vive en un nodo propio, "Bajo el capó", que cuelga del núcleo con
+   una arista punteada porque no es parte del CV.
+2. **Navegación espacial con zoom semántico en tres niveles:** mapa, nodo (una
+   sección) y subnodo (el detalle: un puesto). Entrar a un nodo es un vuelo de
+   cámara de 900 ms; el nodo se abre como una sala y el resto del grafo se
+   desenfoca y oscurece detrás. Cada nivel tiene su URL (`/es/memoria/dalton`),
+   así que el atrás del navegador y los enlaces directos funcionan; la ruta
+   tipo terminal (`~/alex/memoria/dalton`) lleva un enlace por tramo.
+3. **Dos formas de recorrerlo.** El scroll es un tour guiado que vuela de
+   nodo en nodo en orden; el clic o el toque es exploración libre. "Modo CV",
+   siempre en la barra, muestra todo el contenido en una sola columna sencilla
+   e imprimible: es también lo que se ve sin JavaScript o sin WebGL, y lo que
+   lee un buscador.
 
-| Paso | Sección | Lo que hace el agente |
+| Nodo | Sala | Contenido |
 |---|---|---|
-| 1 · Petición | Héroe | Llega el POST, se crea el id, se emite `response.created`. |
-| 2 · Contexto | Formación e idiomas | El perfil completo entra a la ventana de contexto, sin recuperación; un bloque por sección del YAML. |
-| 3 · Consulta | Experiencia | El modelo recibe contexto, pregunta y las cuatro herramientas; para una pregunta general responde directo. Se llama "Herramientas" sólo si la corrida grabada las llamó. |
-| 4 · Razonamiento | Cómo pienso | Tokens de razonamiento reales, si la corrida los reporta. |
-| 5 · Verificación | Fuentes | No es un paso del bucle: es la fundamentación por reglas del agente y la verificación de esta página (check-claims, citas), contadas como lo que son. |
-| 6 · Respuesta | Contacto | El texto llega por `output_text.delta`; `response.completed` trae el usage. |
+| Alex | El núcleo | La primera pantalla: nombre, rol, las tres cifras con fuente y contacto, encima del mapa completo, y la pista "Haz scroll o toca un nodo". |
+| System prompt · Quién soy | `/es/quien-soy` | Quién soy, qué busco, cómo pienso (los modos de falla) y la frase del ingreso en 2021 con sus fuentes. |
+| Memory · Experiencia | `/es/memoria` | Los cuatro puestos como subnodos, del más reciente al más antiguo. Dentro de Dalton, el momento fuerte: un grafo de 184 nodos que colapsa en un solo orquestador con cuatro ramas, y el 92 %. |
+| Outputs · Proyectos | `/es/proyectos` | Los siete proyectos de perfil.yaml. |
+| Tools · Stack | `/es/stack` | Las nueve categorías de habilidades, en racimos. |
+| Training · Formación | `/es/formacion` | IPN, la publicación arbitrada con sus límites, idiomas y certificaciones en curso. |
+| API · Contacto | `/es/contacto` | Correo, LinkedIn y GitHub. |
+| Bajo el capó | `/es/bajo-el-capo` | Cómo funciona la página: la ventana de contexto bloque por bloque y la corrida grabada con su marcador. Las grabaciones sólo se usan aquí. |
 
-Los pasos 1 y 2 están construidos; 3, 4 y 6 conservan por ahora su contenido
-de siempre con su número de paso, y el 5 llega con ellos.
+**Es verdad, no una simulación.** Lo que "Bajo el capó" reproduce es una
+corrida grabada contra el agente desplegado (`scripts/grabar_corrida.py` en
+el repo del agente): eventos SSE con tiempo, id, `usage`, herramientas y el
+contexto bloque por bloque, contado con el tokenizador sobre el texto exacto.
+Nada corre en vivo, cada visita cuesta cero, y cada número sale de ese JSON.
+Mientras `runs/*.json` está `pending`, el marcador lo dice y no hay cifras.
+`docs/agent-run-map.md` tiene lo que pasa de verdad en el agente, con
+archivo y línea.
 
-**El marcador**, fijo bajo la barra y en monoespaciada, muestra id, paso,
-tokens acumulados, tiempo y estado, y avanza con el scroll: la entrada se
-carga en el paso 2, el razonamiento en el 4, la salida en el 6. Para lectores
-de pantalla sólo anuncia el cambio de paso.
+**Un solo DOM para los dos modos.** El HTML del servidor es siempre la
+columna completa: el núcleo y las siete salas, una tras otra. Con JavaScript,
+un script en `<head>` pone `data-mode="explore"` antes del primer pintado
+(salvo que la persona haya elegido Modo CV, que se recuerda en el navegador)
+y el CSS convierte esa misma columna en el mapa: el núcleo queda fijo sobre el
+lienzo, las salas se esconden salvo la abierta, que se vuelve panel con scroll
+propio, y un carril invisible le da al scroll la altura del tour. Nada se
+duplica y nada se pide al servidor al navegar: cada nodo es un `pushState`
+sobre la misma página. Un enlace directo a un subnodo llega con su sala ya
+abierta en el HTML.
 
-**El escenario** es un solo lienzo fijo detrás de toda la página con el grafo
-del agente (`src/lib/agent-graph.ts`), por donde viaja la petición conforme
-avanza el scroll. three.js con React Three Fiber, `frameloop="demand"`: sólo
-renderiza cuando hay scroll o una transición activa (0 draw calls en reposo,
-medido), DPR tope 2 (1.5 en móvil), pausa con la pestaña oculta, y se carga
-después del LCP en su propio chunk (**238 KB gzip**, tope 300). Sin WebGL o
-con `prefers-reduced-motion`, queda el mismo grafo como SVG del servidor, con
-el paso activo resaltado y sin vuelos de cámara; sin JavaScript, el SVG y el
-paso 1. Sustituye al shader del héroe: nunca dos contextos WebGL a la vez.
+**El escenario** es un solo lienzo fijo detrás de todo (three.js con React
+Three Fiber, `src/components/map/MapScene.tsx`): el grafo con el núcleo al
+centro y los nodos a distintas profundidades, compuesto a mano para apaisado
+y para vertical (`src/lib/map-graph.ts`). Las aristas significan algo —el
+system prompt gobierna a todos, Tools alimenta a Outputs, Training alimenta a
+Memory— y por ellas viajan partículas tenues como tokens. En reposo, paralaje
+suave con el cursor. `frameloop="demand"`: renderiza durante un vuelo, con el
+paralaje, y —para las partículas— a 20 cuadros por segundo mientras el mapa
+está a la vista y hubo interacción en los últimos 20 segundos; después se
+duerme, y con la pestaña oculta o con movimiento reducido no pide ningún
+cuadro. DPR tope 2 (1.5 en vertical), sin luces ni posprocesado. Se carga
+después del LCP en su propio chunk (**241 KB gzip**, tope 300); mientras
+tanto está el mismo mapa como SVG del servidor, proyectado con la misma
+cámara. Sin WebGL la página pasa a Modo CV, y en Modo CV el lienzo se
+desmonta: nunca hay dos contextos WebGL, y a veces ninguno.
+
+**Etiquetas, teclado y lectores de pantalla.** Las etiquetas de los nodos son
+HTML encima del lienzo (enlaces de verdad, con su URL y objetivos táctiles
+de 44 px), colocadas cada cuadro con la proyección de la cámara. Se recorren
+con las flechas, Enter entra y Esc sale (o el atrás del navegador, o
+pellizcar en el teléfono). La sala abierta es un `role="dialog"`, recibe el
+foco en su título, y lo que queda detrás (núcleo y etiquetas) va `inert`; al
+salir, el foco vuelve a la etiqueta del nodo. En móvil la sala entra como
+panel a pantalla completa.
+
+**Movimiento con significado.** Lo único que se mueve es lo que cambia de
+estado: el vuelo de la cámara al entrar y salir, la sala que llega cuando la
+cámara aterriza, las barras de la ventana de contexto que se llenan al abrir
+"Bajo el capó", y el colapso del grafo de Dalton cuando su subnodo entra en
+pantalla. Con `prefers-reduced-motion` la cámara salta y la sala llega con un
+fundido de opacidad, que es lo único que se conserva.
 
 ### El agente de CV es una tarjeta
 
@@ -198,19 +244,20 @@ un componente que no se publica no debe meter clases en el CSS servido.
 
 ## Animación
 
-Hay un solo momento orquestado —la entrada del héroe al cargar— y lo demás
-responde a lo que hace la persona. No hay entradas por scroll ni tarjetas que
-se eleven: cada bloque renderiza visible por defecto, sin ningún estado inicial
-que dependa de JavaScript para resolverse, y no hay librería de animación. El
-JS servido bajó de 207 130 a **172 733 bytes gzip** al quitarla.
+Hay un solo momento orquestado al cargar —la entrada del núcleo— y lo demás
+responde a lo que hace la persona: el vuelo de la cámara, la sala que se abre,
+el colapso del grafo de Dalton. No hay entradas por scroll ni tarjetas que se
+eleven: cada bloque renderiza visible por defecto, sin ningún estado inicial
+que dependa de JavaScript para resolverse, y no hay librería de animación.
 
 Los tokens de movimiento viven en el `@theme` de `globals.css` y son sólo los
 que algo usa: `duration-fast` (150 ms: hover, foco, estado), `duration-base`
-(300 ms: la entrada del héroe, el borde de una tarjeta, el cambio de idioma),
-`ease-out` `cubic-bezier(0.16, 1, 0.3, 1)`, `ease-in-out`
-`cubic-bezier(0.65, 0, 0.35, 1)` y `distance` (16 px; tope 20). `npm run lint`
-falla si un token se queda sin uso, y comprueba que la curva que usa el JS
-(`src/lib/tokens.ts`) sea la misma que `--ease-out`.
+(300 ms: la entrada del núcleo, el borde de una tarjeta, el cambio de idioma,
+la llegada de una sala), `duration-flight` (900 ms: el vuelo de la cámara y
+el colapso del grafo de Dalton), `ease-out` `cubic-bezier(0.16, 1, 0.3, 1)`,
+`ease-in-out` `cubic-bezier(0.65, 0, 0.35, 1)` y `distance` (16 px; tope 20).
+`npm run lint` falla si un token se queda sin uso, y comprueba que las curvas
+y el vuelo que usa el JS (`src/lib/tokens.ts`) sean los mismos que en el CSS.
 
 **Regla dura:** todo lo que se mueve anima sólo `transform` y `opacity`. Los
 hovers cambian color, que no dispara layout. Se puede comprobar en el CSS
@@ -219,16 +266,18 @@ opacidad y transform.
 
 | Qué | Cómo |
 |---|---|
-| Entrada del héroe | Una animación CSS: fade + 16 px, 300 ms, ease-out; la pregunta se escribe palabra por palabra (45 ms entre palabras, sólo opacidad) y la respuesta corta entra en tres tandas a 60 ms (nombre y titular, cifras, contacto). Corre sin JS y arranca en el primer pintado, así que no retrasa el LCP. Sólo en la primera carga: al cambiar de idioma `<html>` lleva `data-navigated` y el héroe nuevo llega con el fundido. |
-| Marcador de la corrida | Lo único que anima desde JavaScript: tokens y tiempo acumulados avanzan con `requestAnimationFrame` hacia el valor del paso activo, con la misma curva de entrada (`cubic-bezier()` resuelta en 40 líneas propias, `src/lib/bezier.ts`). El paso y el estado cambian de golpe, y el estado inicial viene en el HTML del servidor. |
+| Entrada del núcleo | Una animación CSS: fade + 16 px, 300 ms, ease-out, en cuatro tandas a 60 ms (nombre, titular, cifras, contacto). Corre sin JS y arranca en el primer pintado, así que no retrasa el LCP. Sólo en la primera carga: al cambiar de idioma `<html>` lleva `data-navigated` y el núcleo nuevo llega con el fundido. |
+| Vuelo de la cámara | Lo que anima desde JavaScript: al entrar o salir de un nodo la cámara interpola posición y objetivo en 900 ms con `ease-in-out` (`cubic-bezier()` resuelta en 40 líneas propias, `src/lib/bezier.ts`); el nodo abierto crece y le sale un halo. La sala llega con fade + 16 px cuando la cámara ya casi aterrizó (`duration-flight − duration-base`). |
+| El grafo de Dalton | 184 círculos en un SVG con sus dos posiciones en variables CSS; al cambiar `data-state` el CSS interpola `transform` en 900 ms con 2 ms de escalonado. Sin JavaScript se ve el estado final. |
 | Hovers | Tarjetas: el borde pasa del gris fino al acento en 300 ms, sólo color. Enlaces del nav: un subrayado que crece desde la izquierda, que es un `scaleX` sobre un pseudoelemento. Botones: fondo, 150 ms. Las utilidades `transition-*` de Tailwind heredan los tokens de estado. |
 | Cambio de idioma | Fundido cruzado con la View Transitions API a `duration-base`, disparado por `LanguageLink`: sin recarga, sin blanco en medio. La posición de lectura se conserva a propósito (`scroll: false` en las dos rutas): las dos páginas tienen la misma estructura, y el mismo desplazamiento muestra la misma sección en el otro idioma. Sin la API, el enlace navega como siempre. |
-| Escenario 3D | El token recorre el grafo conforme avanza el scroll: la posición objetivo sale del paso y de la fracción de sección leída, y el lienzo la persigue con una interpolación corta en el bucle bajo demanda. Sin vuelos de cámara ni entradas por scroll: lo único que se mueve es lo que cambia de estado. Detalle arriba, en "La página es una corrida del agente". |
+| El mapa en reposo | Partículas por las aristas y paralaje con el cursor, en el bucle bajo demanda: 20 cuadros por segundo mientras hay vida, ninguno cuando no. Detalle arriba, en "El perfil como un agente". |
 
 Con `prefers-reduced-motion: reduce` las animaciones se quitan —no se acortan—:
-el héroe aparece entero, el marcador salta a su valor, el borde de la tarjeta
-cambia de golpe, el fundido entre idiomas se salta entero, y el lienzo 3D ni
-se pide: queda el grafo en SVG con el paso activo marcado.
+el núcleo aparece entero, la cámara salta en vez de volar, la sala llega con
+un fundido de opacidad (lo único que se conserva), el grafo de Dalton se queda
+en su estado final, las partículas no viajan, y el fundido entre idiomas se
+salta entero.
 
 ---
 
@@ -267,6 +316,20 @@ enlace del nav o una cifra, porque el titular entraba con opacidad 0 y el LCP
 no lo cuenta; ahora es el párrafo de presentación, que se pinta en el primer
 pintado. Accesibilidad, buenas prácticas y SEO: 100 en las doce corridas.
 
+**Con el mapa** (Fase 1 bis), mismo contenedor, 3 corridas por ruta:
+
+| Ruta | Rendimiento | LCP | TBT | CLS |
+|---|---|---|---|---|
+| `/en` | 99 / 99 / 98 | 2.17 / 2.18 / 2.11 s | 64 ms | 0.001 |
+| `/es` | 99 / 100 / 100 | 2.15 / 1.87 / 1.85 s | 49 ms | 0.000 |
+
+El elemento LCP es el titular (`h1`, 380 × 106 px en móvil), que entra con
+desplazamiento pero sin fundido: Chrome no cuenta como LCP un elemento en
+opacidad 0, y el fundido lo retrasaba 100 ms observados. El nivel del mapa lo
+pone el script de `<head>` antes de pintar por lo mismo: si el CSS esperara a
+la hidratación para saber que no hay sala abierta, escondería el núcleo
+durante 200 ms. Accesibilidad, buenas prácticas y SEO: 100 en las seis.
+
 JS servido en `/en`, gzip, medido chunk por chunk contra `next start`:
 
 | | JS servido (gzip) |
@@ -274,6 +337,7 @@ JS servido en `/en`, gzip, medido chunk por chunk contra `next start`:
 | Con `motion` (entradas por scroll, elevación de tarjetas) | 207 130 B |
 | Sin librería: héroe en CSS, contador con `requestAnimationFrame` | **172 733 B** |
 | Corrida del agente: héroe, marcador y escenario; el chunk 3D (237 786 B) va aparte y se pide después del LCP | **175 450 B** + 237 786 B diferidos |
+| El mapa: núcleo, explorador, etiquetas y ruta; el chunk 3D (240 628 B, tope 300 KB) va aparte, se pide después del LCP y sólo en modo explorar | **179 109 B** + 240 628 B diferidos |
 
 **34 397 bytes gzip menos.** `motion` no aparece en `package.json`, en ningún
 import ni en el bundle compilado; la única palabra "motion" que queda es
@@ -285,36 +349,44 @@ Accesibilidad, con herramientas y no con impresión:
   13.5, axe 4.13): 25 auditorías pasan, 0 fallan, 10 son manuales, 40 no
   aplican. `color-contrast` pasa con 0 elementos señalados.
 - **axe-core 4.13 desde el proyecto** (`npm run a11y`): 0 violaciones WCAG 2.x
-  A/AA y 0 de best-practice en 8 estados (2 idiomas × móvil, menú abierto,
-  hover de tarjeta, movimiento reducido); 25 reglas pasan. La única regla "por
-  revisar" es `color-contrast` sobre los nodos que están encima del escenario
-  (el grafo en SVG o el lienzo), porque axe no mide contra un fondo que no es
-  un color plano. Esos se miden aparte, abajo.
-- **Teclado, con Tab de verdad:** 32 paradas por idioma, las 32 con anillo de
-  foco, orden vertical monótono (el DOM es el orden visual), Shift+Tab lo
-  recorre al revés, sin trampas de foco. El skip link es la primera parada y
-  lleva a `#main`; el menú móvil abre con Enter y cierra con Esc sin soltar el
-  foco.
-- **Contraste del texto, medido en píxeles renderizados con el escenario 3D
+  A/AA y 0 de best-practice en 16 estados (2 idiomas × móvil, menú abierto,
+  mapa, sala abierta, subnodo, sala en móvil, Modo CV, movimiento reducido);
+  29 reglas pasan. La única regla "por revisar" es `color-contrast` sobre lo
+  que está encima del lienzo, porque axe no mide contra un fondo que no es un
+  color plano. Eso se mide aparte, abajo. La primera pasada encontró un
+  fallo real de `target-size` en los tramos de la ruta (`~` medía 10 px);
+  ahora cada tramo es un objetivo de 24 × 24 px.
+- **Teclado, con Tab de verdad:** el skip link, el logotipo, los siete nodos
+  del nav, Modo CV, el idioma, la ruta y las siete etiquetas del mapa, todas
+  con anillo de foco y en el orden del tour; las flechas saltan entre
+  etiquetas, Enter entra y deja el foco en el título de la sala, Esc sale y
+  devuelve el foco a la etiqueta del nodo. Con una sala abierta, el núcleo y
+  las etiquetas van `inert`: Tab no cae en lo que está desenfocado detrás.
+- **Contraste del texto, medido en píxeles renderizados con el mapa
   corriendo.** AA pide 4.5:1; AAA, 7:1; `muted` da 7.72:1 contra el fondo
-  plano. El escenario es una dependencia de contraste, con presupuesto: el
-  cuerpo de texto (`muted`) tiene que quedar en AAA sobre lo que sea que el
-  grafo pinte detrás, y eso fija el píxel más claro permitido bajo un
-  bloque de texto en rgb(14, 20, 38). El escenario lo cumple por construcción
-  —cada nodo y el token se proyectan a pantalla y, si caen bajo un contenedor
-  de texto, pintan por debajo del tope; sólo encienden en el margen derecho o
-  entre secciones— y se mide con el lienzo corriendo: se esconde el texto, se
-  capturan los contenedores de sección en ocho posiciones de scroll y se toma
-  el píxel más claro. Hoy: **7.13:1** en escritorio y **7.11:1** en móvil para
-  `muted` (peor caso), `subtle` 5.4:1, `accent` 4.97:1. Si cambian los
-  colores del escenario, se vuelve a medir.
+  plano. El mapa es una dependencia de contraste, con presupuesto: el cuerpo
+  de texto (`muted`) tiene que quedar en AAA sobre lo que sea que el grafo
+  pinte detrás, y eso fija el píxel más claro permitido bajo un bloque de
+  texto en rgb(14, 20, 38). El escenario lo cumple por construcción —cada
+  nodo, anillo y partícula se proyecta a pantalla y, si cae bajo el texto del
+  héroe, bajo el panel de una sala o bajo una etiqueta, pinta por debajo del
+  tope; las aristas van pre-mezcladas con el fondo y siempre por debajo— y se
+  mide con el lienzo corriendo: se esconde el texto y se toma el píxel más
+  claro bajo el héroe (con las partículas viajando), bajo las siete
+  etiquetas y bajo el panel de tres salas, en escritorio y a 390 px. Hoy:
+  **7.12:1** en escritorio (bajo el héroe) y **7.13:1** en móvil (bajo una
+  etiqueta) para `muted` (peor caso), `subtle` 5.40:1, `accent` 4.96:1. La
+  primera medición encontró la arista punteada al núcleo a rgb(28, 28, 29),
+  por encima del tope; bajó al 7.5 %. Si cambian los colores del mapa, se
+  vuelve a medir.
 
-Sin JavaScript: de los 375 nodos de texto de `<main>`, **0 ocultos** en los
-dos idiomas, y nada en opacidad 0 en reposo; la pregunta, la respuesta corta,
-el marcador en su estado inicial y el grafo en SVG vienen en el HTML. Con
-`prefers-reduced-motion: reduce`: entrada del héroe apagada, marcador sin
-interpolación, borde de tarjeta sin transición, cambio de idioma sin fundido,
-y el chunk 3D ni se pide (7 chunks en vez de 8, medido).
+Sin JavaScript: la columna completa (Modo CV), sin lienzo ni botón de modo;
+de los 407 nodos de texto de `<main>`, **0 ocultos** en los dos idiomas, y
+nada en opacidad 0 en reposo. Con JavaScript, navegar entre nodos no pide
+nada al servidor (0 peticiones RSC al entrar a un nodo, medido), el atrás del
+navegador deshace cada nivel y el tour por scroll deja su rastro en la URL.
+Con `prefers-reduced-motion: reduce` el 3D sí carga: la cámara salta, la sala
+llega con su fundido y las partículas se quedan quietas.
 
 ## Correr en local
 

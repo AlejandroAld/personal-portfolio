@@ -14,6 +14,7 @@
  */
 
 import type { CiteKey } from "@/lib/evidence";
+import type { NodeId } from "@/lib/map-graph";
 
 export type Locale = "en" | "es";
 
@@ -84,11 +85,6 @@ export interface Dictionary {
   };
 
   readonly nav: {
-    readonly experience: string;
-    readonly projects: string;
-    readonly publication: string;
-    readonly skills: string;
-    readonly contact: string;
     readonly menu: string;
     readonly close: string;
     readonly skipToContent: string;
@@ -103,8 +99,43 @@ export interface Dictionary {
     readonly summary: string;
     readonly availability: string;
     readonly ctaContact: string;
-    readonly ctaProjects: string;
     readonly ctaResume: string;
+  };
+
+  /** El marco: el mapa, sus nodos y la ruta. El único sitio con vocabulario de agente fuera de "Bajo el capó". */
+  readonly map: {
+    /** La pista bajo el núcleo: "Haz scroll o toca un nodo". */
+    readonly hint: string;
+    readonly cvMode: string;
+    readonly exploreMode: string;
+    readonly close: string;
+    /** El primer tramo de la ruta después de ~. */
+    readonly home: string;
+    readonly routeAria: string;
+    readonly mapAria: string;
+    /** El término normal de cada nodo, traducido; el término de agente vive en map-graph.ts. */
+    readonly nodes: Readonly<Record<NodeId, { readonly name: string }>>;
+  };
+
+  /** System prompt · Quién soy. */
+  readonly who: {
+    readonly title: string;
+    readonly intro?: string;
+    readonly lookingFor: string;
+    readonly since2021: string;
+  };
+
+  /** Training · Formación. */
+  readonly training: {
+    readonly title: string;
+  };
+
+  /** El momento de Dalton: el sistema de más de 180 nodos que colapsa en un orquestador. */
+  readonly moment: {
+    readonly caption: string;
+    readonly before: string;
+    readonly after: string;
+    readonly metric: string;
   };
 
   readonly metrics: {
@@ -113,14 +144,12 @@ export interface Dictionary {
   };
 
   readonly experience: {
-    readonly eyebrow: string;
     readonly title: string;
     readonly present: string;
     readonly roles: Readonly<Record<string, RoleCopy>>;
   };
 
   readonly projects: {
-    readonly eyebrow: string;
     readonly title: string;
     readonly intro: string;
     readonly inProgress: string;
@@ -140,7 +169,6 @@ export interface Dictionary {
   };
 
   readonly skills: {
-    readonly eyebrow: string;
     readonly title: string;
   };
 
@@ -150,8 +178,8 @@ export interface Dictionary {
   };
 
   readonly thinking: {
+    /** "Cómo pienso": el rótulo del bloque dentro de "Quién soy". */
     readonly eyebrow: string;
-    readonly title: string;
     readonly intro: string;
     readonly symptom: string;
     readonly fix: string;
@@ -160,7 +188,6 @@ export interface Dictionary {
   };
 
   readonly contact: {
-    readonly eyebrow: string;
     readonly title: string;
     readonly body: string;
     readonly email: string;
@@ -170,25 +197,25 @@ export interface Dictionary {
     readonly resume: string;
   };
 
-  /** El recorrido de la corrida: nombres de paso y el marcador. */
+  /** El marcador de la corrida grabada, dentro de "Bajo el capó". */
   readonly run: {
-    /** "Paso {n} de {total}" */
-    readonly stepLabel: string;
-    readonly stepNames: readonly string[];
-    /** El nombre del paso 3 cuando la corrida grabada sí llamó herramientas. */
-    readonly toolsStepName: string;
-    readonly marker: {
-      readonly pending: string;
-      readonly run: string;
-      readonly tokens: string;
-      readonly running: string;
-      readonly done: string;
-      /** "Paso {n} de {total}: {name}" — lo único que se anuncia al lector de pantalla. */
-      readonly announce: string;
-    };
+    readonly title: string;
+    readonly run: string;
+    readonly model: string;
+    readonly input: string;
+    readonly reasoning: string;
+    readonly output: string;
+    readonly time: string;
+    readonly state: string;
+    /** "{n} tok" */
+    readonly tokens: string;
+    readonly pending: string;
+    readonly done: string;
+    readonly note: string;
+    readonly recordedFrom: string;
   };
 
-  /** Paso 2: formación, idiomas y la ventana de contexto. */
+  /** Bajo el capó (la ventana de contexto) y los rótulos de formación. */
   readonly context: {
     readonly title: string;
     readonly intro: string;

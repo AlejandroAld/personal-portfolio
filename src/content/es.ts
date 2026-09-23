@@ -39,11 +39,6 @@ const es: Dictionary = {
   },
 
   nav: {
-    experience: "Experiencia",
-    projects: "Proyectos",
-    publication: "Publicación",
-    skills: "Habilidades",
-    contact: "Contacto",
     menu: "Abrir menú",
     close: "Cerrar menú",
     skipToContent: "Saltar al contenido",
@@ -58,8 +53,45 @@ const es: Dictionary = {
     summary: persona.presentacion,
     availability: persona.disponibilidad,
     ctaContact: "Hablemos",
-    ctaProjects: "Ver el trabajo",
     ctaResume: "Descargar CV",
+  },
+
+  map: {
+    hint: "Haz scroll o toca un nodo",
+    cvMode: "Modo CV",
+    exploreMode: "Explorar",
+    close: "Cerrar (Esc)",
+    home: "alex",
+    routeAria: "Ruta",
+    mapAria: "Mapa",
+    nodes: {
+      core: { name: "Alex" },
+      prompt: { name: "Quién soy" },
+      memory: { name: "Experiencia" },
+      outputs: { name: "Proyectos" },
+      tools: { name: "Stack" },
+      training: { name: "Formación" },
+      api: { name: "Contacto" },
+      hood: { name: "Bajo el capó" },
+    },
+  },
+
+  who: {
+    title: "Quién soy y qué busco",
+    lookingFor: "Qué busco",
+    since2021: "Desde 2021",
+  },
+
+  training: {
+    title: "Formación, investigación y certificaciones",
+  },
+
+  moment: {
+    caption:
+      "Recibí un sistema de más de 180 nodos con la lógica repartida y errores no reproducibles. Lo reconstruí sobre un orquestador único con estado explícito, y el costo mensual de operación bajó 92% mientras el volumen atendido crecía.",
+    before: "180+ nodos",
+    after: "1 orquestador · 4 agentes",
+    metric: "−92% costo mensual",
   },
 
   metrics: {
@@ -96,7 +128,6 @@ const es: Dictionary = {
   },
 
   experience: {
-    eyebrow: "Experiencia",
     title: "Cuatro años, cuatro salas",
     present: "Actualidad",
     roles: {
@@ -151,7 +182,6 @@ const es: Dictionary = {
   },
 
   projects: {
-    eyebrow: "Proyectos",
     title: "Siete cosas que construí",
     intro:
       "Sistemas en producción en un grupo automotriz, más lo que construyo por mi cuenta. El código va enlazado donde el repositorio es público; el resto es de mi empleador y se queda privado.",
@@ -222,7 +252,6 @@ const es: Dictionary = {
   },
 
   skills: {
-    eyebrow: "Habilidades",
     title: "Con qué trabajo",
   },
 
@@ -233,7 +262,6 @@ const es: Dictionary = {
 
   thinking: {
     eyebrow: "Cómo pienso",
-    title: "Modos de falla que he resuelto",
     intro:
       "La parte interesante de un sistema no es el diagrama de arquitectura, es qué se rompió y qué cambió por eso.",
     symptom: "Qué se rompió",
@@ -277,7 +305,6 @@ const es: Dictionary = {
   },
 
   contact: {
-    eyebrow: "Contacto",
     title: "Hablemos",
     body: "Si estás contratando para el tramo de piloto a producción, que es donde la mayoría de los proyectos de IA se detiene, ese es el trabajo que he estado haciendo. Con gusto entro en todo el detalle técnico que necesites.",
     email: "Correo",
@@ -288,17 +315,19 @@ const es: Dictionary = {
   },
 
   run: {
-    stepLabel: "Paso {n} de {total}",
-    stepNames: ["Petición", "Contexto", "Consulta", "Razonamiento", "Verificación", "Respuesta"],
-    toolsStepName: "Herramientas",
-    marker: {
-      pending: "sin grabación todavía",
-      run: "corrida",
-      tokens: "tok",
-      running: "en curso",
-      done: "completado",
-      announce: "Paso {n} de {total}: {name}",
-    },
+    title: "Corrida grabada",
+    run: "corrida",
+    model: "modelo",
+    input: "entrada",
+    reasoning: "razonamiento",
+    output: "salida",
+    time: "tiempo",
+    state: "estado",
+    tokens: "{n} tok",
+    pending: "sin grabación todavía",
+    done: "completada",
+    note: "Nada corre en vivo: lo que se muestra es una corrida real del agente desplegado, grabada una vez y reproducida aquí. Cada cifra sale de esa grabación; si no está grabada, no hay cifra.",
+    recordedFrom: "Grabada con",
   },
 
   context: {
@@ -321,7 +350,7 @@ const es: Dictionary = {
     sourceAria: "Fuente: {label} — se abre en una pestaña nueva",
     generated: "Cada dato de esta página se genera desde un solo archivo YAML, la misma fuente de verdad con la que responde mi agente de CV.",
     generatedLink: "Ver perfil.yaml",
-    builtWith: "Next.js, TypeScript, Tailwind. El fondo del héroe es un shader de WebGL escrito a mano.",
+    builtWith: "Next.js, TypeScript, Tailwind y three.js. El mapa es un solo lienzo WebGL detrás de la página; en Modo CV no hay ninguno.",
   },
 
   months: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],

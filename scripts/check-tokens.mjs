@@ -13,6 +13,16 @@ const tsEase = ts.match(/EASE_OUT[^=]*=\s*\[([^\]]+)\]/)?.[1].split(",").map(Num
 if (!cssEase || !tsEase) errors.push("no encuentro --ease-out en globals.css o EASE_OUT en tokens.ts");
 else if (cssEase.join() !== tsEase.join()) errors.push(`ease-out: CSS ${cssEase.join(",")} ≠ JS ${tsEase.join(",")}`);
 
+const cssInOut = css.match(/--ease-in-out:\s*cubic-bezier\(([^)]+)\)/)?.[1].split(",").map(Number);
+const tsInOut = ts.match(/EASE_IN_OUT[^=]*=\s*\[([^\]]+)\]/)?.[1].split(",").map(Number);
+if (!cssInOut || !tsInOut) errors.push("no encuentro --ease-in-out en globals.css o EASE_IN_OUT en tokens.ts");
+else if (cssInOut.join() !== tsInOut.join()) errors.push(`ease-in-out: CSS ${cssInOut.join(",")} ≠ JS ${tsInOut.join(",")}`);
+
+const cssFlight = css.match(/--duration-flight:\s*(\d+)ms/)?.[1];
+const tsFlight = ts.match(/FLIGHT_MS\s*=\s*(\d+)/)?.[1];
+if (!cssFlight || !tsFlight) errors.push("no encuentro --duration-flight en globals.css o FLIGHT_MS en tokens.ts");
+else if (cssFlight !== tsFlight) errors.push(`vuelo: CSS ${cssFlight}ms ≠ JS ${tsFlight}ms`);
+
 const theme = css.match(/@theme\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
 const motionTokens = [...theme.matchAll(/^\s*(--(?:duration|ease|distance)[\w-]*):/gm)].map((m) => m[1]);
 const body = css.replace(theme, "");
@@ -26,4 +36,4 @@ if (errors.length) {
   console.error("Tokens de movimiento:\n  " + errors.join("\n  "));
   process.exit(1);
 }
-console.log(`tokens de movimiento: ease-out coincide en CSS y JS; ${motionTokens.length} tokens, todos en uso`);
+console.log(`tokens de movimiento: ease-out, ease-in-out y el vuelo coinciden en CSS y JS; ${motionTokens.length} tokens, todos en uso`);
