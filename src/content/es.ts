@@ -10,6 +10,7 @@
  */
 
 import type { Dictionary } from "./dictionary";
+import { persona } from "./perfil";
 
 const es: Dictionary = {
   complete: true,
@@ -53,18 +54,16 @@ const es: Dictionary = {
     eyebrow: "Ingeniero en IA · Guadalajara, México",
     positioning: "Llevo sistemas de IA a producción",
     positioningAccent: "y los sostengo ahí.",
-    summary:
-      "Responsable técnico de las soluciones de IA generativa en producción de un grupo automotriz, con una publicación arbitrada en NLP detrás. Trabajo el tramo de piloto a producción: tool calling contra sistemas de negocio reales, evaluación anclada en modos de falla reales, guardarraíles, trazabilidad y costo por interacción.",
-    availability:
-      "Abierto a posiciones de ingeniería de IA en México, presencial, híbrido o remoto. Con disponibilidad para reubicarme a Ciudad de México.",
+    // Directo del YAML: si cambia allá, cambia aquí sin tocar este archivo.
+    summary: persona.presentacion,
+    availability: persona.disponibilidad,
     ctaContact: "Hablemos",
     ctaProjects: "Ver el trabajo",
     ctaResume: "Descargar CV",
   },
 
   metrics: {
-    sourceNote: "Resultados del rol actual, en Grupo Dalton.",
-    toWord: "a",
+    sourceNote: "Resultados del rol actual.",
     items: [
       {
         value: "−92%",
@@ -76,16 +75,11 @@ const es: Dictionary = {
         cite: "costReduction",
       },
       {
-        // Antes y después literal, no "−79%": la cifra de origen dice cuánto
-        // trabajo había ahí, y el porcentaje sólo se lo traga.
-        value: "10 h",
-        before: "48 h",
-        countFrom: 48,
-        countTo: 10,
-        suffix: " h",
-        label: "de proceso semanal",
-        context: "El mismo proceso operativo, antes y después del sistema",
-        cite: "processHours",
+        value: "4",
+        countTo: 4,
+        label: "agentes en producción",
+        context: "Agentes conversacionales con tráfico real de clientes, cada uno con estado de sesión, catálogo de herramientas y almacén de conversación independientes.",
+        cite: "fourAgents",
       },
       {
         // "Miles" y "alcance nacional" se quedan vagos a propósito: es una
@@ -112,7 +106,7 @@ const es: Dictionary = {
           "Responsable técnico de las soluciones de IA generativa en producción, de extremo a extremo: arquitectura, integración con los sistemas de negocio, despliegue, seguridad, evaluación y monitoreo.",
         highlights: [
           "Recibí un sistema de más de 180 nodos donde la lógica estaba repartida, se perdía contexto entre saltos y los errores no eran reproducibles. Lo reconstruí sobre un orquestador único y trazable con estado explícito: el costo mensual de operación bajó 92%.",
-          "El proceso operativo pasó de consumir 48 horas semanales a 10.",
+          "Bajé un proceso de cálculo de 48 a 10 horas semanales de trabajo manual y lo hice trazable. Antes del sistema el cálculo no dejaba rastro y su tasa de error era inmedible.",
           "Los sistemas que opero dan servicio a cuatro unidades de negocio distintas del grupo.",
           "El bot de comunicación interna tiene alcance nacional y llega a miles de asesores del grupo.",
           "Cuatro agentes conversacionales con tráfico real de clientes sobre WhatsApp Business API, cada uno con su propio estado de sesión, catálogo de herramientas y almacén de conversación.",
@@ -121,7 +115,6 @@ const es: Dictionary = {
           "Guardarraíles anti-alucinación con validación de salida que bloquea respuestas no sustentadas en el resultado de una herramienta, más agentes revisores que auditan antes de que el cliente vea nada.",
           "Un servidor MCP en Node sobre Cloud Run con OAuth y permisos por rol, que expone sistemas internos como conector para consulta en lenguaje natural.",
           "Una máquina de estados determinista sobre Cloud Functions para los procesos contables que exigen reproducibilidad, deliberadamente sin modelo de por medio.",
-          "Antes del sistema, el cálculo de márgenes no tenía trazabilidad: no se podía reconstruir cómo se había llegado a una cifra, así que la tasa de error era inmedible. El motor lo dejó con historial auditable, que es la condición para siquiera poder medirla.",
           "Control de acceso de toda la arquitectura: RBAC granular, permisos mínimos por herramienta, aislamiento por tenant y OAuth 2.0 / JWT en cada integración que toca datos de clientes.",
         ],
       },
@@ -171,7 +164,6 @@ const es: Dictionary = {
         title: "Agente de CV — un servidor Open Responses",
         summary:
           "Un agente conversacional sobre mi propio perfil, construido sobre la especificación abierta de interoperabilidad y no como un chatbot sobre un PDF. Implementa POST /v1/responses en modo síncrono y streaming SSE, ejecuta un bucle agéntico con herramientas del servidor, y cede el control cuando un cliente declara sus propias function tools.",
-        href: "https://github.com/AlejandroAld/cv-agent",
         hrefLabel: "Ver el código",
         featured: true,
         bullets: [
@@ -239,6 +231,7 @@ const es: Dictionary = {
     title: "Credenciales",
     inProgress: "En curso",
     education: "Estudios",
+    list: "Certificaciones",
     gpa: "Promedio",
   },
 
@@ -301,6 +294,7 @@ const es: Dictionary = {
   },
 
   footer: {
+    sourceAria: "Fuente: {label} — se abre en una pestaña nueva",
     generated: "Cada dato de esta página se genera desde un solo archivo YAML, la misma fuente de verdad con la que responde mi agente de CV.",
     generatedLink: "Ver perfil.yaml",
     builtWith: "Next.js, TypeScript, Tailwind. El fondo del héroe es un shader de WebGL escrito a mano.",

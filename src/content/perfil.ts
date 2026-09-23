@@ -41,6 +41,8 @@ export interface Perfil {
     readonly nombre: string;
     readonly alias: string;
     readonly titular: string;
+    /** Párrafo del héroe del sitio público. `resumen` es la versión completa del agente. */
+    readonly presentacion: string;
     readonly ubicacion: string;
     readonly disponibilidad: string;
     readonly idiomas: readonly { readonly idioma: string; readonly nivel: string }[];
@@ -50,7 +52,13 @@ export interface Perfil {
   readonly experiencia: readonly PerfilRol[];
   readonly proyectos: readonly PerfilProyecto[];
   readonly habilidades: readonly PerfilHabilidad[];
-  readonly educacion: readonly { readonly titulo: string; readonly institucion: string; readonly periodo: string }[];
+  readonly educacion: readonly {
+    readonly titulo: string;
+    /** Nivel del grado por idioma. El sitio lo antepone al título traducido. */
+    readonly nivel: { readonly es: string; readonly en: string };
+    readonly institucion: string;
+    readonly periodo: string;
+  }[];
   readonly publicaciones: readonly {
     readonly titulo: string;
     readonly medio: string;

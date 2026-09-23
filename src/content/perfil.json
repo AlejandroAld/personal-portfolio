@@ -1,18 +1,19 @@
 {
   "_meta": {
-    "fuente": "https://github.com/AlejandroAld/cv-agent/blob/551b2fb3343dd95e002e0181f3386da15d0e65e6/data/perfil.yaml",
+    "fuente": "https://github.com/AlejandroAld/cv-agent/blob/bec5dbb3736181082c7fecf003b1a21612892f3d/data/perfil.yaml",
     "repo": "AlejandroAld/cv-agent",
-    "sha": "551b2fb3343dd95e002e0181f3386da15d0e65e6",
-    "sincronizado": "2026-09-21",
+    "sha": "bec5dbb3736181082c7fecf003b1a21612892f3d",
+    "sincronizado": "2026-09-22",
     "nota": "Generado por scripts/sync-perfil.mjs. No editar a mano: edita perfil.yaml en el repo del agente y vuelve a sincronizar."
   },
   "persona": {
     "nombre": "José Alejandro Aldama Ramos",
     "alias": "Alex",
     "titular": "Ingeniero en Inteligencia Artificial — agentes en producción, evaluación e integración con sistemas de negocio",
+    "presentacion": "Responsable técnico de los sistemas de IA generativa en producción de un grupo automotriz, con una publicación arbitrada en NLP. Trabajo el tramo de piloto a producción: tool calling contra sistemas de negocio reales, evaluación anclada en modos de falla reales, guardarraíles, trazabilidad y costo por interacción. También construyo las plataformas internas donde una persona revisa, aprueba y corrige lo que el agente produce antes de que tenga efecto.",
     "ubicacion": "Guadalajara, Jalisco, México",
     "zona_horaria": "America/Mexico_City",
-    "disponibilidad": "Abierto a posiciones de ingeniería de IA en México, presencial, híbrido o remoto. Con disponibilidad para reubicarme a Ciudad de México.",
+    "disponibilidad": "Abierto a posiciones de ingeniería de IA en México, presencial, híbrido o remoto. Con disponibilidad para reubicarme.",
     "idiomas": [
       {
         "idioma": "Español",
@@ -55,7 +56,7 @@
       "resumen": "Responsable técnico de las soluciones de IA generativa en producción, de extremo a extremo: arquitectura, integración con los sistemas de negocio, despliegue, seguridad, evaluación y monitoreo.\n",
       "logros": [
         "Opero cuatro agentes conversacionales con tráfico real de clientes sobre WhatsApp Business API, con estado de sesión, catálogo de herramientas y almacén de conversación independientes.",
-        "El proceso operativo pasó de consumir 48 horas semanales a 10.",
+        "Bajé un proceso de cálculo de 48 a 10 horas semanales de trabajo manual y lo hice trazable. Antes del sistema el cálculo no dejaba rastro y su tasa de error era inmedible.",
         "Los sistemas que opero dan servicio a cuatro unidades de negocio distintas del grupo. No se nombran.",
         "El bot de comunicación interna tiene alcance nacional y llega a miles de asesores del grupo.",
         "Construí la arquitectura de tool calling sobre n8n autohospedado en Kubernetes, con Claude vía la API de Anthropic desplegada en Azure AI Foundry: más de una docena de herramientas propias conectadas a endpoints HTTP, salidas estructuradas con JSON Schema, enrutamiento por máquina de estados y escalamiento a humano.",
@@ -412,6 +413,10 @@
   "educacion": [
     {
       "titulo": "Ingeniería en Inteligencia Artificial",
+      "nivel": {
+        "es": "Ingeniería",
+        "en": "B.S."
+      },
       "institucion": "Instituto Politécnico Nacional (IPN)",
       "periodo": "2021-02 a 2025-01. Promedio 9.31 / 10.0"
     }
