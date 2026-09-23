@@ -105,10 +105,13 @@ protección, porque todo saldría con la IP del servidor.
 
 ## Trazabilidad
 
-La página no lleva una cita bajo cada bloque: eso era ruido. El pie lo explica
-una vez, con enlace al YAML. Para comprobar un número concreto, cada bloque con
-métrica tiene un enlace a su línea exacta que aparece al pasar el cursor o al
-llegar con el teclado, y que en reposo no ocupa espacio.
+La página no lleva una cita bajo cada párrafo: eso era ruido. El pie lo explica
+una vez, con enlace al YAML. Lo que sí lleva cada bloque con cifra —la tira,
+cada puesto, cada modo de falla— es un enlace a su línea exacta, siempre
+visible al pie del bloque, en gris y en acento al pasar el cursor o al
+enfocarlo. Antes aparecía sólo con hover; en un teléfono no hay hover, y la
+prueba de que cada número tiene fuente no puede depender de él. Cada enlace
+mide al menos 24 × 24 px, el objetivo táctil mínimo de WCAG 2.2.
 
 Los enlaces van fijados a un SHA, nunca a `main`: un enlace a `main` apunta a
 la línea equivocada en cuanto el archivo cambia.
@@ -257,10 +260,10 @@ Accesibilidad, con herramientas y no con impresión:
   héroe, porque axe no mide contra un fondo que no es un color plano. Esos se
   miden aparte, abajo.
 - **Teclado, con Tab de verdad:** 26 paradas por idioma, las 26 con anillo de
-  foco y opacidad ≥ 0.9, orden vertical monótono (el DOM es el orden visual),
-  Shift+Tab lo recorre al revés, sin trampas de foco. El skip link es la
-  primera parada y lleva a `#main`; el menú móvil abre con Enter y cierra con
-  Esc sin soltar el foco.
+  foco, orden vertical monótono (el DOM es el orden visual), Shift+Tab lo
+  recorre al revés, sin trampas de foco. El skip link es la primera parada y
+  lleva a `#main`; el menú móvil abre con Enter y cierra con Esc sin soltar el
+  foco.
 - **Contraste del texto del héroe, medido en píxeles renderizados** con el
   shader corriendo (se oculta el texto y se lee el fondo bajo su caja, y se
   toma el píxel más claro): párrafo `muted` **7.41:1** en escritorio y
@@ -276,8 +279,7 @@ Accesibilidad, con herramientas y no con impresión:
   captura con el shader corriendo.
 
 Sin JavaScript: de los 334 nodos de texto de `<main>`, **0 ocultos** en los
-dos idiomas; lo único con opacidad 0 en reposo son los nueve enlaces de fuente,
-que aparecen al pasar el cursor o al enfocarlos también sin JS. Con
+dos idiomas, y nada en opacidad 0 en reposo. Con
 `prefers-reduced-motion: reduce`: entrada del héroe apagada, contadores quietos,
 borde de tarjeta sin transición, cambio de idioma sin fundido, y el chunk del
 shader ni se pide.

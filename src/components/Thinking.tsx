@@ -7,7 +7,7 @@ import SourceLink from "./SourceLink";
  *
  * Eran cinco y cuatro venían del agente de CV, que era justo el problema de
  * la versión anterior. Ahora hay uno por frente: la investigación, la
- * producción en Dalton, y el agente. La trazabilidad va en hover.
+ * producción en Dalton, y el agente. Cada tarjeta cierra con su cita.
  */
 export default function Thinking({ dict }: { dict: Dictionary }) {
   return (
@@ -21,7 +21,7 @@ export default function Thinking({ dict }: { dict: Dictionary }) {
 
         <ol className="mt-heading grid gap-6 lg:grid-cols-3">
           {dict.thinking.items.map((item) => (
-            <li key={item.id} id={item.id} className="card group relative p-6">
+            <li key={item.id} id={item.id} className="card p-6">
               <h3 className="text-base font-semibold tracking-tight text-fg text-balance">{item.title}</h3>
 
               <div className="mt-5 space-y-4">
@@ -45,7 +45,9 @@ export default function Thinking({ dict }: { dict: Dictionary }) {
                 </div>
               </div>
 
-              {item.cites[0] && <SourceLink cite={item.cites[0]} ariaLabel={dict.footer.sourceAria} />}
+              {item.cites[0] && (
+                <SourceLink cite={item.cites[0]} ariaLabel={dict.footer.sourceAria} className="mt-5" />
+              )}
             </li>
           ))}
         </ol>

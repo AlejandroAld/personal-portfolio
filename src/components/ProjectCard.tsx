@@ -13,7 +13,7 @@ export default function ProjectCard({
   children: ReactNode;
 }) {
   return (
-    <li className={`card card-hover group relative flex flex-col p-6 ${featured ? "sm:col-span-2 lg:col-span-3" : ""}`}>
+    <li className={`card card-hover flex flex-col p-6 ${featured ? "sm:col-span-2 lg:col-span-3" : ""}`}>
       {children}
     </li>
   );

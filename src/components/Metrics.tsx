@@ -22,7 +22,7 @@ export default function Metrics({ dict }: { dict: Dictionary }) {
       <div className="mx-auto max-w-5xl">
         <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           {dict.metrics.items.map((metric) => (
-            <li key={metric.cite} className="group relative">
+            <li key={metric.cite}>
               <p className="text-4xl font-semibold tracking-tight text-fg sm:text-5xl">
                 {metric.countTo === undefined ? (
                   metric.value
@@ -32,7 +32,7 @@ export default function Metrics({ dict }: { dict: Dictionary }) {
               </p>
               <p className="mt-2 text-sm font-medium text-fg text-pretty">{metric.label}</p>
               <p className="mt-1.5 text-xs leading-relaxed text-subtle text-pretty">{metric.context}</p>
-              <SourceLink cite={metric.cite} ariaLabel={dict.footer.sourceAria} />
+              <SourceLink cite={metric.cite} ariaLabel={dict.footer.sourceAria} className="mt-3" />
             </li>
           ))}
         </ul>
