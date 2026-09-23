@@ -3,7 +3,7 @@ import { formatPeriod, perfil, term } from "@/content/perfil";
 import SectionHeading from "./SectionHeading";
 import SourceLink from "./SourceLink";
 
-/** La cita de cada puesto, para la trazabilidad en hover. */
+/** La cita de cada puesto: el enlace a su línea del YAML, al pie del bloque. */
 const CITE_BY_ROLE = {
   "exp-dalton": "costReduction",
   "exp-loreal": "lorealDashboard",
@@ -32,10 +32,7 @@ export default function Experience({ dict }: { dict: Dictionary }) {
             const cite = CITE_BY_ROLE[rol.id as keyof typeof CITE_BY_ROLE];
 
             return (
-              <li
-                key={rol.id}
-                className="group relative border-b border-border py-8 first:pt-0 last:border-b-0"
-              >
+              <li key={rol.id} className="border-b border-border py-8 first:pt-0 last:border-b-0">
                 <div className="role-grid">
                   <div>
                     <p className="font-mono text-xs text-subtle tnum">
@@ -79,10 +76,10 @@ export default function Experience({ dict }: { dict: Dictionary }) {
                         </li>
                       ))}
                     </ul>
+
+                    {cite && <SourceLink cite={cite} ariaLabel={dict.footer.sourceAria} className="mt-4" />}
                   </div>
                 </div>
-
-                {cite && <SourceLink cite={cite} ariaLabel={dict.footer.sourceAria} />}
               </li>
             );
           })}

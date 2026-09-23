@@ -330,33 +330,25 @@ html[data-navigated] .rise {
 }
 
 /* ===========================================================================
-   Trazabilidad en hover
+   Trazabilidad por bloque
    ---------------------------------------------------------------------------
-   La página ya no lleva una cita bajo cada bloque: el pie explica de una vez
-   que todo se genera desde un YAML. Lo que queda es esto, para quien quiera
-   comprobar un número concreto.
+   La página no lleva una cita bajo cada párrafo: el pie explica de una vez que
+   todo sale de un YAML. Lo que sí lleva cada bloque con cifra es este enlace a
+   su línea exacta, siempre visible: en una pantalla táctil no hay hover, y la
+   prueba de que cada número tiene fuente no puede depender de él. Gris `muted`
+   en reposo, acento al pasar el cursor o al enfocarlo; nunca opacidad.
 
-   `absolute` para que no ocupe espacio en reposo, y visible al pasar el cursor
-   por el bloque o al llegar con el teclado. Sigue en el orden de tabulación:
-   no está escondido, está en reposo.
+   Mide al menos 24 × 24 px: el mínimo de objetivo táctil de WCAG 2.2 (2.5.8).
+   La altura la pone min-height, no el texto de 11 px.
    =========================================================================== */
 
 .source-link {
-  @apply absolute top-0 right-0 z-10 rounded-sm bg-nav px-1.5 py-1 font-mono text-micro whitespace-nowrap text-subtle;
-  line-height: 1;
-  opacity: 0;
-  transition:
-    opacity var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out);
+  @apply inline-flex items-center rounded-sm font-mono text-micro whitespace-nowrap text-muted transition-colors;
+  min-height: 1.5rem;
+  min-width: 1.5rem;
 }
-
-/* `:focus` y no sólo `:focus-visible`: un elemento enfocable que no se ve es
-   un fallo de foco visible, llegue el foco como llegue. */
-.group:hover > .source-link,
-.group:focus-within > .source-link,
 .source-link:hover,
-.source-link:focus {
-  opacity: 1;
+.source-link:focus-visible {
   color: var(--color-accent);
 }
 
