@@ -1,4 +1,4 @@
-// axe-core contra la página construida: dos idiomas, ocho estados cada uno.
+// axe-core contra la página construida: dos idiomas, diez estados cada uno.
 //
 //   npm run build && npm run start      (en otra terminal)
 //   npm run a11y                        (A11Y_URL para otro origen)
@@ -33,6 +33,23 @@ const STATES = [
     setup: async (p) => {
       await p.locator("header button[aria-controls='mobile-nav']").click();
       await p.waitForSelector("#mobile-nav");
+    },
+  },
+  {
+    name: "escritorio, umbral",
+    viewport: { width: 1280, height: 900 },
+    threshold: true,
+    setup: async (p) => {
+      await p.waitForFunction(() => document.querySelector(".stage-canvas canvas"), null, { timeout: 10000 }).catch(() => {});
+      await p.locator(".th-option-explore").hover();
+    },
+  },
+  {
+    name: "móvil, umbral",
+    viewport: { width: 390, height: 844 },
+    threshold: true,
+    setup: async (p) => {
+      await p.waitForTimeout(600);
     },
   },
   {
@@ -73,7 +90,7 @@ const STATES = [
     name: "escritorio, Modo CV",
     viewport: { width: 1280, height: 900 },
     setup: async (p) => {
-      await p.locator(".mode-toggle").click();
+      await p.locator('.mode-switch-nav button[data-mode="cv"]').click();
       await p.waitForTimeout(400);
       await sweep(p);
     },
@@ -94,6 +111,8 @@ for (const lang of ["en", "es"]) {
       reducedMotion: state.reducedMotion,
     });
     const page = await ctx.newPage();
+    // La primera visita muestra el umbral; los demás estados parten del mapa.
+    if (!state.threshold) await page.addInitScript(() => localStorage.setItem("modo", "explore"));
     await page.goto(`${BASE}/${lang}`, { waitUntil: "networkidle" });
     await state.setup(page);
     await page.waitForTimeout(800);

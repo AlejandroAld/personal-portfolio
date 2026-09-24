@@ -102,12 +102,27 @@ export interface Dictionary {
     readonly ctaResume: string;
   };
 
+  /** El umbral: la entrada donde se elige cómo conocerme. */
+  readonly threshold: {
+    readonly intro: string;
+    readonly cvKicker: string;
+    readonly cvTitle: string;
+    readonly exploreKicker: string;
+    readonly exploreTitle: string;
+    /** "unos {n} min" */
+    readonly minutes: string;
+    /** Nombre accesible del botón: "{title}, {time}" */
+    readonly optionAria: string;
+    readonly groupAria: string;
+  };
+
   /** El marco: el mapa, sus nodos y la ruta. El único sitio con vocabulario de agente fuera de "Bajo el capó". */
   readonly map: {
     /** La pista bajo el núcleo: "Haz scroll o toca un nodo". */
     readonly hint: string;
     readonly cvMode: string;
     readonly exploreMode: string;
+    readonly switchAria: string;
     readonly close: string;
     /** El primer tramo de la ruta después de ~. */
     readonly home: string;

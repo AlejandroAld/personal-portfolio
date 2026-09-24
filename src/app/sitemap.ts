@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { NODES, SUBNODES, pathFor, type NodeId } from "@/lib/map-graph";
+import { NODES, SUBNODES, cvPath, pathFor, type NodeId } from "@/lib/map-graph";
 import { absoluteUrl, getDictionary, publishedLocales } from "@/lib/site";
 
 /**
@@ -21,9 +21,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       },
     }));
 
+  const cv: MetadataRoute.Sitemap = locales.map((locale) => ({
+    url: absoluteUrl(cvPath(locale)),
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.9,
+    alternates: { languages: Object.fromEntries(locales.map((l) => [getDictionary(l).htmlLang, absoluteUrl(cvPath(l))])) },
+  }));
   return [
     ...entry(null, null, 1),
+    ...cv,
     ...NODES.filter((n) => n.id !== "core").flatMap((n) => entry(n.id, null, 0.8)),
-    ...NODES.flatMap((n) => (SUBNODES[n.id] ?? []).flatMap((s) => entry(n.id, s.slug, 0.6))),
+    ...NODES.flatMap((n) => (SUBNODES[n.id] ?? []).flatMap((s) => entry(n.id, s.ref, 0.6))),
   ];
 }

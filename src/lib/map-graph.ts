@@ -30,14 +30,14 @@ export interface MapNode {
 }
 
 export const NODES: readonly MapNode[] = [
-  { id: "core", agent: null, slug: { es: "", en: "" }, landscape: [0, 0, 0], portrait: [0, -1.12, 0], r: 1.6 },
-  { id: "prompt", agent: "System prompt", slug: { es: "quien-soy", en: "who-i-am" }, landscape: [-1.2, 0.82, -0.2], portrait: [-0.62, -0.62, -0.2], r: 1 },
-  { id: "memory", agent: "Memory", slug: { es: "memoria", en: "memory" }, landscape: [1.62, 0.15, 0.2], portrait: [0.78, -1.12, 0.2], r: 1.15 },
-  { id: "outputs", agent: "Outputs", slug: { es: "proyectos", en: "projects" }, landscape: [1.35, -0.62, -0.15], portrait: [0.6, -1.62, -0.15], r: 1 },
-  { id: "tools", agent: "Tools", slug: { es: "stack", en: "stack" }, landscape: [-1.35, -0.62, 0.1], portrait: [-0.6, -1.62, 0.1], r: 1 },
-  { id: "training", agent: "Training", slug: { es: "formacion", en: "education" }, landscape: [-1.6, 0.15, -0.3], portrait: [-0.78, -1.12, -0.3], r: 0.95 },
-  { id: "api", agent: "API", slug: { es: "contacto", en: "contact" }, landscape: [1.2, 0.82, -0.1], portrait: [0.62, -0.62, -0.1], r: 0.9 },
-  { id: "hood", agent: null, slug: { es: "bajo-el-capo", en: "under-the-hood" }, landscape: [0.1, -1.0, -0.4], portrait: [0, -2.0, -0.4], r: 0.8 },
+  { id: "core", agent: null, slug: { es: "", en: "" }, landscape: [0, 0, 0], portrait: [0, -0.95, 0], r: 1.6 },
+  { id: "prompt", agent: "System prompt", slug: { es: "quien-soy", en: "who-i-am" }, landscape: [-1.28, 0.76, -0.2], portrait: [-0.62, -0.5, -0.2], r: 1 },
+  { id: "memory", agent: "Memory", slug: { es: "memoria", en: "memory" }, landscape: [1.62, 0.15, 0.2], portrait: [0.78, -0.95, 0.2], r: 1.15 },
+  { id: "outputs", agent: "Outputs", slug: { es: "proyectos", en: "projects" }, landscape: [1.35, -0.62, -0.15], portrait: [0.6, -1.38, -0.15], r: 1 },
+  { id: "tools", agent: "Tools", slug: { es: "stack", en: "stack" }, landscape: [-1.35, -0.62, 0.1], portrait: [-0.6, -1.38, 0.1], r: 1 },
+  { id: "training", agent: "Training", slug: { es: "formacion", en: "education" }, landscape: [-1.6, 0.15, -0.3], portrait: [-0.78, -0.95, -0.3], r: 0.95 },
+  { id: "api", agent: "API", slug: { es: "contacto", en: "contact" }, landscape: [1.28, 0.76, -0.1], portrait: [0.62, -0.5, -0.1], r: 0.9 },
+  { id: "hood", agent: null, slug: { es: "bajo-el-capo", en: "under-the-hood" }, landscape: [0.1, -1.0, -0.4], portrait: [0, -1.72, -0.4], r: 0.8 },
 ];
 
 export type EdgeKind = "hub" | "governs" | "feeds" | "hood";
@@ -83,18 +83,26 @@ export const FLOWS: readonly (readonly [NodeId, NodeId])[] = [
   ["core", "api"],
 ];
 
-/** Subnodos: el detalle dentro de un nodo. Sólo Memory por ahora. */
-export const SUBNODES: Readonly<Partial<Record<NodeId, readonly { readonly slug: string; readonly ref: string }[]>>> = {
+export interface SubNode {
+  /** El slug dice la función, por idioma; nunca un id del YAML. */
+  readonly slug: Readonly<Record<Locale, string>>;
+  /** El id en perfil.json, sólo para buscar los datos. */
+  readonly ref: string;
+}
+
+/** Subnodos: el detalle dentro de un nodo. Sólo Memory por ahora, del más reciente al más antiguo. */
+export const SUBNODES: Readonly<Partial<Record<NodeId, readonly SubNode[]>>> = {
   memory: [
-    { slug: "dalton", ref: "exp-dalton" },
-    { slug: "grupo-ti", ref: "exp-grupo-ti" },
-    { slug: "loreal", ref: "exp-loreal" },
-    { slug: "ipn", ref: "exp-ipn" },
+    { slug: { es: "agentes-en-produccion", en: "agents-in-production" }, ref: "exp-dalton" },
+    { slug: { es: "rag-en-oracle-apex", en: "rag-on-oracle-apex" }, ref: "exp-grupo-ti" },
+    { slug: { es: "datos-y-automatizacion", en: "data-and-automation" }, ref: "exp-loreal" },
+    { slug: { es: "investigacion-nlp", en: "nlp-research" }, ref: "exp-ipn" },
   ],
 };
 
 export interface Stop {
   readonly node: NodeId;
+  /** El `ref` del subnodo (id del YAML), no su slug: la URL se arma por idioma. */
   readonly sub: string | null;
 }
 
@@ -103,7 +111,7 @@ export const TOUR: readonly Stop[] = [
   { node: "core", sub: null },
   { node: "prompt", sub: null },
   { node: "memory", sub: null },
-  { node: "memory", sub: "dalton" },
+  { node: "memory", sub: "exp-dalton" },
   { node: "outputs", sub: null },
   { node: "tools", sub: null },
   { node: "training", sub: null },
@@ -124,27 +132,37 @@ export function nodeBySlug(locale: Locale, slug: string): MapNode | undefined {
   return NODES.find((n) => n.id !== "core" && n.slug[locale] === slug);
 }
 
-export function subBySlug(node: NodeId, slug: string): { slug: string; ref: string } | undefined {
-  return SUBNODES[node]?.find((s) => s.slug === slug);
+export function subBySlug(locale: Locale, node: NodeId, slug: string): SubNode | undefined {
+  return SUBNODES[node]?.find((s) => s.slug[locale] === slug);
 }
 
-/** "/es/memoria/dalton" */
+export function subByRef(node: NodeId, ref: string): SubNode | undefined {
+  return SUBNODES[node]?.find((s) => s.ref === ref);
+}
+
+/** "/es/memoria/agentes-en-produccion". `sub` es el ref del subnodo. */
 export function pathFor(locale: Locale, node: NodeId | null = null, sub: string | null = null): string {
   if (!node || node === "core") return `/${locale}`;
   const base = `/${locale}/${nodeById(node).slug[locale]}`;
-  return sub ? `${base}/${sub}` : base;
+  const s = sub ? subByRef(node, sub) : undefined;
+  return s ? `${base}/${s.slug[locale]}` : base;
+}
+
+/** La URL del Modo CV: /es/cv, /en/cv. */
+export function cvPath(locale: Locale): string {
+  return `/${locale}/cv`;
 }
 
 /** Lo contrario: de un pathname a (nodo, subnodo); null si no es una ruta del mapa. */
 export function parsePath(locale: Locale, pathname: string): Stop | null {
   const parts = pathname.split("/").filter(Boolean);
   if (parts[0] !== locale) return null;
-  if (parts.length === 1) return { node: "core", sub: null };
+  if (parts.length === 1 || (parts.length === 2 && parts[1] === "cv")) return { node: "core", sub: null };
   const node = nodeBySlug(locale, parts[1]);
   if (!node) return null;
   if (parts.length === 2) return { node: node.id, sub: null };
-  const sub = subBySlug(node.id, parts[2]);
-  return sub ? { node: node.id, sub: sub.slug } : null;
+  const sub = subBySlug(locale, node.id, parts[2]);
+  return sub ? { node: node.id, sub: sub.ref } : null;
 }
 
 export function stopIndex(node: NodeId | null, sub: string | null): number {
@@ -190,8 +208,16 @@ export function mapDistance(aspect: number): number {
   const portrait = isPortrait(aspect);
   const pts = NODES.map((n) => positionOf(n, portrait));
   const halfW = Math.max(...pts.map((p) => Math.abs(p[0]))) + (portrait ? 0.38 : 0.5);
-  const halfH = Math.max(...pts.map((p) => Math.abs(p[1]))) + (portrait ? 0.3 : 0.28);
+  const halfH = Math.max(...pts.map((p) => Math.abs(p[1]))) + (portrait ? 0.62 : 0.28);
   return Math.max(halfW / (TAN * aspect), halfH / TAN);
+}
+
+/** El centro del grafo (en vertical está bajo el texto del héroe, no en el origen). */
+export function graphCenter(aspect: number): Vec3 {
+  const portrait = isPortrait(aspect);
+  const pts = NODES.map((n) => positionOf(n, portrait));
+  const ys = pts.map((p) => p[1]);
+  return [0, (Math.min(...ys) + Math.max(...ys)) / 2, 0];
 }
 
 /** A qué distancia se queda la cámara al entrar a un nodo, y al subnodo. */
@@ -229,3 +255,59 @@ export function projectMap(p: Vec3, aspect: number): { x: number; y: number } {
   const dz = cam[2] - p[2];
   return { x: (p[0] - cam[0]) / (dz * TAN * aspect), y: (p[1] - cam[1]) / (dz * TAN) };
 }
+
+/* ---------------------------------------------------------------------------
+   El tour por scroll: una trayectoria continua por todas las paradas.
+   --------------------------------------------------------------------------- */
+
+/** La pose de una parada del tour. */
+export function stopPose(i: number, aspect: number): CameraPose {
+  const s = TOUR[Math.min(Math.max(0, i), TOUR.length - 1)];
+  if (s.node === "core") return mapPose(aspect);
+  return focusPose(s.node, s.sub ? "sub" : "node", aspect);
+}
+
+function catmull(p0: number, p1: number, p2: number, p3: number, t: number): number {
+  const t2 = t * t;
+  const t3 = t2 * t;
+  return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3);
+}
+
+/**
+ * La pose de la cámara para un progreso continuo del tour, 0 … TOUR.length-1:
+ * Catmull-Rom por las poses de las paradas, así que en cada parada la cámara
+ * pasa exactamente por su pose y entre paradas va en curva. El asentamiento
+ * suave lo pone `tourEase`, que aplana el progreso cerca de cada parada.
+ */
+export function tourPose(t: number, aspect: number): CameraPose {
+  const n = TOUR.length;
+  const clamped = Math.min(Math.max(0, t), n - 1);
+  const i = Math.min(n - 2, Math.floor(clamped));
+  const u = clamped - i;
+  const P = (k: number) => stopPose(Math.min(Math.max(0, k), n - 1), aspect);
+  const p0 = P(i - 1);
+  const p1 = P(i);
+  const p2 = P(i + 1);
+  const p3 = P(i + 2);
+  const at = (key: "position" | "target", c: 0 | 1 | 2) => catmull(p0[key][c], p1[key][c], p2[key][c], p3[key][c], u);
+  return {
+    position: [at("position", 0), at("position", 1), at("position", 2)],
+    target: [at("target", 0), at("target", 1), at("target", 2)],
+  };
+}
+
+/**
+ * Del avance lineal del scroll al progreso del tour: dentro de cada tramo,
+ * una curva que se aplana en los extremos (smootherstep). La cámara se
+ * asienta en cada parada sin saltos ni secuestro del scroll: la persona sigue
+ * mandando la velocidad.
+ */
+export function tourEase(linear: number): number {
+  const i = Math.floor(linear);
+  const u = Math.min(1, Math.max(0, linear - i));
+  const v = u * u * u * (u * (u * 6 - 15) + 10);
+  return i + v;
+}
+
+/** Qué tan cerca de una parada hay que estar para que su sala esté abierta. */
+export const STOP_WINDOW = 0.32;

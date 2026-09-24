@@ -28,17 +28,19 @@ export default function Experience({ dict, locale, activeSub }: { dict: Dictiona
   const slugMemory = nodeById("memory").slug[locale];
   return (
     <ol className="subnodes">
-      {subs.map(({ slug, ref }) => {
+      {subs.map(({ slug: slugs, ref }) => {
         const rol = perfil.experiencia.find((r) => r.id === ref);
         if (!rol) return null;
+        const slug = slugs[locale];
         const copy = dict.experience.roles[rol.id];
         const cite = CITE_BY_ROLE[rol.id as keyof typeof CITE_BY_ROLE];
-        const href = pathFor(locale, "memory", slug);
+        const href = pathFor(locale, "memory", ref);
         const headingId = `memory-${slug}-title`;
 
         return (
           <li key={rol.id}>
-            <article id={`${slugMemory}-${slug}`} className="subnode" data-sub={slug} data-active-sub={activeSub === slug ? "" : undefined} aria-labelledby={headingId}>
+            {/* `data-sub` lleva el ref del YAML (interno); el id y la URL llevan el slug por función. */}
+            <article id={`${slugMemory}-${slug}`} className="subnode" data-sub={ref} data-active-sub={activeSub === ref ? "" : undefined} aria-labelledby={headingId}>
               <div className="role-grid">
                 <div className="subnode-meta">
                   <p className="font-mono text-xs text-subtle tnum">{formatPeriod(rol.inicio, rol.fin, dict)}</p>
@@ -50,7 +52,7 @@ export default function Experience({ dict, locale, activeSub }: { dict: Dictiona
                 <div>
                   <h3 id={headingId} className="text-lg font-semibold tracking-tight text-fg text-balance">
                     {/* En modo explorar la cabecera es la puerta al subnodo; en Modo CV es sólo el título. */}
-                    <a href={href} data-enter="memory" data-sub={slug} className="subnode-link">
+                    <a href={href} data-enter="memory" data-sub={ref} className="subnode-link">
                       {copy?.headline ?? term(rol.puesto, dict)}
                       <span className="subnode-arrow" aria-hidden="true">
                         {" "}

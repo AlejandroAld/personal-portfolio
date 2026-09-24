@@ -2,19 +2,21 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState, type ComponentType } from "react";
-import { setMode, useExplorer } from "@/lib/explorer";
+import { fallbackToCv, useExplorer } from "@/lib/explorer";
 import MapDiagram from "./MapDiagram";
 
 /**
- * El escenario: un solo lienzo fijo detrás de la página, en modo explorar.
+ * El escenario: un solo lienzo fijo, en el umbral y en modo explorar.
  *
- * Empieza con el mapa en SVG, que viene en el HTML del servidor. El escenario
- * WebGL se carga después del LCP, en su propio chunk, y cuando pinta su
- * primer cuadro el SVG se apaga. Sin WebGL, la página pasa a Modo CV: la
- * columna completa, sin mapa. En Modo CV el lienzo se desmonta —no hay
- * ningún contexto WebGL vivo— y al volver a explorar se vuelve a cargar.
- * Nunca hay dos contextos a la vez. Con movimiento reducido el 3D sí carga,
- * pero sin vuelos de cámara.
+ * Empieza con el mapa en SVG, que viene en el HTML del servidor; en el umbral
+ * es lo que se ve dentro del marco de la derecha mientras el 3D carga. El
+ * escenario WebGL se carga después del LCP, en su propio chunk, y cuando
+ * pinta su primer cuadro el SVG se apaga. Es el mismo lienzo que luego ocupa
+ * la pantalla completa: al elegir no se vuelve a cargar nada. Sin WebGL la
+ * página pasa a Modo CV. En Modo CV el lienzo se desmonta —no hay ningún
+ * contexto WebGL vivo— y al volver a explorar se vuelve a cargar. Nunca hay
+ * dos contextos a la vez. Con movimiento reducido el 3D sí carga, pero sin
+ * vuelos ni caídas.
  */
 
 const MapScene = dynamic(() => import("./MapScene"), { ssr: false }) as ComponentType<{ onReady: () => void }>;
@@ -35,19 +37,21 @@ function hasWebGL(): boolean {
 export default function MapStage() {
   const { mode } = useExplorer({ node: null, sub: null });
   const [phase, setPhase] = useState<"svg" | "loading" | "3d">("svg");
-  const explore = mode === "explore";
+  const wanted = mode === "explore" || mode === "threshold";
 
   useEffect(() => {
-    if (!explore) {
+    if (!wanted) {
       // Modo CV: fuera el lienzo. Al volver, se carga de nuevo.
       const t = window.setTimeout(() => setPhase("svg"), 0);
       return () => window.clearTimeout(t);
     }
     // Después del LCP: al ocio del navegador, ya con la página pintada.
     const start = () => {
-      if (document.documentElement.dataset.mode !== "explore") return;
+      const m = document.documentElement.dataset.mode;
+      if (m !== "explore" && m !== "threshold") return;
       if (!hasWebGL()) {
-        setMode("cv");
+        // El script de <head> ya lo decidió; esto es la red de seguridad.
+        fallbackToCv();
         return;
       }
       setPhase("loading");
@@ -61,14 +65,14 @@ export default function MapStage() {
       if (w.cancelIdleCallback) w.cancelIdleCallback(idle);
       else window.clearTimeout(idle);
     };
-  }, [explore]);
+  }, [wanted]);
 
   return (
     <div className="stage" aria-hidden="true">
       <div className={phase === "3d" ? "stage-svg stage-svg-off" : "stage-svg"}>
         <MapDiagram />
       </div>
-      {explore && phase !== "svg" && <MapScene onReady={() => setPhase("3d")} />}
+      {wanted && phase !== "svg" && <MapScene onReady={() => setPhase("3d")} />}
     </div>
   );
 }

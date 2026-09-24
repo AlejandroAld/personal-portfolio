@@ -1,46 +1,61 @@
 /**
- * El explorador: dónde está la lectura dentro del mapa.
+ * El explorador: dónde está la lectura dentro del sitio.
  *
- * Un solo almacén para la escena 3D, las etiquetas, la ruta y las salas.
- * Tres niveles —mapa, nodo, subnodo— y dos formas de moverse: el scroll es un
- * tour guiado que vuela de nodo en nodo en orden (TOUR), y el clic o el toque
- * es exploración libre. Las dos mantienen sincronizados la URL, la posición
- * de scroll y el estado.
+ * Un solo almacén para el umbral, la escena 3D, las etiquetas, la ruta, el
+ * interruptor y las salas. Tres modos —umbral, explorar, CV— y, dentro de
+ * explorar, tres niveles: mapa, nodo y subnodo. Dos formas de moverse: el
+ * scroll es un tour guiado que arrastra la cámara por una trayectoria
+ * continua que pasa por todas las paradas, y el clic, el toque o Enter es
+ * exploración libre. Las dos mantienen sincronizados la URL, el scroll y el
+ * estado.
  *
- * Cada nodo y subnodo tiene su URL. La navegación va por `history.pushState`:
- * todas las rutas del mapa renderizan la misma página, así que no hay nada
- * que pedir al servidor; el botón de atrás vuelve al nivel anterior y un
- * enlace directo abre la sala de entrada (el HTML del servidor ya la trae
- * abierta).
+ * URLs: cada nodo y subnodo tiene la suya; entrar con clic, toque o Enter
+ * hace `pushState`; el tour por scroll hace `replaceState`; el Modo CV vive
+ * en /es/cv y /en/cv. Todas las rutas renderizan la misma página, así que
+ * nada se pide al servidor.
  *
- * El almacén también pone los atributos que el CSS lee: `data-mode` en
- * <html> (explorar o CV), `data-level` (map | node | sub), `data-active` en
- * la sala abierta y `data-active-sub` en el subnodo.
+ * El umbral sale sólo la primera vez; la elección se guarda en el navegador
+ * y después el sitio abre en el último modo elegido. Un enlace directo se lo
+ * salta. Elegir es una caída dentro del modo elegido (`choose`), y cambiar de
+ * modo desde el interruptor es la misma caída en corto (`switchMode`).
+ *
+ * El almacén también pone los atributos que el CSS lee: `data-mode`,
+ * `data-level`, `data-hover`, `data-falling` en <html>; `data-active` en la
+ * sala abierta y `data-active-sub` en el subnodo.
  */
 
 import { useMemo, useSyncExternalStore } from "react";
-import { LABELED, TOUR, parsePath, pathFor, stopIndex, type Locale, type NodeId } from "./map-graph";
-import { FLIGHT_MS } from "./tokens";
+import { LABELED, STOP_WINDOW, TOUR, cvPath, parsePath, pathFor, stopIndex, tourEase, type Locale, type NodeId } from "./map-graph";
+import { FALL_MS, FALL_SHORT_MS, FLIGHT_MS } from "./tokens";
 
-export type Mode = "explore" | "cv";
+export type Mode = "threshold" | "explore" | "cv";
 export type Level = "map" | "node" | "sub";
+export type Choice = "explore" | "cv";
 
 export interface ExplorerState {
   readonly mode: Mode;
   readonly node: NodeId | null;
   readonly sub: string | null;
   readonly level: Level;
+  /** La parada del tour más cercana (la URL y la sala). */
   readonly stop: number;
+  /** El progreso continuo del tour, 0 … TOUR.length-1 (la cámara). */
+  readonly tour: number;
+  /** Cómo se llegó al nodo abierto: la cámara vuela distinto. */
+  readonly via: "click" | "scroll";
+  readonly hover: NodeId | null;
   readonly reduced: boolean;
   readonly portrait: boolean;
-  /** Sube con cada vuelo de cámara; la escena lo usa para arrancar la interpolación. */
+  /** Sube con cada entrada o salida por clic; la escena arranca el vuelo. */
   readonly flight: number;
+  /** La caída en curso al elegir en el umbral o cambiar de modo. */
+  readonly falling: Choice | null;
 }
 
 const STORAGE_KEY = "modo";
 
 let locale: Locale = "en";
-let state: ExplorerState = { mode: "cv", node: null, sub: null, level: "map", stop: 0, reduced: false, portrait: false, flight: 0 };
+let state: ExplorerState = { mode: "cv", node: null, sub: null, level: "map", stop: 0, tour: 0, via: "scroll", hover: null, reduced: false, portrait: false, flight: 0, falling: null };
 const listeners = new Set<() => void>();
 const labels = new Map<NodeId, HTMLElement>();
 let bound = false;
@@ -78,9 +93,13 @@ export function useExplorer(initial: { node: NodeId | null; sub: string | null }
       sub: initial.sub,
       level: levelOf(initial.node, initial.sub),
       stop: stopIndex(initial.node, initial.sub),
+      tour: stopIndex(initial.node, initial.sub),
+      via: "scroll",
+      hover: null,
       reduced: false,
       portrait: false,
       flight: 0,
+      falling: null,
     }),
     [initial.node, initial.sub],
   );
@@ -102,7 +121,7 @@ export function labelElement(id: NodeId): HTMLElement | undefined {
 }
 
 /* ---------------------------------------------------------------------------
-   El tour: qué desplazamiento corresponde a cada parada
+   El tour: el scroll como progreso continuo
    --------------------------------------------------------------------------- */
 
 function heroHeight(): number {
@@ -116,11 +135,11 @@ export function stopOffset(i: number): number {
   return i <= 0 ? 0 : heroHeight() + (i - 1) * stopHeight();
 }
 
-function stopAt(scrollY: number): number {
+/** Del desplazamiento al avance lineal del tour (0 = mapa, 1 = primera parada…). */
+function linearAt(scrollY: number): number {
   const h = heroHeight();
-  if (scrollY < h * 0.5) return 0;
-  const s = stopHeight();
-  return Math.min(TOUR.length - 1, 1 + Math.floor((scrollY - h + s * 0.5) / s));
+  if (scrollY <= h) return Math.max(0, scrollY / h);
+  return Math.min(TOUR.length - 1, 1 + (scrollY - h) / stopHeight());
 }
 
 function layoutTour() {
@@ -142,6 +161,10 @@ function applyDom(prev: ExplorerState | null) {
   const html = document.documentElement;
   html.dataset.mode = state.mode;
   html.dataset.level = state.level;
+  if (state.hover) html.dataset.hover = state.hover;
+  else delete html.dataset.hover;
+  if (state.falling) html.dataset.falling = state.falling;
+  else delete html.dataset.falling;
 
   for (const room of document.querySelectorAll<HTMLElement>(".room[data-node]")) {
     const active = state.node !== null && room.dataset.node === state.node;
@@ -161,11 +184,17 @@ function applyDom(prev: ExplorerState | null) {
     }
   }
 
-  // Con una sala abierta, lo que queda detrás no se puede enfocar.
+  // Con una sala abierta, lo que queda detrás no se puede enfocar; en el
+  // umbral, las previsualizaciones tampoco.
   const inertBehind = state.mode === "explore" && state.level !== "map";
   for (const el of document.querySelectorAll<HTMLElement>(".core, .map-labels")) {
-    if (inertBehind) el.setAttribute("inert", "");
+    if (inertBehind || state.mode === "threshold") el.setAttribute("inert", "");
     else el.removeAttribute("inert");
+  }
+  const main = document.querySelector<HTMLElement>("main.page");
+  if (main) {
+    if (state.mode === "threshold") main.setAttribute("inert", "");
+    else main.removeAttribute("inert");
   }
 }
 
@@ -178,11 +207,11 @@ function set(next: Partial<ExplorerState>) {
 }
 
 /* ---------------------------------------------------------------------------
-   Navegación
+   Navegación dentro del mapa
    --------------------------------------------------------------------------- */
 
-function pushUrl(node: NodeId | null, sub: string | null, replace = false) {
-  const url = pathFor(locale, node, sub);
+function pushUrl(node: NodeId | null, sub: string | null, replace: boolean) {
+  const url = state.mode === "cv" ? cvPath(locale) : pathFor(locale, node, sub);
   if (window.location.pathname === url) return;
   if (replace) window.history.replaceState(null, "", url);
   else window.history.pushState(null, "", url);
@@ -193,13 +222,83 @@ function focusRoom() {
   title?.focus({ preventScroll: true });
 }
 
-function goTo(node: NodeId | null, sub: string | null, opts: { push?: boolean; scroll?: boolean; focus?: boolean } = {}) {
-  const { push = true, scroll = true, focus = true } = opts;
+/**
+ * La etiqueta del nodo viaja hasta convertirse en el nombre de la sala (y de
+ * vuelta al salir): un fantasma de la etiqueta se anima de un rectángulo al
+ * otro con transform y opacidad, sincronizado con el vuelo de la cámara.
+ */
+function morphLabel(node: NodeId, direction: "in" | "out") {
+  if (state.reduced) return;
+  const label = labelElement(node);
+  const room = document.querySelector<HTMLElement>(`.room[data-node="${node}"]`);
+  const kicker = room?.querySelector<HTMLElement>(".room-kicker");
+  if (!label || !kicker || label.hasAttribute("data-offscreen")) return;
+  const a = label.getBoundingClientRect();
+  const b = kicker.getBoundingClientRect();
+  if (a.width === 0 || b.width === 0) return;
+  const ghost = label.cloneNode(true) as HTMLElement;
+  ghost.className = "map-label map-label-ghost";
+  ghost.removeAttribute("href");
+  ghost.setAttribute("aria-hidden", "true");
+  ghost.style.transform = "none";
+  ghost.style.left = `${a.left}px`;
+  ghost.style.top = `${a.top}px`;
+  ghost.style.width = `${a.width}px`;
+  ghost.style.height = `${a.height}px`;
+  document.body.appendChild(ghost);
+  const dx = b.left - a.left;
+  const dy = b.top - a.top;
+  const sx = b.width / a.width;
+  const sy = b.height / a.height;
+  const from = { transform: "translate(0px, 0px) scale(1, 1)", opacity: 1 };
+  const to = { transform: `translate(${dx}px, ${dy}px) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`, opacity: 0 };
+  const duration = direction === "in" ? FLIGHT_MS * 0.6 : FLIGHT_MS * 0.4;
+  const anim = ghost.animate(direction === "in" ? [from, { ...to, opacity: 0.85, offset: 0.7 }, to] : [to, { ...from, opacity: 0.85, offset: 0.6 }, { ...from, opacity: 0 }], {
+    duration,
+    easing: "cubic-bezier(0.65, 0, 0.35, 1)",
+    fill: "forwards",
+  });
+  anim.onfinish = () => ghost.remove();
+  anim.oncancel = () => ghost.remove();
+}
+
+let leavingTimer = 0;
+/**
+ * La salida: la sala que se deja se queda un momento recogiéndose hacia su
+ * nodo (65 % de la duración de la entrada) mientras la cámara se retira. El
+ * CSS anima `data-leaving`; aquí sólo se marca y se apunta hacia dónde.
+ */
+function leaveRoom(node: NodeId) {
+  const room = document.querySelector<HTMLElement>(`.room[data-node="${node}"]`);
+  if (!room || state.reduced) return;
+  const label = labelElement(node)?.getBoundingClientRect();
+  const head = room.querySelector<HTMLElement>(".room-head")?.getBoundingClientRect();
+  if (label && head) {
+    room.style.setProperty("--collect-x", `${Math.round((label.left + label.width / 2 - (head.left + head.width / 2)) * 0.35)}px`);
+    room.style.setProperty("--collect-y", `${Math.round((label.top - head.top) * 0.35)}px`);
+  }
+  for (const r of document.querySelectorAll<HTMLElement>(".room[data-leaving]")) r.removeAttribute("data-leaving");
+  room.setAttribute("data-leaving", "");
+  document.documentElement.dataset.leaving = "";
+  window.clearTimeout(leavingTimer);
+  leavingTimer = window.setTimeout(() => {
+    room.removeAttribute("data-leaving");
+    delete document.documentElement.dataset.leaving;
+  }, FLIGHT_MS * 0.65 + 40);
+}
+
+function goTo(node: NodeId | null, sub: string | null, opts: { push?: boolean; replace?: boolean; scroll?: boolean; focus?: boolean; via?: "click" | "scroll" } = {}) {
+  const { push = true, replace = false, scroll = true, focus = true, via = "click" } = opts;
   const target = node === "core" ? null : node;
   const stop = stopIndex(target, sub);
   const changed = target !== state.node || sub !== state.sub;
-  if (push) pushUrl(target, sub, !changed);
-  set({ node: target, sub, stop, flight: changed ? state.flight + 1 : state.flight });
+  if (push) pushUrl(target, sub, replace || !changed);
+  if (changed && state.node && target !== state.node && state.mode === "explore") leaveRoom(state.node);
+  if (changed && via === "click") {
+    if (target && !state.node) morphLabel(target, "in");
+    else if (!target && state.node) morphLabel(state.node, "out");
+  }
+  set({ node: target, sub, stop, via, tour: scroll ? stop : state.tour, flight: changed && via === "click" ? state.flight + 1 : state.flight });
   if (scroll && state.mode === "explore") scrollToStop(stop);
   if (focus && changed) {
     if (target) focusRoom();
@@ -207,9 +306,9 @@ function goTo(node: NodeId | null, sub: string | null, opts: { push?: boolean; s
   }
 }
 
-/** Entrar a un nodo o a un subnodo (clic, toque, Enter, enlace). */
+/** Entrar a un nodo o a un subnodo (clic, toque, Enter, enlace): pushState. */
 export function enter(node: NodeId | null, sub: string | null = null) {
-  goTo(node, sub);
+  goTo(node, sub, { via: "click" });
 }
 
 /** Salir un nivel: del subnodo al nodo, del nodo al mapa. */
@@ -217,35 +316,156 @@ export function exit() {
   if (state.level === "map") return;
   const leaving = state.node;
   if (state.level === "sub") {
-    goTo(state.node, null);
+    goTo(state.node, null, { via: "click" });
     return;
   }
-  goTo(null, null, { focus: false });
+  goTo(null, null, { focus: false, via: "click" });
   if (leaving) labelElement(leaving)?.focus({ preventScroll: true });
 }
 
-export function setMode(mode: Mode) {
-  if (mode === state.mode) return;
+export function setHover(node: NodeId | null) {
+  if (node === state.hover) return;
+  set({ hover: node });
+}
+
+/* ---------------------------------------------------------------------------
+   El umbral y el cambio de modo: la caída
+   --------------------------------------------------------------------------- */
+
+function remember(mode: Choice) {
   try {
     localStorage.setItem(STORAGE_KEY, mode);
   } catch {
     /* sin almacenamiento, el modo dura la visita */
   }
-  const { node } = state;
-  set({ mode });
+}
+
+/** Fotogramas de una transformación que crece hacia la pantalla con el punto de fuga fijo. */
+function portalFrames(el: HTMLElement, origin: { x: number; y: number }, overshoot: boolean): Keyframe[] {
+  const m = new DOMMatrixReadOnly(getComputedStyle(el).transform);
+  const s0 = m.a || 1;
+  const tx0 = m.e;
+  const ty0 = m.f;
+  const frames: Keyframe[] = [];
+  const steps = 14;
+  for (let i = 0; i <= steps; i++) {
+    const k = i / steps;
+    // Curva con un rebote suave al final cuando se pide.
+    const e = overshoot ? 1 - Math.pow(1 - k, 3) * Math.cos(k * 4.2) : 1 - Math.pow(1 - k, 3);
+    const s = s0 + (1 - s0) * e;
+    // El punto bajo el clic no se mueve: la escala crece desde ahí.
+    const tx = origin.x - (origin.x - tx0) * (s / s0);
+    const ty = origin.y - (origin.y - ty0) * (s / s0);
+    frames.push({ transform: `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${s.toFixed(4)})`, offset: k });
+  }
+  frames[frames.length - 1] = { transform: "none", offset: 1 };
+  return frames;
+}
+
+function fallBackFrames(el: HTMLElement): Keyframe[] {
+  const m = new DOMMatrixReadOnly(getComputedStyle(el).transform);
+  const s0 = m.a || 1;
+  return [
+    { transform: `translate(${m.e}px, ${m.f}px) scale(${s0})`, opacity: 1 },
+    { transform: `translate(${m.e}px, ${m.f + 40}px) scale(${(s0 * 0.84).toFixed(4)})`, opacity: 0 },
+  ];
+}
+
+let fallTimer = 0;
+
+/**
+ * Elegir en el umbral. La previsualización elegida se vuelve un portal que
+ * crece hacia la pantalla desde el punto del clic; la otra mitad cae hacia
+ * atrás y se desvanece. Con movimiento reducido no hay caída: un fundido.
+ */
+export function choose(mode: Choice, origin: { x: number; y: number }) {
+  if (state.mode !== "threshold" || state.falling) return;
+  remember(mode);
+  const main = document.querySelector<HTMLElement>("main.page");
+  const stage = document.querySelector<HTMLElement>(".stage");
+  const html = document.documentElement;
+  html.style.setProperty("--fall-x", `${origin.x}px`);
+  html.style.setProperty("--fall-y", `${origin.y}px`);
+  set({ falling: mode, flight: state.flight + 1 });
+
+  const duration = state.reduced ? 200 : FALL_MS;
+  if (!state.reduced && main && stage) {
+    const grow = mode === "cv" ? main : stage;
+    const back = mode === "cv" ? stage : main;
+    grow.animate(portalFrames(grow, origin, mode === "cv"), { duration, easing: "linear", fill: "forwards" });
+    back.animate(fallBackFrames(back), { duration: duration * 0.55, easing: "cubic-bezier(0.65, 0, 0.35, 1)", fill: "forwards" });
+  }
+  window.clearTimeout(fallTimer);
+  fallTimer = window.setTimeout(() => land(mode), duration);
+}
+
+function land(mode: Choice) {
+  const main = document.querySelector<HTMLElement>("main.page");
+  const stage = document.querySelector<HTMLElement>(".stage");
+  for (const el of [main, stage]) el?.getAnimations().forEach((a) => a.cancel());
+  const html = document.documentElement;
+  html.dataset.arrive = mode;
+  window.setTimeout(() => delete html.dataset.arrive, 1200);
   if (mode === "cv") {
-    // Se sigue leyendo donde se iba: la sección del nodo abierto.
-    const room = node ? document.querySelector<HTMLElement>(`.room[data-node="${node}"]`) : null;
-    if (room) room.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior });
-    else window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    set({ mode: "cv", falling: null, node: null, sub: null, stop: 0, tour: 0 });
+    window.history.replaceState(null, "", cvPath(locale));
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    document.querySelector<HTMLElement>(".mode-switch button[data-mode='cv']")?.focus({ preventScroll: true });
   } else {
+    set({ mode: "explore", falling: null, node: null, sub: null, stop: 0, tour: 0 });
+    window.history.replaceState(null, "", pathFor(locale));
     layoutTour();
-    scrollToStop(state.stop);
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    document.querySelector<HTMLElement>(".core h1")?.focus({ preventScroll: true });
   }
 }
 
-export function toggleMode() {
-  setMode(state.mode === "cv" ? "explore" : "cv");
+/** Sin WebGL: Modo CV sin caída y sin guardar nada, porque no fue una elección. */
+export function fallbackToCv() {
+  if (state.mode === "cv") return;
+  set({ mode: "cv", falling: null, node: null, sub: null, stop: 0, tour: 0 });
+  window.history.replaceState(null, "", cvPath(locale));
+  window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+}
+
+/** Cambiar de modo desde el interruptor: la misma caída, en corto. */
+export function switchMode(mode: Choice) {
+  if (state.mode === mode || state.falling) return;
+  remember(mode);
+  const main = document.querySelector<HTMLElement>("main.page");
+  const stage = document.querySelector<HTMLElement>(".stage");
+  const core = document.querySelector<HTMLElement>(".core");
+  const html = document.documentElement;
+  const duration = state.reduced ? 200 : FALL_SHORT_MS;
+  const { node, sub } = state;
+  html.dataset.switching = mode;
+  window.setTimeout(() => delete html.dataset.switching, duration + 50);
+
+  if (mode === "cv") {
+    set({ mode: "cv", falling: null });
+    window.history.replaceState(null, "", cvPath(locale));
+    const room = node ? document.querySelector<HTMLElement>(`.room[data-node="${node}"]`) : null;
+    if (room) room.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior });
+    else window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    if (!state.reduced && main && stage) {
+      main.animate([{ transform: "scale(0.94)", opacity: 0 }, { transform: "scale(1.012)", opacity: 1, offset: 0.7 }, { transform: "none", opacity: 1 }], { duration, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" });
+      stage.animate([{ transform: "scale(1)", opacity: 1 }, { transform: "scale(1.08)", opacity: 0 }], { duration: duration * 0.8, easing: "cubic-bezier(0.65, 0, 0.35, 1)", fill: "forwards" });
+    } else if (main) {
+      main.animate([{ opacity: 0 }, { opacity: 1 }], { duration });
+    }
+  } else {
+    set({ mode: "explore", falling: null, node, sub, via: "click", flight: state.flight + 1 });
+    window.history.replaceState(null, "", pathFor(locale, node, sub));
+    layoutTour();
+    scrollToStop(state.stop);
+    if (!state.reduced && stage && core) {
+      stage.getAnimations().forEach((a) => a.cancel());
+      stage.animate([{ transform: "scale(0.94)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" });
+      core.animate([{ transform: "scale(0.97)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration, delay: duration * 0.3, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)", fill: "backwards" });
+    } else if (stage) {
+      stage.animate([{ opacity: 0 }, { opacity: 1 }], { duration });
+    }
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -258,13 +478,26 @@ function onScroll() {
   frame = window.requestAnimationFrame(() => {
     frame = 0;
     const y = window.scrollY;
+    const linear = linearAt(y);
+    const tour = tourEase(linear);
     // El héroe se apaga conforme el tour arranca.
-    const t = Math.min(1, Math.max(0, y / (heroHeight() * 0.5)));
-    document.documentElement.style.setProperty("--tour-t", t.toFixed(3));
-    const i = stopAt(y);
-    if (i !== state.stop) {
-      const s = TOUR[i];
-      goTo(s.node, s.sub, { scroll: false, focus: false });
+    document.documentElement.style.setProperty("--tour-t", Math.min(1, linear * 2).toFixed(3));
+    const nearest = Math.round(tour);
+    const inWindow = Math.abs(tour - nearest) <= STOP_WINDOW;
+    if (inWindow && nearest !== state.stop) {
+      const s = TOUR[nearest];
+      goTo(s.node, s.sub, { replace: true, scroll: false, focus: false, via: "scroll" });
+      set({ tour });
+    } else if (inWindow && state.level === "map" && nearest > 0) {
+      const s = TOUR[nearest];
+      goTo(s.node, s.sub, { replace: true, scroll: false, focus: false, via: "scroll" });
+      set({ tour });
+    } else if (!inWindow && state.level !== "map" && state.via === "scroll") {
+      // En tránsito entre paradas: la sala se recoge y el mapa vuelve.
+      if (state.node) leaveRoom(state.node);
+      set({ node: null, sub: null, tour });
+    } else if (Math.abs(tour - state.tour) > 0.0005) {
+      set({ tour });
     }
   });
 }
@@ -272,7 +505,8 @@ function onScroll() {
 function onPopState() {
   const parsed = parsePath(locale, window.location.pathname);
   if (!parsed) return;
-  goTo(parsed.node, parsed.sub, { push: false });
+  if (state.mode === "cv") return;
+  goTo(parsed.node, parsed.sub, { push: false, via: "click" });
 }
 
 function onKey(e: KeyboardEvent) {
@@ -287,10 +521,9 @@ function onKey(e: KeyboardEvent) {
     return;
   }
   const el = e.target as HTMLElement | null;
-  const onLabel = el?.classList.contains("map-label");
-  if (!onLabel) return;
+  if (!el?.classList.contains("map-label")) return;
   const order = LABELED;
-  const current = order.indexOf(el!.dataset.node as NodeId);
+  const current = order.indexOf(el.dataset.node as NodeId);
   let next = -1;
   if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (current + 1) % order.length;
   else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (current - 1 + order.length) % order.length;
@@ -337,24 +570,52 @@ function onResize() {
   const portrait = window.innerWidth / window.innerHeight < 0.9;
   layoutTour();
   if (portrait !== state.portrait) set({ portrait });
-  if (state.mode === "explore") scrollToStop(state.stop);
+  if (state.mode === "explore" && state.via === "click") scrollToStop(state.stop);
+}
+
+// En el umbral, la previsualización del CV se desplaza sola, despacio, y se
+// detiene al pasar el cursor.
+let previewFrame = 0;
+function previewScroll() {
+  previewFrame = 0;
+  if (state.mode !== "threshold") return;
+  const main = document.querySelector<HTMLElement>("main.page");
+  if (main && state.hover !== ("cv" as unknown as NodeId) && !state.reduced) {
+    main.scrollTop += 0.4;
+    if (main.scrollTop + main.clientHeight >= main.scrollHeight - 1) main.scrollTop = 0;
+  }
+  previewFrame = window.requestAnimationFrame(previewScroll);
+}
+
+/** Qué mitad del umbral tiene el cursor o el foco. */
+export function setThresholdHover(side: Choice | null) {
+  const html = document.documentElement;
+  if (side) html.dataset.hover = side;
+  else delete html.dataset.hover;
+  // Se guarda como hover del almacén para que el desplazamiento se detenga.
+  state = { ...state, hover: (side as unknown as NodeId) ?? null };
+  emit();
 }
 
 /** Arranca el explorador. Lo llama <Explorer> al montar; devuelve la limpieza. */
 export function initExplorer(loc: Locale, initial: { node: NodeId | null; sub: string | null }): () => void {
   locale = loc;
   const html = document.documentElement;
-  const mode: Mode = html.dataset.mode === "cv" ? "cv" : "explore";
+  const dataMode = html.dataset.mode;
+  const mode: Mode = dataMode === "cv" ? "cv" : dataMode === "threshold" ? "threshold" : "explore";
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const portrait = window.innerWidth / window.innerHeight < 0.9;
   const fromUrl = parsePath(loc, window.location.pathname) ?? initial;
-  const node = fromUrl.node === "core" ? null : fromUrl.node;
+  const node = mode === "explore" && fromUrl.node !== "core" ? fromUrl.node : null;
+  const sub = node ? fromUrl.sub : null;
 
   window.history.scrollRestoration = "manual";
-  state = { mode, node, sub: fromUrl.sub, level: levelOf(node, fromUrl.sub), stop: stopIndex(node, fromUrl.sub), reduced, portrait, flight: 0 };
+  const stop = stopIndex(node, sub);
+  state = { mode, node, sub, level: levelOf(node, sub), stop, tour: stop, via: "scroll", hover: null, reduced, portrait, flight: 0, falling: null };
   applyDom(null);
   layoutTour();
-  if (mode === "explore") scrollToStop(state.stop);
+  if (mode === "explore") scrollToStop(stop);
+  if (mode === "threshold") previewFrame = window.requestAnimationFrame(previewScroll);
   bound = true;
   emit();
 
@@ -377,7 +638,10 @@ export function initExplorer(loc: Locale, initial: { node: NodeId | null; sub: s
     document.removeEventListener("touchstart", onTouchStart);
     document.removeEventListener("touchmove", onTouchMove);
     if (frame) window.cancelAnimationFrame(frame);
+    if (previewFrame) window.cancelAnimationFrame(previewFrame);
+    window.clearTimeout(fallTimer);
     frame = 0;
+    previewFrame = 0;
   };
 }
 

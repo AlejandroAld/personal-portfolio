@@ -12,13 +12,13 @@ import { useEffect, useRef } from "react";
  * en pantalla; cada nodo lleva sus dos posiciones y el CSS interpola. Con
  * movimiento reducido se queda el estado final.
  *
- * Los 184 nodos y las aristas del caos salen de un generador con semilla
+ * Los nodos (más de 180) y las aristas del caos salen de un generador con semilla
  * fija: el dibujo es el mismo en el servidor y en el cliente.
  */
 
 const W = 640;
 const H = 360;
-const N = 184;
+const N = 184; // más de 180: el dato público es "180+"
 const BRANCHES = 4;
 
 function seeded(seed: number) {

@@ -1,7 +1,7 @@
 "use client";
 
 import LanguageLink from "./LanguageLink";
-import ModeToggle from "./ModeToggle";
+import ModeSwitch from "./ModeSwitch";
 import { useEffect, useState } from "react";
 
 /**
@@ -27,7 +27,7 @@ export default function Nav({
   home,
 }: {
   links: readonly NavLink[];
-  labels: { menu: string; close: string; mode: { cv: string; explore: string } };
+  labels: { menu: string; close: string; mode: { cv: string; explore: string }; modeAria: string };
   cta: NavLink | null;
   languageSwitch: NavLink | null;
   /** La ruta del mapa: el logotipo vuelve ahí. */
@@ -79,8 +79,8 @@ export default function Nav({
         </ul>
 
         <div className="flex items-center gap-2">
-          {/* Modo CV: la columna completa, sin 3D. Siempre a la vista. */}
-          <ModeToggle labels={labels.mode} />
+          {/* CV | Explorar: siempre a la vista, en los dos modos. */}
+          <ModeSwitch labels={labels.mode} ariaLabel={labels.modeAria} placement="nav" />
 
           {/* Navegación del cliente con fundido cruzado: ver LanguageLink. */}
           {languageSwitch && (

@@ -58,10 +58,22 @@ const en: Dictionary = {
     ctaResume: "Download CV",
   },
 
+  threshold: {
+    intro: "Two ways to get to know me. If you're in a hurry, read my CV. If you have a few minutes, explore my profile as an agent: every node is a part of my path.",
+    cvKicker: "Quick answer",
+    cvTitle: "Read the CV",
+    exploreKicker: "Deep reasoning",
+    exploreTitle: "Explore",
+    minutes: "about {n} min",
+    optionAria: "{title}, {time}",
+    groupAria: "How to get to know me",
+  },
+
   map: {
     hint: "Scroll, or tap a node",
-    cvMode: "CV mode",
+    cvMode: "CV",
     exploreMode: "Explore",
+    switchAria: "Reading mode",
     close: "Close (Esc)",
     home: "alex",
     routeAria: "Path",
