@@ -217,7 +217,7 @@ renderiza mientras hay algo que mover —el umbral, una caída, un resorte sin
 asentar, el paralaje y las partículas mientras el mapa está a la vista— y
 con la pestaña oculta o con movimiento reducido no pide ningún cuadro. DPR
 tope 2 (1.5 en vertical), sin luces ni posprocesado. Se carga después del
-LCP en su propio chunk (**243 KB gzip**, 242 795 B; tope 300); mientras tanto está el
+LCP en su propio chunk (**243 KB gzip**, 242 835 B; tope 300); mientras tanto está el
 mismo mapa como SVG del servidor, proyectado con la misma cámara. Sin WebGL
 la página pasa a Modo CV, y en Modo CV el lienzo se desmonta: nunca hay dos
 contextos WebGL, y a veces ninguno.
@@ -460,7 +460,7 @@ JS servido en `/en`, gzip, medido chunk por chunk contra `next start`:
 | Sin librería: héroe en CSS, contador con `requestAnimationFrame` | **172 733 B** |
 | Corrida del agente: héroe, marcador y escenario; el chunk 3D (237 786 B) va aparte y se pide después del LCP | **175 450 B** + 237 786 B diferidos |
 | El mapa: núcleo, explorador, etiquetas y ruta; el chunk 3D (240 628 B, tope 300 KB) va aparte, se pide después del LCP y sólo en modo explorar | **179 109 B** + 240 628 B diferidos |
-| Con el umbral y el interruptor; el chunk 3D (242 795 B, tope 300 KB) suma el vidrio, las partículas con estela y el resorte | **181 868 B** + 242 795 B diferidos |
+| Con el umbral y el interruptor; el chunk 3D (242 835 B, tope 300 KB) suma el vidrio, las partículas con estela y el resorte | **181 924 B** + 242 835 B diferidos |
 
 **34 397 bytes gzip menos.** `motion` no aparece en `package.json`, en ningún
 import ni en el bundle compilado; la única palabra "motion" que queda es
@@ -512,7 +512,7 @@ Accesibilidad, con herramientas y no con impresión:
   daba rgb(28, 28, 28)). Si cambian los colores del mapa, se vuelve a medir.
 
 Sin JavaScript: la columna completa (Modo CV), sin lienzo ni botón de modo;
-de los 395 nodos de texto de `<main>`, **0 ocultos** en los dos idiomas, y
+de los 350 nodos de texto de `<main>`, **0 ocultos** en los dos idiomas, y
 nada en opacidad 0 en reposo. Con JavaScript, navegar entre nodos no pide
 nada al servidor (0 peticiones RSC al entrar a un nodo, medido), el atrás del
 navegador deshace cada nivel y el tour por scroll deja su rastro en la URL.
