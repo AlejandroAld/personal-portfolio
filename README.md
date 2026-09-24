@@ -448,9 +448,9 @@ así que son cotas inferiores, no lo que verá una máquina con GPU:
 
 | Momento | CPU 1x | CPU 4x |
 |---|---|---|
-| Caída del umbral → explorar (1.4 s) | 38 cuadros rAF, peor intervalo 73 ms; traza: 49 perdidos de 127 | 32 cuadros, peor 178 ms; 56 de 118 |
-| Entrada a un nodo (0.8 s) | 15 cuadros, peor 162 ms; 41 de 77 | 12 cuadros, peor 138 ms; 75 de 138 |
-| Salida (0.7 s) | 8 cuadros, peor 130 ms; 43 de 65 | 6 cuadros, peor 249 ms; 64 de 82 |
+| Caída del umbral → explorar (1.4 s) | 37 cuadros rAF, peor intervalo 71 ms; traza: 51 perdidos de 129 | 33 cuadros, peor 158 ms; 53 de 119 |
+| Entrada a un nodo (0.8 s) | 15 cuadros, peor 188 ms; 44 de 86 | 11 cuadros, peor 229 ms; 43 de 80 |
+| Salida (0.7 s) | 8 cuadros, peor 135 ms; 66 de 87 | 6 cuadros, peor 178 ms; 48 de 67 |
 
 JS servido en `/en`, gzip, medido chunk por chunk contra `next start`:
 
@@ -512,7 +512,7 @@ Accesibilidad, con herramientas y no con impresión:
   daba rgb(28, 28, 28)). Si cambian los colores del mapa, se vuelve a medir.
 
 Sin JavaScript: la columna completa (Modo CV), sin lienzo ni botón de modo;
-de los 407 nodos de texto de `<main>`, **0 ocultos** en los dos idiomas, y
+de los 395 nodos de texto de `<main>`, **0 ocultos** en los dos idiomas, y
 nada en opacidad 0 en reposo. Con JavaScript, navegar entre nodos no pide
 nada al servidor (0 peticiones RSC al entrar a un nodo, medido), el atrás del
 navegador deshace cada nivel y el tour por scroll deja su rastro en la URL.
