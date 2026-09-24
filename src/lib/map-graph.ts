@@ -29,7 +29,15 @@ export interface MapNode {
   readonly r: number;
 }
 
-export const NODES: readonly MapNode[] = [
+/**
+ * "Bajo el capó" sólo existe con las dos corridas del agente grabadas. La
+ * bandera la fija next.config.ts al construir, leyendo src/content/runs; sin
+ * ella el nodo sale del grafo entero (nodos, aristas, tour, etiquetas, barra,
+ * sala y sitemap) y su URL redirige al mapa. El código se queda tal cual.
+ */
+export const HOOD_AVAILABLE = process.env.NEXT_PUBLIC_HOOD_AVAILABLE === "1";
+
+const ALL_NODES: readonly MapNode[] = [
   { id: "core", agent: null, slug: { es: "", en: "" }, landscape: [0, 0, 0], portrait: [0, -0.95, 0], r: 1.6 },
   { id: "prompt", agent: "System prompt", slug: { es: "quien-soy", en: "who-i-am" }, landscape: [-1.28, 0.76, -0.2], portrait: [-0.62, -0.5, -0.2], r: 1 },
   { id: "memory", agent: "Memory", slug: { es: "memoria", en: "memory" }, landscape: [1.62, 0.15, 0.2], portrait: [0.78, -0.95, 0.2], r: 1.15 },
@@ -39,6 +47,7 @@ export const NODES: readonly MapNode[] = [
   { id: "api", agent: "API", slug: { es: "contacto", en: "contact" }, landscape: [1.28, 0.76, -0.1], portrait: [0.62, -0.5, -0.1], r: 0.9 },
   { id: "hood", agent: null, slug: { es: "bajo-el-capo", en: "under-the-hood" }, landscape: [0.1, -1.0, -0.4], portrait: [0, -1.72, -0.4], r: 0.8 },
 ];
+export const NODES: readonly MapNode[] = HOOD_AVAILABLE ? ALL_NODES : ALL_NODES.filter((n) => n.id !== "hood");
 
 export type EdgeKind = "hub" | "governs" | "feeds" | "hood";
 
@@ -48,7 +57,7 @@ export interface MapEdge {
   readonly kind: EdgeKind;
 }
 
-export const EDGES: readonly MapEdge[] = [
+export const EDGES: readonly MapEdge[] = ([
   // El núcleo conecta con todo lo que es CV.
   { a: "core", b: "prompt", kind: "hub" },
   { a: "core", b: "memory", kind: "hub" },
@@ -67,7 +76,7 @@ export const EDGES: readonly MapEdge[] = [
   { a: "training", b: "memory", kind: "feeds" },
   // La capa que explica la página cuelga del núcleo, punteada.
   { a: "core", b: "hood", kind: "hood" },
-];
+] satisfies readonly MapEdge[]).filter((e) => HOOD_AVAILABLE || e.kind !== "hood");
 
 /** Por qué aristas viajan las partículas, y en qué sentido. */
 export const FLOWS: readonly (readonly [NodeId, NodeId])[] = [
@@ -107,7 +116,7 @@ export interface Stop {
 }
 
 /** El tour guiado: el orden en que el scroll vuela de nodo en nodo. */
-export const TOUR: readonly Stop[] = [
+export const TOUR: readonly Stop[] = ([
   { node: "core", sub: null },
   { node: "prompt", sub: null },
   { node: "memory", sub: null },
@@ -117,10 +126,10 @@ export const TOUR: readonly Stop[] = [
   { node: "training", sub: null },
   { node: "api", sub: null },
   { node: "hood", sub: null },
-];
+] satisfies readonly Stop[]).filter((s) => HOOD_AVAILABLE || s.node !== "hood");
 
 /** Los nodos con etiqueta en el mapa, en el orden del tour (el núcleo es el héroe). */
-export const LABELED: readonly NodeId[] = ["prompt", "memory", "outputs", "tools", "training", "api", "hood"];
+export const LABELED: readonly NodeId[] = (["prompt", "memory", "outputs", "tools", "training", "api", "hood"] as const).filter((id) => HOOD_AVAILABLE || id !== "hood");
 
 export function nodeById(id: NodeId): MapNode {
   const n = NODES.find((x) => x.id === id);

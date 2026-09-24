@@ -1,5 +1,5 @@
 import { getRun } from "@/content/runs";
-import { NODES, cvPath, nodeById, pathFor, type Locale, type NodeId } from "@/lib/map-graph";
+import { HOOD_AVAILABLE, NODES, cvPath, nodeById, pathFor, type Locale, type NodeId } from "@/lib/map-graph";
 import { RESUME_URL, getDictionary, publishedLocales } from "@/lib/site";
 import Contact from "./Contact";
 import Core from "./Core";
@@ -45,7 +45,7 @@ export default function Site({ lang, node, sub, cv = false }: { lang: Locale; no
   return (
     <>
       <Nav
-        links={(["prompt", "memory", "outputs", "tools", "training", "api", "hood"] as NodeId[]).map(navLink)}
+        links={(["prompt", "memory", "outputs", "tools", "training", "api", ...(HOOD_AVAILABLE ? ["hood"] : [])] as NodeId[]).map(navLink)}
         labels={{ menu: dict.nav.menu, close: dict.nav.close, mode: switchLabels, modeAria: dict.map.switchAria }}
         // Apagado hasta que exista el PDF: ver RESUME_URL en src/lib/site.ts.
         cta={RESUME_URL ? { href: RESUME_URL, label: dict.hero.ctaResume } : null}
@@ -87,9 +87,12 @@ export default function Site({ lang, node, sub, cv = false }: { lang: Locale; no
           <Contact dict={dict} />
         </Room>
 
-        <Room {...room("hood")} title={dict.context.title} intro={dict.context.intro}>
-          <Hood dict={dict} run={run} />
-        </Room>
+        {/* Sólo con las dos corridas grabadas (ver next.config.ts). */}
+        {HOOD_AVAILABLE && (
+          <Room {...room("hood")} title={dict.context.title} intro={dict.context.intro}>
+            <Hood dict={dict} run={run} />
+          </Room>
+        )}
       </main>
 
       <Footer dict={dict} />

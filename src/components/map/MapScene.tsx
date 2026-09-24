@@ -4,7 +4,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { getExplorer, labelElement, setHover, subscribeExplorer, type ExplorerState } from "@/lib/explorer";
-import { EDGES, FLOWS, FOV, LABELED, NODES, focusPose, graphCenter, isPortrait, mapDistance, mapPose, nodeById, positionOf, tourPose, type CameraPose, type NodeId, type Vec3 } from "@/lib/map-graph";
+import { EDGES, FLOWS, FOV, HOOD_AVAILABLE, LABELED, NODES, focusPose, graphCenter, isPortrait, mapDistance, mapPose, nodeById, positionOf, tourPose, type CameraPose, type NodeId, type Vec3 } from "@/lib/map-graph";
 import { FALL_MS } from "@/lib/tokens";
 
 /**
@@ -225,7 +225,8 @@ function Graph({ onReady }: { onReady: () => void }) {
   const edgeList = useMemo(() => EDGES.filter((e) => e.kind !== "hood"), []);
 
   const hoodEdge = useMemo(() => {
-    const e = EDGES.find((x) => x.kind === "hood")!;
+    const e = EDGES.find((x) => x.kind === "hood");
+    if (!e) return null;
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.Float32BufferAttribute([...pos[e.a], ...pos[e.b]], 3));
     const line = new THREE.Line(g, new THREE.LineDashedMaterial({ color: srgb(...EDGE_BASE.hood), dashSize: 0.045, gapSize: 0.035, toneMapped: false }));
@@ -724,15 +725,17 @@ function Graph({ onReady }: { onReady: () => void }) {
       <lineSegments ref={edgesRef} geometry={edgeGeometry}>
         <lineBasicMaterial vertexColors toneMapped={false} />
       </lineSegments>
-      <primitive object={hoodEdge} />
+      {hoodEdge && <primitive object={hoodEdge} />}
       <lineSegments ref={rings} geometry={ringGeometry}>
         <lineBasicMaterial vertexColors toneMapped={false} />
       </lineSegments>
       <instancedMesh ref={nodeMesh} args={[glass.geometry, glass.material, bodies.length]} frustumCulled={false} />
-      <mesh ref={hood} frustumCulled={false}>
-        <icosahedronGeometry args={[1, 1]} />
-        <meshBasicMaterial wireframe toneMapped={false} />
-      </mesh>
+      {HOOD_AVAILABLE && (
+        <mesh ref={hood} frustumCulled={false}>
+          <icosahedronGeometry args={[1, 1]} />
+          <meshBasicMaterial wireframe toneMapped={false} />
+        </mesh>
+      )}
       <mesh ref={iris} visible={false} frustumCulled={false}>
         <ringGeometry args={[0.6, 0.62, 96]} />
         <meshBasicMaterial color={srgb(59, 130, 246)} transparent opacity={0.16} toneMapped={false} depthWrite={false} side={THREE.DoubleSide} />

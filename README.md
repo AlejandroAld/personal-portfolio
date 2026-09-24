@@ -179,7 +179,7 @@ toque o Enter usa `pushState`.
 | Tools · Stack | `/es/stack` | Las nueve categorías de habilidades, una debajo de otra: en rejilla las cortas dejaban hueco al lado de las largas. |
 | Training · Formación | `/es/formacion` | IPN, la publicación arbitrada con sus límites, idiomas y certificaciones en curso, en una sola columna; las certificaciones en una fila de tarjetas de la misma altura. |
 | API · Contacto | `/es/contacto` | Correo, LinkedIn y GitHub. |
-| Bajo el capó | `/es/bajo-el-capo` | Cómo funciona la página: la ventana de contexto bloque por bloque y la corrida grabada con su marcador. Las grabaciones sólo se usan aquí. Ventana de contexto y marcador van en una sola columna. |
+| Bajo el capó | `/es/bajo-el-capo` | Cómo funciona la página: la ventana de contexto bloque por bloque y la corrida grabada con su marcador. Las grabaciones sólo se usan aquí. Ventana de contexto y marcador van en una sola columna. **Oculto mientras las corridas estén `pending`**: `next.config.ts` lee `src/content/runs/*.json` al construir y fija `NEXT_PUBLIC_HOOD_AVAILABLE`; sin ella el nodo sale del grafo entero (mapa, aristas, tour, etiquetas, barra, sala y sitemap) y `/es/bajo-el-capo` y `/en/under-the-hood` redirigen al mapa. Vuelve solo en cuanto las dos grabaciones existan y pasen `check-runs`. |
 
 **Es verdad, no una simulación.** Lo que "Bajo el capó" reproduce es una
 corrida grabada contra el agente desplegado (`scripts/grabar_corrida.py` en
@@ -556,6 +556,7 @@ condicional que mantener.
 |---|---|
 | `RESUME_URL` | Sube el PDF a `public/` y pon su ruta en `src/lib/site.ts`. Aparece el botón de descarga en el héroe, en contacto y en el nav. |
 | `AGENT_URL` | Se puede sobreescribir con `NEXT_PUBLIC_AGENT_URL`. Es pública por definición: nunca pongas aquí la llave del endpoint Bearer. |
+| `NEXT_PUBLIC_HOOD_AVAILABLE` | No se pone a mano: la calcula `next.config.ts` con el `status` de las dos corridas. Graba las corridas con `scripts/grabar_corrida.py` de cv-agent, pasa `npm run lint` (check-runs) y el nodo "Bajo el capó" vuelve con el siguiente build. |
 
 ---
 
