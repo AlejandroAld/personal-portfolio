@@ -19,7 +19,7 @@ const en: Dictionary = {
   htmlLang: "en",
 
   meta: {
-    title: "José Alejandro Aldama Ramos — AI Engineer",
+    title: "José Alejandro Aldama Ramos, AI Engineer",
     description:
       "AI Engineer in Guadalajara. I take AI systems to production and keep them running there: four agents with real customer traffic, operating cost cut 92%, evaluation anchored in real failure modes, and a peer-reviewed NLP publication.",
     keywords: [
@@ -35,15 +35,10 @@ const en: Dictionary = {
       "José Alejandro Aldama Ramos",
     ],
     ogAlt:
-      "José Alejandro Aldama Ramos — AI Engineer. Agents in production, evaluation, and integration with business systems.",
+      "José Alejandro Aldama Ramos, AI Engineer. Agents in production, evaluation, and integration with business systems.",
   },
 
   nav: {
-    experience: "Experience",
-    projects: "Projects",
-    publication: "Publication",
-    skills: "Skills",
-    contact: "Contact",
     menu: "Open menu",
     close: "Close menu",
     skipToContent: "Skip to content",
@@ -58,10 +53,56 @@ const en: Dictionary = {
     summary:
       "Technical owner of the generative AI systems in production at an automotive group, with a peer-reviewed publication in NLP behind me. I work the stretch from pilot to production: tool calling against real business systems, evaluation anchored in real failure modes, guardrails, tracing and cost per interaction. I also build the internal platforms where a person reviews, approves and corrects what the agent produced before it takes effect.",
     availability:
-      "Open to AI engineering roles in Mexico — on-site, hybrid or remote. Open to relocation.",
+      "Open to AI engineering roles in Mexico: on-site, hybrid or remote. Open to relocation.",
     ctaContact: "Get in touch",
-    ctaProjects: "See the work",
     ctaResume: "Download CV",
+  },
+
+  threshold: {
+    intro: "Two ways to get to know me. If you're in a hurry, read my CV. If you have a few minutes, explore my profile as an agent: every node is a part of my path.",
+    cvKicker: "Quick answer",
+    cvTitle: "Read the CV",
+    exploreKicker: "Deep reasoning",
+    exploreTitle: "Explore",
+    groupAria: "How to get to know me",
+  },
+
+  map: {
+    hint: "Scroll, or tap a node",
+    cvMode: "CV",
+    exploreMode: "Explore",
+    switchAria: "Reading mode",
+    close: "Close (Esc)",
+    home: "alex",
+    routeAria: "Path",
+    mapAria: "Map",
+    nodes: {
+      core: { name: "Alex" },
+      prompt: { name: "Who I am" },
+      memory: { name: "Experience" },
+      outputs: { name: "Projects" },
+      tools: { name: "Stack" },
+      training: { name: "Education" },
+      api: { name: "Contact" },
+      hood: { name: "Under the hood" },
+    },
+  },
+
+  who: {
+    title: "Who I am and what I'm looking for",
+    lookingFor: "What I'm looking for",
+  },
+
+  training: {
+    title: "Education, research and certifications",
+  },
+
+  moment: {
+    caption:
+      "I inherited a system of more than 180 nodes with its logic scattered and errors that could not be reproduced. I rebuilt it on a single orchestrator with explicit state, and the monthly operating cost dropped 92% while the volume handled grew.",
+    before: "180+ nodes",
+    after: "1 orchestrator · 4 agents",
+    metric: "−92% monthly cost",
   },
 
   metrics: {
@@ -98,7 +139,6 @@ const en: Dictionary = {
   },
 
   experience: {
-    eyebrow: "Experience",
     title: "Four years, four rooms",
     present: "Present",
     roles: {
@@ -107,7 +147,7 @@ const en: Dictionary = {
         summary:
           "Technical owner of the generative AI systems in production, end to end: architecture, integration with the business systems, deployment, security, evaluation and monitoring.",
         highlights: [
-          "Inherited a system of more than 180 nodes where logic was scattered, context was lost between hops and errors weren't reproducible. Rebuilt it onto a single traceable orchestrator with explicit state — monthly operating cost fell 92%.",
+          "Inherited a system of more than 180 nodes where logic was scattered, context was lost between hops and errors weren't reproducible. Rebuilt it onto a single traceable orchestrator with explicit state: monthly operating cost fell 92%.",
           "Cut a recurring calculation from 48 to 10 hours of manual work per week, and made it auditable. Before the system, the calculation left no trace and its error rate could not be measured.",
           "The systems I run serve four separate business units inside the group.",
           "The internal communications bot runs nationwide and reaches thousands of advisors across the group.",
@@ -116,7 +156,7 @@ const en: Dictionary = {
           "Evaluation strategy from scratch: an offline suite anchored in real production failure modes that runs on every change and decides whether a prompt change ships or gets reverted.",
           "Anti-hallucination guardrails with output validation that blocks answers not grounded in a tool result, plus reviewer agents that audit before the customer sees anything.",
           "An MCP server in Node on Cloud Run with OAuth and per-role permissions, exposing internal systems as a natural-language connector.",
-          "A deterministic state machine on Cloud Functions for the accounting processes that require reproducibility — deliberately with no model in the path.",
+          "A deterministic state machine on Cloud Functions for the accounting processes that require reproducibility, deliberately with no model in the path.",
           "Access control across the architecture: granular RBAC, least privilege per tool, tenant isolation, and OAuth 2.0 / JWT on every integration touching customer data.",
         ],
       },
@@ -125,7 +165,7 @@ const en: Dictionary = {
         summary:
           "AI solutions delivered on the client's own infrastructure, in consulting with direct client contact.",
         highlights: [
-          "Built ingestion, chunking, embeddings and retrieval inside Oracle APEX on Oracle Cloud — an environment with no native support for vector search or RAG.",
+          "Built ingestion, chunking, embeddings and retrieval inside Oracle APEX on Oracle Cloud, an environment with no native support for vector search or RAG.",
           "Python and JavaScript backends orchestrating data ingestion and computer vision services over REST APIs.",
         ],
       },
@@ -144,7 +184,7 @@ const en: Dictionary = {
           "Research into detecting depression tendency through text analysis on a clinical corpus.",
         highlights: [
           "Trained and compared BERT, RoBERTa and DeBERTa with full fine-tuning in PyTorch on the DAIC-WOZ clinical corpus, labeled with the PHQ-8 instrument.",
-          "Hyperparameter search and a 10-run protocol reporting mean and standard deviation instead of single-run results — a single run tells you where the seed landed, not how the model behaves.",
+          "Hyperparameter search and a 10-run protocol reporting mean and standard deviation instead of single-run results: a single run tells you where the seed landed, not how the model behaves.",
           "Prioritized recall on purpose: in clinical screening a false negative costs more than a false positive.",
           "Deployed the best performing model as an inference API on Amazon SageMaker.",
         ],
@@ -153,7 +193,6 @@ const en: Dictionary = {
   },
 
   projects: {
-    eyebrow: "Projects",
     title: "Seven things I built",
     intro:
       "Production systems at an automotive group, plus what I build on my own time. Code is linked where the repository is public; the rest is my employer's and stays private.",
@@ -163,16 +202,16 @@ const en: Dictionary = {
     privateRepo: "Private",
     items: {
       "proy-cv-agent": {
-        title: "CV agent — an Open Responses server",
+        title: "CV agent: an Open Responses server",
         summary:
           "A conversational agent over my own profile, built on the open interoperability spec rather than as a chatbot over a PDF. It implements POST /v1/responses in sync and SSE streaming modes, runs an agent loop with server-side tools, and yields control when a client declares its own function tools.",
         hrefLabel: "View code",
         featured: true,
         bullets: [
-          "The input as the model gets it: the whole profile in the prompt, no retrieval step — so a retriever missing the right chunk stops being a failure mode.",
+          "The input as the model gets it: the whole profile in the prompt, no retrieval step, so a retriever missing the right chunk stops being a failure mode.",
           "Every tool call with its arguments and result, because tool selection is a decision you should be able to read.",
           "The reasoning before the answer, where the guardrails bite: a gap declared instead of filled, a requirement marked adjacent instead of covered.",
-          "Tokens as they leave — real streaming, with the cost and latency of that single interaction.",
+          "Tokens as they leave: real streaming, with the cost and latency of that single interaction.",
         ],
       },
       "proy-agentes-whatsapp": {
@@ -193,7 +232,7 @@ const en: Dictionary = {
       "proy-migracion-web": {
         title: "Angular 9 to Next.js 15, with keys that never reach the browser",
         summary:
-          "PageSpeed went from 34 to 96 and LCP from 8.3 seconds to 2.5. A BFF pattern where the browser only calls internal route handlers and API keys live server-side only — made enforceable with automated verification that no key leaks into the bundle, plus an SEO check in CI on every pull request.",
+          "PageSpeed went from 34 to 96 and LCP from 8.3 seconds to 2.5. A BFF pattern where the browser only calls internal route handlers and API keys live server-side only, made enforceable with automated verification that no key leaks into the bundle, plus an SEO check in CI on every pull request.",
       },
       "proy-saas-flotillas": {
         title: "Multi-tenant fleet management SaaS",
@@ -203,7 +242,7 @@ const en: Dictionary = {
       "proy-cotizador": {
         title: "Vehicle valuation flow",
         summary:
-          "A purchase and valuation agent inside the conversational suite: it gives a private seller a price range for their car and turns the conversation into an appointment. The valuation itself lives outside the model, in deterministic logic — a wrong price range is a business problem, not a conversational detail.",
+          "A purchase and valuation agent inside the conversational suite: it gives a private seller a price range for their car and turns the conversation into an appointment. The valuation itself lives outside the model, in deterministic logic: a wrong price range is a business problem, not a conversational detail.",
       },
     },
   },
@@ -224,82 +263,99 @@ const en: Dictionary = {
   },
 
   skills: {
-    eyebrow: "Skills",
     title: "What I work with",
   },
 
   certifications: {
-    eyebrow: "Education & certifications",
-    title: "Credentials",
     inProgress: "In progress",
-    education: "Education",
-    list: "Certifications",
     gpa: "GPA",
   },
 
-  thinking: {
-    eyebrow: "How I think",
-    title: "Failure modes I've fixed",
-    intro:
-      "The interesting part of a system isn't the architecture diagram, it's what broke and what changed because of it.",
-    symptom: "What broke",
-    fix: "What I did",
-    lesson: "What it generalizes to",
+  work: {
+    eyebrow: "How I work",
+    // Traducción aprobada de `principios` en perfil.yaml, en el mismo orden.
     items: [
       {
-        id: "my-own-paper",
-        title: "Three methodological flaws in my own published paper",
-        symptom:
-          "I oversampled before the split, so there is data leakage between train and test. I partitioned by question-answer pair instead of by participant, so there is group leakage. And I evaluated at the turn level instead of the patient level, which is the clinical unit that actually matters.",
-        fix:
-          "I found them after the fact and documented them in the limitations section rather than leaving them for a reader to find. The F1 of 0.7744 has to be read with all three of those on top of it, and I say so whenever I cite the number.",
-        lesson:
-          "Validation is designed before the experiment, not after it. A number you can't defend is worse than having no number. That's why the evaluation suites I build today are anchored in real production failure modes and not in synthetic cases I invented myself.",
-        cites: ["paperLimitations", "paperJournal"],
+        phrase: "An agent proves itself on real traffic, not in a demo.",
+        proof: "I run four in production today with real customers, measured on quality, cost and latency per interaction.",
+        cite: "workRealTraffic",
       },
       {
-        id: "concurrency",
-        title: "The messaging failure that only shows up with real traffic",
-        symptom:
-          "Someone sends three short messages in a row instead of one long one. A flow execution is already in flight for that conversation, so the messages that arrive mid-run either get lost or start a second execution that contradicts the first. It's the classic messaging failure mode, and it doesn't appear in any test you write by hand.",
-        fix:
-          "Per-conversation concurrency control with Redis: messages arriving while an execution is in progress get captured and folded into it rather than racing it. It runs on all four agents.",
-        lesson:
-          "Real traffic behaves in ways a synthetic transcript never will. That's the same reason my evaluation suites are anchored in production failure modes: the cases worth testing are the ones users found, not the ones I imagined.",
-        cites: ["redisConcurrency"],
+        phrase: "The model proposes; a person decides.",
+        proof: "That's why I built the platforms where someone reviews, approves and corrects what an agent produces before it takes effect.",
+        cite: "workPersonDecides",
       },
       {
-        id: "banking-core",
-        title: "The false positive that would have died in the first interview",
-        symptom:
-          "A fit-evaluation tool scored requirement coverage as a boolean. A \"banking core\" requirement came back covered — on the strength of \"base-360 banking convention\", which is a day-count convention inside an interest calculation, not integration with a banking core.",
-        fix:
-          "Coverage now has three states, not two: direct when the term appears in a job title, project name, stack or keyword; adjacent when it only appears inside prose; no evidence when it doesn't appear at all. A contract test pins the case, and an adversarial eval guards the behavior end to end.",
-        lesson:
-          "A boolean was collapsing two different things into one answer. A banking recruiter catches that stretch on the first follow-up question — and a tool that stretches is worse than no tool, because it's a claim about a real person that fails on contact.",
-        cites: ["adjacencyCoverage", "adjacencyTest", "adjacencyEval"],
+        phrase: "Simple scales better than impressive.",
+        proof: "I replaced a 180+ node system with a single traceable orchestrator, and handled volume grew.",
+        cite: "workSimple",
+      },
+      {
+        phrase: "I build it with the people who will run it.",
+        proof: "I work directly with business leadership and train the teams that operate what I ship.",
+        cite: "workWithOperators",
       },
     ],
   },
 
   contact: {
-    eyebrow: "Contact",
     title: "Let's talk",
-    body: "If you're hiring for the stretch between pilot and production — where most AI projects stall — that's the work I've been doing. Happy to go as deep into the technical detail as you want.",
+    body: "If you're hiring for the stretch between pilot and production, where most AI projects stall, that's the work I've been doing. Happy to go as deep into the technical detail as you want.",
     email: "Email",
     location: "Location",
     linkedin: "LinkedIn",
     github: "GitHub",
     resume: "Download CV",
-    languages:
-      "Spanish (native) · English (B2, professional working proficiency — fluent technical reading and writing, with a peer-reviewed publication written in English).",
+  },
+
+  run: {
+    title: "Recorded run",
+    run: "run",
+    model: "model",
+    input: "input",
+    reasoning: "reasoning",
+    output: "output",
+    time: "time",
+    state: "state",
+    tokens: "{n} tok",
+    pending: "no recording yet",
+    none: "n/a",
+    done: "completed",
+    note: "Nothing runs live: what you see is a real run of the deployed agent, recorded once and replayed here. Every figure comes from that recording; if it isn't recorded, there is no figure.",
+    recordedFrom: "Recorded with",
+  },
+
+  context: {
+    title: "The whole profile goes into the context window, without retrieval",
+    intro:
+      "There is no vector store and no retriever: the agent flattens perfil.yaml into text and sends it whole with every request. The most common failure of a CV bot is a retriever missing the right chunk and the model filling the gap; with the full profile in context, that failure cannot happen.",
+    window: "Context window",
+    windowNote: "Each block counted with the {tokenizer} tokenizer over the exact prompt text; the provider billed {total} input tokens for this run.",
+    tokens: "{n} tokens",
+    pendingBlocks: "Block sizes appear once the run is recorded.",
+    education: "Education",
+    languages: "Languages",
+    certifications: "Certifications",
+    blocks: {
+      Identidad: "Identity",
+      "Contacto público": "Public contact",
+      Resumen: "Summary",
+      Experiencia: "Experience",
+      Proyectos: "Projects",
+      Habilidades: "Skills",
+      Educación: "Education",
+      Publicaciones: "Publications",
+      Certificaciones: "Certifications",
+      "Respuestas preparadas (úsalas casi literales cuando apliquen)": "Prepared answers",
+      "Datos que NO debes revelar": "Data that must not be revealed",
+    },
   },
 
   footer: {
-    sourceAria: "Source: {label} — opens in a new tab",
-    generated: "Every fact on this page is generated from a single YAML file — the same source of truth my CV agent answers from.",
+    sourceAria: "Source: {label}, opens in a new tab",
+    generated: "Every fact on this page is generated from a single YAML file: the same source of truth my CV agent answers from.",
     generatedLink: "See perfil.yaml",
-    builtWith: "Next.js, TypeScript, Tailwind. Hero background is a hand-written WebGL shader.",
+    builtWith: "Next.js, TypeScript, Tailwind and three.js. The map is a single WebGL canvas behind the page; CV mode has none.",
   },
 
   months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -396,14 +452,17 @@ const en: Dictionary = {
     "Desarrollador de Inteligencia Artificial": "Artificial Intelligence Developer",
     "Ingeniero Junior de Inteligencia Artificial": "Junior Artificial Intelligence Engineer",
     "Beauty Tech Intern (TI y Datos)": "Beauty Tech Intern (IT & Data)",
-    "Investigador en IA Aplicada — NLP y Deep Learning": "Applied AI Researcher — NLP & Deep Learning",
+    "Investigador en IA Aplicada: NLP y Deep Learning": "Applied AI Researcher: NLP & Deep Learning",
     // El nivel ("B.S.") es un dato del YAML, no una interpretación de aquí.
     "Ingeniería en Inteligencia Artificial": `${educacion.nivel.en} Artificial Intelligence Engineering`,
     "Español": "Spanish",
     "Inglés": "English",
+    Nativo: "Native",
+    "B2, competencia profesional de trabajo. Lectura y escritura técnica fluidas, con una publicación arbitrada escrita en inglés. Conversacional en nivel intermedio alto, en mejora activa.":
+      "B2, professional working proficiency. Fluent technical reading and writing, with a peer-reviewed publication written in English. Conversational at an upper-intermediate level, actively improving.",
     // El titular del YAML, para los datos estructurados de la página en inglés.
-    "Ingeniero en Inteligencia Artificial — agentes en producción, evaluación e integración con sistemas de negocio":
-      "AI Engineer — agents in production, evaluation and integration with business systems",
+    "Ingeniero en Inteligencia Artificial: agentes en producción, evaluación e integración con sistemas de negocio":
+      "AI Engineer: agents in production, evaluation and integration with business systems",
     "Guadalajara, Jalisco": "Guadalajara, Jalisco, Mexico",
     "Ciudad de México": "Mexico City, Mexico",
     "Guadalajara, Jalisco, México": "Guadalajara, Jalisco, Mexico",

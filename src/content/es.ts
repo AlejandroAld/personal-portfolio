@@ -9,8 +9,12 @@
  * este archivo.
  */
 
+import type { CiteKey } from "@/lib/evidence";
 import type { Dictionary } from "./dictionary";
-import { persona } from "./perfil";
+import { persona, principios } from "./perfil";
+
+/** La cita de cada principio, en el orden del YAML. */
+const PRINCIPIOS_CITES: readonly CiteKey[] = ["workRealTraffic", "workPersonDecides", "workSimple", "workWithOperators"];
 
 const es: Dictionary = {
   complete: true,
@@ -19,7 +23,7 @@ const es: Dictionary = {
   htmlLang: "es",
 
   meta: {
-    title: "José Alejandro Aldama Ramos — Ingeniero en IA",
+    title: "José Alejandro Aldama Ramos, Ingeniero en IA",
     description:
       "Ingeniero en Inteligencia Artificial en Guadalajara. Llevo sistemas de IA a producción y los sostengo ahí: cuatro agentes con tráfico real de clientes, costo de operación reducido 92%, evaluación anclada en modos de falla reales, y una publicación arbitrada en NLP.",
     keywords: [
@@ -35,15 +39,10 @@ const es: Dictionary = {
       "José Alejandro Aldama Ramos",
     ],
     ogAlt:
-      "José Alejandro Aldama Ramos — Ingeniero en IA. Agentes en producción, evaluación e integración con sistemas de negocio.",
+      "José Alejandro Aldama Ramos, Ingeniero en IA. Agentes en producción, evaluación e integración con sistemas de negocio.",
   },
 
   nav: {
-    experience: "Experiencia",
-    projects: "Proyectos",
-    publication: "Publicación",
-    skills: "Habilidades",
-    contact: "Contacto",
     menu: "Abrir menú",
     close: "Cerrar menú",
     skipToContent: "Saltar al contenido",
@@ -58,8 +57,54 @@ const es: Dictionary = {
     summary: persona.presentacion,
     availability: persona.disponibilidad,
     ctaContact: "Hablemos",
-    ctaProjects: "Ver el trabajo",
     ctaResume: "Descargar CV",
+  },
+
+  threshold: {
+    intro: "Dos formas de conocerme. Si tienes prisa, lee mi CV. Si tienes unos minutos, explora mi perfil como un agente: cada nodo es una parte de mi trayectoria.",
+    cvKicker: "Respuesta rápida",
+    cvTitle: "Leer el CV",
+    exploreKicker: "Razonamiento profundo",
+    exploreTitle: "Explorar",
+    groupAria: "Cómo conocerme",
+  },
+
+  map: {
+    hint: "Haz scroll o toca un nodo",
+    cvMode: "CV",
+    exploreMode: "Explorar",
+    switchAria: "Modo de lectura",
+    close: "Cerrar (Esc)",
+    home: "alex",
+    routeAria: "Ruta",
+    mapAria: "Mapa",
+    nodes: {
+      core: { name: "Alex" },
+      prompt: { name: "Quién soy" },
+      memory: { name: "Experiencia" },
+      outputs: { name: "Proyectos" },
+      tools: { name: "Stack" },
+      training: { name: "Formación" },
+      api: { name: "Contacto" },
+      hood: { name: "Bajo el capó" },
+    },
+  },
+
+  who: {
+    title: "Quién soy y qué busco",
+    lookingFor: "Qué busco",
+  },
+
+  training: {
+    title: "Formación, investigación y certificaciones",
+  },
+
+  moment: {
+    caption:
+      "Recibí un sistema de más de 180 nodos con la lógica repartida y errores no reproducibles. Lo reconstruí sobre un orquestador único con estado explícito, y el costo mensual de operación bajó 92% mientras el volumen atendido crecía.",
+    before: "180+ nodos",
+    after: "1 orquestador · 4 agentes",
+    metric: "−92% costo mensual",
   },
 
   metrics: {
@@ -96,7 +141,6 @@ const es: Dictionary = {
   },
 
   experience: {
-    eyebrow: "Experiencia",
     title: "Cuatro años, cuatro salas",
     present: "Actualidad",
     roles: {
@@ -151,7 +195,6 @@ const es: Dictionary = {
   },
 
   projects: {
-    eyebrow: "Proyectos",
     title: "Siete cosas que construí",
     intro:
       "Sistemas en producción en un grupo automotriz, más lo que construyo por mi cuenta. El código va enlazado donde el repositorio es público; el resto es de mi empleador y se queda privado.",
@@ -161,7 +204,7 @@ const es: Dictionary = {
     privateRepo: "Privado",
     items: {
       "proy-cv-agent": {
-        title: "Agente de CV — un servidor Open Responses",
+        title: "Agente de CV: un servidor Open Responses",
         summary:
           "Un agente conversacional sobre mi propio perfil, construido sobre la especificación abierta de interoperabilidad y no como un chatbot sobre un PDF. Implementa POST /v1/responses en modo síncrono y streaming SSE, ejecuta un bucle agéntico con herramientas del servidor, y cede el control cuando un cliente declara sus propias function tools.",
         hrefLabel: "Ver el código",
@@ -222,66 +265,21 @@ const es: Dictionary = {
   },
 
   skills: {
-    eyebrow: "Habilidades",
     title: "Con qué trabajo",
   },
 
   certifications: {
-    eyebrow: "Estudios y certificaciones",
-    title: "Credenciales",
     inProgress: "En curso",
-    education: "Estudios",
-    list: "Certificaciones",
     gpa: "Promedio",
   },
 
-  thinking: {
-    eyebrow: "Cómo pienso",
-    title: "Modos de falla que he resuelto",
-    intro:
-      "La parte interesante de un sistema no es el diagrama de arquitectura, es qué se rompió y qué cambió por eso.",
-    symptom: "Qué se rompió",
-    fix: "Qué hice",
-    lesson: "A qué generaliza",
-    items: [
-      {
-        id: "my-own-paper",
-        title: "Tres debilidades metodológicas en mi propia publicación",
-        symptom:
-          "Hice el sobremuestreo antes del split, así que hay fuga de datos entre entrenamiento y prueba. Particioné por par pregunta-respuesta y no por participante, así que hay fuga por grupo. Y evalué a nivel turno en vez de a nivel paciente, que es la unidad clínica que de verdad importa.",
-        fix:
-          "Las identifiqué después y las documenté en la sección de limitaciones, en vez de dejarlas para que las encontrara quien leyera. El F1 de 0.7744 hay que leerlo con las tres encima, y lo digo cada vez que cito el número.",
-        lesson:
-          "La validación se diseña antes del experimento, no después. Un número que no puedes defender es peor que no tener número. Por eso las suites de evaluación que construyo hoy se anclan en modos de falla reales de producción y no en casos sintéticos que yo mismo inventé.",
-        cites: ["paperLimitations", "paperJournal"],
-      },
-      {
-        id: "concurrency",
-        title: "El modo de falla de mensajería que sólo aparece con tráfico real",
-        symptom:
-          "Alguien manda tres mensajes cortos seguidos en vez de uno largo. Ya hay una ejecución del flujo en curso para esa conversación, así que los mensajes que llegan a media corrida o se pierden o arrancan una segunda ejecución que contradice a la primera. Es el modo de falla clásico de mensajería, y no aparece en ninguna prueba que escribas a mano.",
-        fix:
-          "Control de concurrencia por conversación con Redis: los mensajes que llegan mientras una ejecución está en curso se capturan y se integran a ella en vez de competirle. Corre en los cuatro agentes.",
-        lesson:
-          "El tráfico real se comporta de formas que una transcripción sintética nunca va a reproducir. Es la misma razón por la que mis suites de evaluación se anclan en fallas de producción: los casos que vale la pena probar son los que encontraron los usuarios, no los que yo imaginé.",
-        cites: ["redisConcurrency"],
-      },
-      {
-        id: "banking-core",
-        title: "El falso positivo que habría muerto en la primera entrevista",
-        symptom:
-          "Una herramienta de evaluación de encaje calificaba la cobertura con un booleano. Un requisito de «core bancario» salía cubierto, apoyado en «convención bancaria base 360», que es una convención de conteo de días dentro de un cálculo de intereses, no integración con un core bancario.",
-        fix:
-          "La cobertura ahora tiene tres estados, no dos: directa cuando el término aparece en un puesto, nombre de proyecto, stack o keyword; adyacente cuando sólo aparece dentro de la prosa; sin evidencia cuando no aparece. Un test de contrato fija el caso y una evaluación adversarial vigila el comportamiento de punta a punta.",
-        lesson:
-          "Un booleano estaba metiendo dos cosas distintas en la misma respuesta. Un reclutador bancario detecta ese estiramiento en la primera pregunta de seguimiento, y una herramienta que estira es peor que no tener herramienta, porque es una afirmación sobre una persona real que se cae al primer contacto.",
-        cites: ["adjacencyCoverage", "adjacencyTest", "adjacencyEval"],
-      },
-    ],
+  work: {
+    eyebrow: "Cómo trabajo",
+    // Literal del YAML (`principios`), en orden, cada uno con su cita.
+    items: principios.map((p, i) => ({ phrase: p.frase, proof: p.prueba, cite: PRINCIPIOS_CITES[i] })),
   },
 
   contact: {
-    eyebrow: "Contacto",
     title: "Hablemos",
     body: "Si estás contratando para el tramo de piloto a producción, que es donde la mayoría de los proyectos de IA se detiene, ese es el trabajo que he estado haciendo. Con gusto entro en todo el detalle técnico que necesites.",
     email: "Correo",
@@ -289,15 +287,44 @@ const es: Dictionary = {
     linkedin: "LinkedIn",
     github: "GitHub",
     resume: "Descargar CV",
-    languages:
-      "Español (nativo) · Inglés (B2, competencia profesional de trabajo: lectura y escritura técnica fluidas, con una publicación arbitrada escrita en inglés).",
+  },
+
+  run: {
+    title: "Corrida grabada",
+    run: "corrida",
+    model: "modelo",
+    input: "entrada",
+    reasoning: "razonamiento",
+    output: "salida",
+    time: "tiempo",
+    state: "estado",
+    tokens: "{n} tok",
+    pending: "sin grabación todavía",
+    none: "n/d",
+    done: "completada",
+    note: "Nada corre en vivo: lo que se muestra es una corrida real del agente desplegado, grabada una vez y reproducida aquí. Cada cifra sale de esa grabación; si no está grabada, no hay cifra.",
+    recordedFrom: "Grabada con",
+  },
+
+  context: {
+    title: "El perfil completo entra a la ventana de contexto, sin recuperación",
+    intro:
+      "No hay base vectorial ni recuperador: el agente aplana perfil.yaml a texto y lo manda entero en cada petición. El modo de falla más común de un bot de CV es que el recuperador no traiga el fragmento correcto y el modelo rellene el hueco; con el perfil entero en contexto, esa falla no puede ocurrir.",
+    window: "Ventana de contexto",
+    windowNote: "Cada bloque contado con el tokenizador {tokenizer} sobre el texto exacto del prompt; el proveedor cobró {total} tokens de entrada en esta corrida.",
+    tokens: "{n} tokens",
+    pendingBlocks: "Los tamaños de bloque aparecen cuando la corrida esté grabada.",
+    education: "Formación",
+    languages: "Idiomas",
+    certifications: "Certificaciones",
+    blocks: {},
   },
 
   footer: {
-    sourceAria: "Fuente: {label} — se abre en una pestaña nueva",
+    sourceAria: "Fuente: {label}, se abre en una pestaña nueva",
     generated: "Cada dato de esta página se genera desde un solo archivo YAML, la misma fuente de verdad con la que responde mi agente de CV.",
     generatedLink: "Ver perfil.yaml",
-    builtWith: "Next.js, TypeScript, Tailwind. El fondo del héroe es un shader de WebGL escrito a mano.",
+    builtWith: "Next.js, TypeScript, Tailwind y three.js. El mapa es un solo lienzo WebGL detrás de la página; en Modo CV no hay ninguno.",
   },
 
   months: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],

@@ -12,7 +12,7 @@
  */
 
 export const CV_AGENT_REPO = "AlejandroAld/cv-agent";
-export const CV_AGENT_SHA = "bec5dbb3736181082c7fecf003b1a21612892f3d";
+export const CV_AGENT_SHA = "77d97a22a1bf9d386a3b7fd4c396daa1ee301a6d";
 export const CV_AGENT_URL = `https://github.com/${CV_AGENT_REPO}`;
 
 /** Una línea suelta, o un rango [desde, hasta]. */
@@ -70,7 +70,7 @@ export const CITES = {
   noRagRationale: { label: "README.md", href: `${CV_AGENT_URL}/blob/${CV_AGENT_SHA}/README.md#contexto-completo-en-el-prompt-no-rag` },
 
   // --- Modo de falla: la fuga de datos en mi propio paper -----------------
-  paperLimitations: { label: "perfil.yaml:321-332", href: perfil([321, 332]) },
+  paperLimitations: { label: "perfil.yaml:333-344", href: perfil([333, 344]) },
   paperJournal: { label: "Computación y Sistemas", href: "https://www.cys.cic.ipn.mx/ojs/index.php/CyS/article/view/5887" },
 
   // --- Modo de falla: el falso negativo también miente --------------------
@@ -99,11 +99,18 @@ export const CITES = {
   saasFlotillas: { label: "perfil.yaml:208-218", href: perfil([208, 218]) },
   cotizador: { label: "perfil.yaml:248-259", href: perfil([248, 259]) },
   research: { label: "perfil.yaml:133-148", href: perfil([133, 148]) },
-  education: { label: "perfil.yaml:281-288", href: perfil([281, 288]) },
-  certifications: { label: "perfil.yaml:300-306", href: perfil([300, 306]) },
+  education: { label: "perfil.yaml:281-300", href: perfil([281, 300]) },
+  certifications: { label: "perfil.yaml:312-318", href: perfil([312, 318]) },
   presentation: { label: "perfil.yaml:21", href: perfil(21) },
   availability: { label: "perfil.yaml:31", href: perfil(31) },
   thesis: { label: "perfil.yaml:55-67", href: perfil([55, 67]) },
+
+  // --- Cómo trabajo: los cuatro principios, frase y prueba ------------------
+  // Van al final de perfil.yaml (77d97a2), así que ninguna línea de arriba se movió.
+  workRealTraffic: { label: "perfil.yaml:373-376", href: perfil([373, 376]) },
+  workPersonDecides: { label: "perfil.yaml:377-380", href: perfil([377, 380]) },
+  workSimple: { label: "perfil.yaml:381-384", href: perfil([381, 384]) },
+  workWithOperators: { label: "perfil.yaml:385-388", href: perfil([385, 388]) },
 } as const satisfies Record<string, Cite>;
 
 export type CiteKey = keyof typeof CITES;

@@ -1,15 +1,23 @@
 /**
- * Espejo en JS del único token de movimiento que el JS necesita.
+ * Espejo en JS de los tokens de movimiento que el JS necesita.
  *
- * La fuente es el @theme de src/app/globals.css. El contador de la tira es lo
- * único que anima desde JavaScript, y quiere la curva de entrada como cuatro
- * números; `scripts/check-tokens.mjs` comprueba en cada `npm run lint` que
- * sigan siendo los mismos que `--ease-out`, y que ningún token de movimiento
- * del CSS se haya quedado sin uso.
+ * La fuente es el @theme de src/app/globals.css. `scripts/check-tokens.mjs`
+ * comprueba en cada `npm run lint` que las curvas y las duraciones sigan
+ * siendo las mismas que en el CSS, y que ningún token de movimiento se haya
+ * quedado sin uso.
  */
 
 /** Entradas: la misma curva que `--ease-out`. */
 export const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-/** El contador de la tira, en segundos. Es un valor del plan, no un token. */
-export const COUNT_DURATION = 0.8;
+/** Transiciones: la misma curva que `--ease-in-out`. */
+export const EASE_IN_OUT: [number, number, number, number] = [0.65, 0, 0.35, 1];
+
+/** La entrada a un nodo, del clic a la sala legible: el mismo número que `--duration-flight`. */
+export const FLIGHT_MS = 650;
+
+/** La caída del umbral: el mismo número que `--duration-fall`. */
+export const FALL_MS = 1250;
+
+/** El cambio de modo desde el interruptor: la misma caída, en corto (`--duration-fall-short`). */
+export const FALL_SHORT_MS = 550;

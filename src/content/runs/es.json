@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "status": "pending",
+  "language": "es",
+  "question": "¿Quién es Alex y por qué debería contratarlo?",
+  "recorded_at": null,
+  "cv_agent_sha": null,
+  "endpoint": "https://cv-agent.mangopond-59d644ac.eastus2.azurecontainerapps.io/v1/responses",
+  "recorder": "scripts/grabar_corrida.py",
+  "response": null,
+  "timeline_ms": null,
+  "tool_calls": null,
+  "events": [],
+  "output_text": "",
+  "context": null
+}

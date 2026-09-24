@@ -14,6 +14,7 @@
  */
 
 import type { CiteKey } from "@/lib/evidence";
+import type { NodeId } from "@/lib/map-graph";
 
 export type Locale = "en" | "es";
 
@@ -57,15 +58,6 @@ export interface ProjectCopy {
   readonly bullets?: readonly string[];
 }
 
-export interface FailureMode {
-  readonly id: string;
-  readonly title: string;
-  readonly symptom: string;
-  readonly fix: string;
-  readonly lesson: string;
-  readonly cites: readonly CiteKey[];
-}
-
 export interface Dictionary {
   /**
    * `false` mientras la traducción esté a medias: el idioma queda fuera del
@@ -84,11 +76,6 @@ export interface Dictionary {
   };
 
   readonly nav: {
-    readonly experience: string;
-    readonly projects: string;
-    readonly publication: string;
-    readonly skills: string;
-    readonly contact: string;
     readonly menu: string;
     readonly close: string;
     readonly skipToContent: string;
@@ -103,8 +90,53 @@ export interface Dictionary {
     readonly summary: string;
     readonly availability: string;
     readonly ctaContact: string;
-    readonly ctaProjects: string;
     readonly ctaResume: string;
+  };
+
+  /** El umbral: la entrada donde se elige cómo conocerme. */
+  readonly threshold: {
+    readonly intro: string;
+    readonly cvKicker: string;
+    readonly cvTitle: string;
+    readonly exploreKicker: string;
+    readonly exploreTitle: string;
+    readonly groupAria: string;
+  };
+
+  /** El marco: el mapa, sus nodos y la ruta. El único sitio con vocabulario de agente fuera de "Bajo el capó". */
+  readonly map: {
+    /** La pista bajo el núcleo: "Haz scroll o toca un nodo". */
+    readonly hint: string;
+    readonly cvMode: string;
+    readonly exploreMode: string;
+    readonly switchAria: string;
+    readonly close: string;
+    /** El primer tramo de la ruta después de ~. */
+    readonly home: string;
+    readonly routeAria: string;
+    readonly mapAria: string;
+    /** El término normal de cada nodo, traducido; el término de agente vive en map-graph.ts. */
+    readonly nodes: Readonly<Record<NodeId, { readonly name: string }>>;
+  };
+
+  /** System prompt · Quién soy. */
+  readonly who: {
+    readonly title: string;
+    readonly intro?: string;
+    readonly lookingFor: string;
+  };
+
+  /** Training · Formación. */
+  readonly training: {
+    readonly title: string;
+  };
+
+  /** El momento de Dalton: el sistema de más de 180 nodos que colapsa en un orquestador. */
+  readonly moment: {
+    readonly caption: string;
+    readonly before: string;
+    readonly after: string;
+    readonly metric: string;
   };
 
   readonly metrics: {
@@ -113,14 +145,12 @@ export interface Dictionary {
   };
 
   readonly experience: {
-    readonly eyebrow: string;
     readonly title: string;
     readonly present: string;
     readonly roles: Readonly<Record<string, RoleCopy>>;
   };
 
   readonly projects: {
-    readonly eyebrow: string;
     readonly title: string;
     readonly intro: string;
     readonly inProgress: string;
@@ -140,32 +170,26 @@ export interface Dictionary {
   };
 
   readonly skills: {
-    readonly eyebrow: string;
     readonly title: string;
   };
 
   readonly certifications: {
-    readonly eyebrow: string;
-    readonly title: string;
     readonly inProgress: string;
-    readonly education: string;
-    /** Subtítulo de la lista. No es `title`: repetir el h2 debajo del h2 confunde. */
-    readonly list: string;
     readonly gpa: string;
   };
 
-  readonly thinking: {
+  readonly work: {
+    /** "Cómo trabajo": el rótulo del bloque dentro de "Quién soy". */
     readonly eyebrow: string;
-    readonly title: string;
-    readonly intro: string;
-    readonly symptom: string;
-    readonly fix: string;
-    readonly lesson: string;
-    readonly items: readonly FailureMode[];
+    /**
+     * Cuatro principios: una frase grande y una línea de prueba con su cita.
+     * El texto es literal de `principios` en perfil.yaml; en inglés, la
+     * traducción aprobada.
+     */
+    readonly items: readonly { readonly phrase: string; readonly proof: string; readonly cite: CiteKey }[];
   };
 
   readonly contact: {
-    readonly eyebrow: string;
     readonly title: string;
     readonly body: string;
     readonly email: string;
@@ -173,7 +197,42 @@ export interface Dictionary {
     readonly linkedin: string;
     readonly github: string;
     readonly resume: string;
+  };
+
+  /** El marcador de la corrida grabada, dentro de "Bajo el capó". */
+  readonly run: {
+    readonly title: string;
+    readonly run: string;
+    readonly model: string;
+    readonly input: string;
+    readonly reasoning: string;
+    readonly output: string;
+    readonly time: string;
+    readonly state: string;
+    /** "{n} tok" */
+    readonly tokens: string;
+    readonly pending: string;
+    /** El hueco de una cifra que todavía no existe: sin grabación no hay número. */
+    readonly none: string;
+    readonly done: string;
+    readonly note: string;
+    readonly recordedFrom: string;
+  };
+
+  /** Bajo el capó (la ventana de contexto) y los rótulos de formación. */
+  readonly context: {
+    readonly title: string;
+    readonly intro: string;
+    readonly window: string;
+    readonly windowNote: string;
+    /** "{n} tokens" */
+    readonly tokens: string;
+    readonly pendingBlocks: string;
+    readonly education: string;
     readonly languages: string;
+    readonly certifications: string;
+    /** Nombres en inglés de los bloques del prompt; en español van tal cual. */
+    readonly blocks: Readonly<Record<string, string>>;
   };
 
   readonly footer: {

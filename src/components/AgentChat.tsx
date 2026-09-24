@@ -76,7 +76,7 @@ export const CHAT_STRINGS: Record<Locale, ChatStrings> = {
     liveLabel: "Live",
     errorGeneric: "The agent couldn't answer. Try again in a moment.",
     errorRateLimit:
-      "You've hit the hourly limit for this public demo. It's capped per IP because a web page can't hold a credential — the cost, not the identity, is what gets protected.",
+      "You've hit the hourly limit for this public demo. It's capped per IP because a web page can't hold a credential: the cost, not the identity, is what gets protected.",
     errorOffline: "The agent is unreachable right now.",
     transcriptLabel: "Conversation with the CV agent",
     disclaimer:

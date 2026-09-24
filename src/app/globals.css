@@ -69,17 +69,23 @@
   --spacing-section: 5rem;
   --spacing-section-lg: 6rem;
   --spacing-heading: 2.5rem;
-  /* Lo que la barra fija tapa al saltar a un ancla. Es el ÚNICO desplazamiento:
-     ninguna sección lleva scroll-margin propio encima de esto. */
-  --spacing-anchor: 5rem;
+  /* Lo que la barra fija y el marcador tapan al saltar a un ancla. Es el ÚNICO
+     desplazamiento: ninguna sección lleva scroll-margin propio encima de esto. */
+  --spacing-anchor: 5.5rem;
+  /* Alto de la barra de navegación: el marcador se cuelga justo debajo. */
+  --spacing-nav: 3.5rem;
+  /* Barra + ruta: lo que la sala abierta deja libre arriba. */
+  --spacing-chrome: 5.0625rem;
   /* Columna de fechas y empresa en la trayectoria. */
-  --spacing-meta: 11rem;
 
   /* --- Movimiento --------------------------------------------------------- */
   /* Sólo los que algo usa: `npm run lint` falla si uno se queda sin uso, y
      comprueba que la curva del contador (src/lib/tokens.ts) sea `--ease-out`. */
   --duration-fast: 150ms; /* hover, foco, cambios de estado */
   --duration-base: 300ms; /* la entrada del héroe, el borde de una tarjeta, el cambio de idioma */
+  --duration-flight: 650ms; /* la entrada a un nodo: del clic a la sala legible */
+  --duration-fall: 1250ms; /* la caída del umbral al modo elegido */
+  --duration-fall-short: 550ms; /* la misma caída, desde el interruptor */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* entradas */
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* transiciones */
   /* Desplazamiento de la entrada del héroe. El tope es 20px. */
@@ -153,13 +159,6 @@ body {
   }
 
   /* Trayectoria: fechas y empresa a la izquierda, el resultado a la derecha. */
-  .role-grid {
-    @apply grid gap-4 sm:gap-8;
-    @variant sm {
-      grid-template-columns: var(--spacing-meta) minmax(0, 1fr);
-    }
-  }
-
   /* El eyebrow de sección y la etiqueta de campo son la misma pieza en dos
      colores: acento para abrir una sección, gris para nombrar un dato. */
   .eyebrow,
@@ -266,6 +265,23 @@ body {
 .rise {
   animation: rise var(--duration-base) var(--ease-out) both;
 }
+/* El titular es el LCP: entra con el mismo desplazamiento pero sin fundido,
+   porque Chrome no cuenta como LCP un elemento mientras está en opacidad 0 y
+   el fundido lo retrasaba 100 ms observados (300 ms simulados). */
+@keyframes rise-solid {
+  from {
+    transform: translateY(var(--distance));
+  }
+  to {
+    transform: none;
+  }
+}
+.rise-solid {
+  animation: rise-solid var(--duration-base) var(--ease-out) both;
+}
+html[data-navigated] .rise-solid {
+  animation: none;
+}
 .rise-2 {
   animation-delay: 60ms;
 }
@@ -294,39 +310,1055 @@ html[data-navigated] .rise {
 }
 
 /* ===========================================================================
-   Fondo del héroe
+   Los dos modos
    ---------------------------------------------------------------------------
-   El degradado está SIEMPRE, sin JS. El canvas de WebGL lo tapa cuando puede;
-   cuando no —sin WebGL, contexto perdido, movimiento reducido o equipo
-   modesto— esto es lo que se ve, y es una composición terminada.
-
-   Reproduce la misma composición que el shader: una fuente fría abajo a la
-   derecha sobre casi negro, con el mismo tope de brillo (#121b34) que mantiene
-   el contraste AA de todo el texto que va encima. Ese color no es un token:
-   está calculado contra el shader en src/lib/glow.ts, y se cambia allí.
+   El HTML del servidor es siempre la columna completa: el núcleo y las siete
+   salas, una tras otra. Eso es el Modo CV, lo que se ve sin JavaScript y lo
+   que lee un buscador. Con JavaScript, un script en <head> pone
+   `data-mode="explore"` antes del primer pintado (salvo que la persona haya
+   elegido Modo CV) y estas reglas convierten la misma columna en el mapa:
+   el núcleo queda fijo sobre el lienzo, las salas se esconden salvo la
+   abierta, que se vuelve panel, y un carril invisible le da al scroll la
+   altura del tour. Nada se duplica: son los mismos nodos del DOM.
    =========================================================================== */
 
-.hero-backdrop {
+.page {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Modo CV (y sin JavaScript): la columna ------------------------------- */
+
+.core {
+  padding: 7rem 1rem 3.5rem;
+}
+.core-inner {
+  margin-inline: auto;
+  max-width: 64rem;
+}
+.core-link {
+  @apply text-fg underline decoration-border-strong underline-offset-4 transition-colors hover:text-accent hover:decoration-accent;
+}
+.core-hint {
+  display: none;
+}
+.core-actions {
+  @apply mt-7 flex flex-wrap items-center gap-3;
+}
+
+.room {
+  @apply border-t border-border px-4 py-section sm:px-6 sm:py-section-lg;
+}
+.room-inner {
+  margin-inline: auto;
+  max-width: 64rem;
+}
+.room-head {
+  position: relative;
+}
+.room-kicker {
+  @apply font-mono text-xs tracking-wide uppercase;
+  color: var(--color-subtle);
+}
+.room-agent {
+  color: var(--color-accent);
+}
+.room-title {
+  @apply mt-3 text-2xl font-semibold tracking-tight text-balance sm:text-3xl;
+  outline-offset: 6px;
+}
+.room-intro {
+  @apply mt-4 max-w-2xl leading-relaxed text-muted text-pretty;
+}
+.room-body {
+  margin-top: var(--spacing-heading);
+}
+.room-close {
+  display: none;
+}
+
+.subnodes {
+  display: grid;
+}
+.subnode {
+  @apply border-b border-border py-8;
+}
+.subnodes > li:first-child .subnode {
+  padding-top: 0;
+}
+.subnodes > li:last-child .subnode {
+  border-bottom: 0;
+}
+/* En la columna el titular es sólo un titular. */
+.subnode-link {
+  color: inherit;
+  text-decoration: none;
+}
+.subnode-arrow {
+  display: none;
+}
+
+.tour,
+.stage,
+.map-labels,
+.route,
+.threshold {
+  display: none;
+}
+
+/* --- El interruptor: CV | Explorar ---------------------------------------- */
+
+/* Sin JavaScript no hay modo que cambiar; en el umbral todavía no se eligió. */
+html:not([data-mode]) .mode-switch,
+html[data-mode="threshold"] .mode-switch {
+  display: none;
+}
+.mode-switch {
+  display: inline-flex;
+  padding: 0.1875rem;
+  gap: 0.125rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+}
+.mode-switch-option {
+  min-height: 2rem;
+  padding: 0.25rem 0.875rem;
+  border-radius: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+.mode-switch-option:hover {
+  color: var(--color-fg);
+}
+.mode-switch-option[aria-pressed="true"] {
+  color: #fff;
+  background: var(--color-accent-solid);
+}
+.mode-switch-bottom {
+  display: none;
+}
+/* En móvil el interruptor va fijo abajo; el de la barra se esconde. */
+@media (max-width: 767px) {
+  .mode-switch-nav {
+    display: none;
+  }
+  html[data-mode="cv"] .mode-switch-bottom,
+  html[data-mode="explore"] .mode-switch-bottom {
+    display: inline-flex;
+    position: fixed;
+    left: 50%;
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    z-index: 45;
+    transform: translateX(-50%);
+    background: var(--color-nav);
+    backdrop-filter: blur(12px);
+  }
+  .mode-switch-bottom .mode-switch-option {
+    min-height: 2.5rem;
+    min-width: 5.25rem;
+    padding-inline: 1.125rem;
+    font-size: 0.75rem;
+  }
+  html[data-mode="cv"] main.page,
+  html[data-mode="cv"] footer.page {
+    padding-bottom: 3.5rem;
+  }
+}
+
+/* ===========================================================================
+   El umbral: la entrada donde se elige cómo conocerme
+   ---------------------------------------------------------------------------
+   Sólo en la primera visita (`data-mode="threshold"`, decidido antes de
+   pintar). Las dos mitades comparten geometría por variables: el marco, la
+   previsualización viva (la columna real del CV a la izquierda, el lienzo
+   real del mapa a la derecha) y la opción usan la misma traslación y la
+   misma escala, así que crecen y se inclinan juntas al pasar el cursor.
+   Las previsualizaciones son el viewport entero a escala: un marco de
+   44vw × 44vh es la pantalla al 44 %.
+   =========================================================================== */
+
+:root {
+  --th-cv-x: 4vw;
+  --th-cv-y: 43vh;
+  --th-cv-s: 0.44;
+  --th-cv-tilt: rotateY(0deg);
+  --th-cv-dim: 1;
+  --th-ex-x: 52vw;
+  --th-ex-y: 43vh;
+  --th-ex-s: 0.44;
+  --th-ex-tilt: rotateY(0deg);
+  --th-ex-dim: 1;
+  --th-top: 10vh;
+}
+/* Al pasar el cursor (o enfocar), esa mitad crece a cerca del 60 % del ancho y
+   se inclina hacia la persona; la otra se atenúa y se aleja. */
+html[data-hover="cv"] {
+  --th-cv-x: 3vw;
+  --th-cv-y: 39vh;
+  --th-cv-s: 0.57;
+  --th-cv-tilt: rotateY(4deg);
+  --th-ex-x: 63vw;
+  --th-ex-y: 46vh;
+  --th-ex-s: 0.34;
+  --th-ex-dim: 0.55;
+}
+html[data-hover="explore"] {
+  --th-ex-x: 40vw;
+  --th-ex-y: 39vh;
+  --th-ex-s: 0.57;
+  --th-ex-tilt: rotateY(-4deg);
+  --th-cv-x: 3vw;
+  --th-cv-y: 46vh;
+  --th-cv-s: 0.34;
+  --th-cv-dim: 0.55;
+}
+/* En vertical, CV arriba y exploración abajo, con la previsualización
+   recortada a media pantalla para que quepan las dos. */
+@media (max-aspect-ratio: 9/10) {
+  :root,
+  html[data-hover="cv"],
+  html[data-hover="explore"] {
+    --th-cv-x: 25vw;
+    --th-cv-y: 30vh;
+    --th-cv-s: 0.5;
+    --th-cv-tilt: rotateY(0deg);
+    --th-cv-dim: 1;
+    --th-ex-x: 25vw;
+    --th-ex-y: 70vh;
+    --th-ex-s: 0.5;
+    --th-ex-tilt: rotateY(0deg);
+    --th-ex-dim: 1;
+    --th-top: 3vh;
+  }
+}
+
+html[data-mode="threshold"] .threshold {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+html[data-mode="threshold"] header,
+html[data-mode="threshold"] footer.page {
+  display: none;
+}
+html[data-mode="threshold"] body {
+  overflow: hidden;
+}
+.th-top {
   position: absolute;
+  inset-inline: 0;
+  top: var(--th-top);
+  padding-inline: 1.5rem;
+  text-align: center;
+  pointer-events: auto;
+}
+.th-name {
+  @apply text-sm font-medium text-fg;
+}
+/* En vertical, `.th-name` y `.th-intro` van más chicos (abajo). */
+.th-intro {
+  @apply mx-auto mt-4 max-w-2xl text-lg leading-snug text-muted text-balance sm:text-2xl;
+}
+@media (max-aspect-ratio: 9/10) {
+  .th-name {
+    @apply text-xs;
+  }
+  .th-intro {
+    @apply mt-2 text-sm;
+  }
+}
+/* Las previsualizaciones: la columna real y el lienzo real, a escala. */
+html[data-mode="threshold"] main.page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  transform-origin: 0 0;
+  transform: translate(var(--th-cv-x), var(--th-cv-y)) perspective(1400px) var(--th-cv-tilt) scale(var(--th-cv-s));
+  opacity: var(--th-cv-dim);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+  pointer-events: none;
+}
+html[data-mode="threshold"] .stage {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  transform-origin: 0 0;
+  transform: translate(var(--th-ex-x), var(--th-ex-y)) perspective(1400px) var(--th-ex-tilt) scale(var(--th-ex-s));
+  opacity: var(--th-ex-dim);
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+}
+@media (max-aspect-ratio: 9/10) {
+  html[data-mode="threshold"] main.page,
+  html[data-mode="threshold"] .stage {
+    clip-path: inset(0 0 44vh 0);
+  }
+}
+/* En el umbral el núcleo es parte de la columna (la previsualización del CV). */
+html[data-mode="threshold"] .core {
+  padding-top: 6rem;
+}
+/* El marco: el viewport entero a la misma escala, sólo el borde. */
+.th-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  border: 2px solid var(--color-border-strong);
+  border-radius: 1.25rem;
+  box-shadow:
+    0 0 0 6px rgb(10 10 10 / 60%),
+    0 40px 120px rgb(0 0 0 / 55%);
+  transform-origin: 0 0;
+  pointer-events: auto;
+  cursor: pointer;
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    border-color var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+}
+.th-frame-cv {
+  transform: translate(var(--th-cv-x), var(--th-cv-y)) perspective(1400px) var(--th-cv-tilt) scale(var(--th-cv-s));
+  opacity: var(--th-cv-dim);
+}
+.th-frame-explore {
+  transform: translate(var(--th-ex-x), var(--th-ex-y)) perspective(1400px) var(--th-ex-tilt) scale(var(--th-ex-s));
+  opacity: var(--th-ex-dim);
+}
+html[data-hover="cv"] .th-frame-cv,
+html[data-hover="explore"] .th-frame-explore {
+  border-color: var(--color-accent);
+  box-shadow:
+    0 0 0 6px rgb(10 10 10 / 60%),
+    0 0 0 8px rgb(59 130 246 / 25%),
+    0 40px 120px rgb(0 0 0 / 60%);
+}
+@media (max-aspect-ratio: 9/10) {
+  .th-frame {
+    clip-path: inset(0 0 44vh 0 round 1.25rem);
+  }
+}
+/* Las opciones, encima de cada marco: sobretítulo y título. */
+.th-options {
+  position: absolute;
+  inset: 0;
+}
+.th-option {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.125rem;
+  min-width: 12rem;
+  padding: 0.5rem 0.75rem;
+  margin: -0.5rem -0.75rem;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  color: var(--color-fg);
+  pointer-events: auto;
+  cursor: pointer;
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+}
+.th-option-cv {
+  transform: translate(var(--th-cv-x), calc(var(--th-cv-y) - 4.125rem));
+  opacity: var(--th-cv-dim);
+}
+.th-option-explore {
+  transform: translate(var(--th-ex-x), calc(var(--th-ex-y) - 4.125rem));
+  opacity: var(--th-ex-dim);
+}
+.th-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.th-title {
+  @apply text-2xl font-semibold tracking-tight sm:text-3xl;
+}
+@media (max-aspect-ratio: 9/10) {
+  .th-option-cv {
+    transform: translate(var(--th-cv-x), calc(var(--th-cv-y) - 3.625rem));
+  }
+  .th-option-explore {
+    transform: translate(var(--th-ex-x), calc(var(--th-ex-y) - 3.625rem));
+  }
+  .th-title {
+    @apply text-xl;
+  }
+}
+/* La caída: el explorador anima las previsualizaciones con transform y
+   opacidad (Web Animations); lo demás del umbral se apaga. */
+html[data-falling] .th-top,
+html[data-falling] .th-options,
+html[data-falling] .th-frame {
+  opacity: 0 !important;
+  /* Se apaga en el primer cuarto de la caída. */
+  transition: opacity calc(var(--duration-fall) * 0.25) var(--ease-out);
+}
+html[data-falling="explore"] .th-frame-explore,
+html[data-falling="cv"] .th-frame-cv {
+  transition-delay: 120ms;
+}
+html[data-falling] main.page,
+html[data-falling] .stage,
+html[data-falling] .th-frame {
+  transition: none;
+}
+/* Al aterrizar: el núcleo llega con su entrada (explorar) o la columna con un
+   rebote (CV); el CSS sólo pone la entrada, el rebote va en la caída misma. */
+html[data-arrive="explore"] .core {
+  animation: rise var(--duration-fall-short) var(--ease-out) both;
+}
+
+/* --- Modo explorar: el mapa ------------------------------------------------ */
+
+html[data-mode="explore"] .tour {
+  display: block;
+  position: relative;
+  pointer-events: none;
+  /* El explorador lo mide con la ventana real; esto es el valor de arranque. */
+  height: calc(200vh + 8 * 70vh);
+}
+html[data-mode="explore"] main.page,
+html[data-mode="explore"] footer.page {
+  display: contents;
+}
+html[data-mode="explore"] footer.page {
+  display: none;
+}
+
+/* El núcleo: fijo, centrado, encima del lienzo. Se apaga conforme el tour
+   arranca (`--tour-t` lo pone el explorador con el scroll). */
+html[data-mode="explore"] .core {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--spacing-chrome) + 1rem) 1rem 2rem;
+  pointer-events: none;
+  opacity: calc(1 - var(--tour-t, 0));
+}
+html[data-mode="explore"] .core-inner {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 40rem;
+  margin: 0;
+}
+html[data-mode="explore"] .core-hint {
+  display: block;
+  margin-top: 1.75rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-subtle);
+}
+html[data-mode="explore"] .core-actions {
+  display: none;
+}
+/* Sólo cuando el nivel ya se conoce (lo pone el script de <head> antes de
+   pintar): si faltara, el núcleo no puede quedar escondido, porque es el LCP. */
+html[data-mode="explore"][data-level]:not([data-level="map"]) .core {
+  visibility: hidden;
+}
+/* En vertical el texto va arriba, compacto, y el grafo debajo: las tres
+   cifras en una fila para dejarle sitio. */
+@media (max-aspect-ratio: 9/10) {
+  html[data-mode="explore"] .core {
+    align-items: flex-start;
+    padding-top: calc(var(--spacing-chrome) + 1.25rem);
+  }
+  html[data-mode="explore"] .core-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+  html[data-mode="explore"] .core-metric {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+
+/* Las salas: sólo la abierta, como panel con scroll propio encima del mapa,
+   que queda desenfocado y oscuro detrás. Llega con un fundido cuando la
+   cámara ya casi aterrizó. */
+html[data-mode="explore"] .room {
+  display: none;
+}
+html[data-mode="explore"] .room[data-active] {
+  display: block;
+  position: fixed;
+  inset: var(--spacing-chrome) 0 0;
+  z-index: 3;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  border: 0;
+  padding: 2.5rem 1rem 4rem;
+  background: rgb(10 10 10 / 78%);
+  /* El resto del grafo se aleja con desenfoque progresivo, no de golpe. */
+  animation: room-veil var(--duration-flight) var(--ease-out) both;
+}
+@keyframes room-veil {
+  from {
+    background: rgb(10 10 10 / 0%);
+    backdrop-filter: blur(0px);
+  }
+  to {
+    background: rgb(10 10 10 / 78%);
+    backdrop-filter: blur(10px);
+  }
+}
+/* El contenido entra en cascada: nombre del nodo, título, entrada, cuerpo,
+   con 50 ms entre uno y otro, arrancando cuando la cámara ya casi llegó.
+   Todo legible antes de 700 ms desde el clic. */
+html[data-mode="explore"] .room[data-active] .cascade {
+  animation: rise var(--duration-base) var(--ease-out) both;
+  animation-delay: calc(var(--duration-flight) * 0.42 + var(--k, 0) * 50ms);
+}
+/* Al salir, el contenido se recoge hacia el nodo, más rápido (65 % de la entrada). */
+html[data-leaving] .room[data-leaving] {
+  display: block;
+  position: fixed;
+  inset: var(--spacing-chrome) 0 0;
+  z-index: 3;
+  overflow: hidden;
+  border: 0;
+  padding: 2.5rem 1rem 4rem;
+  pointer-events: none;
+  animation: room-unveil calc(var(--duration-flight) * 0.65) var(--ease-in-out) both;
+}
+html[data-leaving] .room[data-leaving] .cascade {
+  animation: room-collect calc(var(--duration-flight) * 0.5) var(--ease-in-out) both;
+  animation-delay: calc((3 - var(--k, 0)) * 30ms);
+}
+@keyframes room-unveil {
+  from {
+    background: rgb(10 10 10 / 78%);
+    backdrop-filter: blur(10px);
+    opacity: 1;
+  }
+  to {
+    background: rgb(10 10 10 / 0%);
+    backdrop-filter: blur(0px);
+    opacity: 0;
+  }
+}
+@keyframes room-collect {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--collect-x, 0px), var(--collect-y, -24px)) scale(0.96);
+  }
+}
+/* En vertical no hay desenfoque: el lienzo se atenúa y se aleja. */
+@media (max-aspect-ratio: 9/10) {
+  html[data-mode="explore"] .room[data-active] {
+    background: rgb(10 10 10 / 92%);
+    animation: room-veil-m var(--duration-flight) var(--ease-out) both;
+  }
+  @keyframes room-veil-m {
+    from {
+      background: rgb(10 10 10 / 0%);
+    }
+    to {
+      background: rgb(10 10 10 / 92%);
+    }
+  }
+  html[data-mode="explore"][data-level]:not([data-level="map"]) .stage {
+    transform: scale(1.06);
+    opacity: 0.6;
+    transition:
+      transform var(--duration-flight) var(--ease-out),
+      opacity var(--duration-flight) var(--ease-out);
+  }
+}
+@media (min-width: 640px) {
+  html[data-mode="explore"] .room[data-active] {
+    padding: 3.5rem 1.5rem 5rem;
+  }
+}
+html[data-mode="explore"] .room-close {
+  position: absolute;
+  top: -0.5rem;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  color: var(--color-muted);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+html[data-mode="explore"] .room-close:hover,
+html[data-mode="explore"] .room-close:focus-visible {
+  color: var(--color-accent);
+}
+html[data-mode="explore"] .room-head {
+  padding-right: 4.5rem;
+}
+
+/* Subnodos. En el nivel del nodo la sala lista las puertas: la cabecera de
+   cada puesto, sin su cuerpo. En el subnodo sólo se ve el elegido, entero. */
+html[data-mode="explore"][data-level="node"] .subnode-body {
+  display: none;
+}
+html[data-mode="explore"][data-level="node"] .subnode-link {
+  color: var(--color-fg);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+html[data-mode="explore"][data-level="node"] .subnode-link:hover,
+html[data-mode="explore"][data-level="node"] .subnode-link:focus-visible {
+  color: var(--color-accent);
+}
+html[data-mode="explore"][data-level="node"] .subnode-arrow {
+  display: inline;
+  color: var(--color-accent);
+}
+/* Del nodo al subnodo no hay vuelo: la sala se desplaza de lado, como avanzar
+   por una línea de tiempo. Los otros puestos se van a la izquierda y el
+   elegido entra por la derecha con su cuerpo. */
+html[data-mode="explore"][data-level="sub"] .subnode:not([data-active-sub]) {
+  display: none;
+}
+html[data-mode="explore"][data-level="sub"] .subnode {
+  border-bottom: 0;
+  padding-top: 0;
+  animation: slide-in var(--duration-base) var(--ease-out) both;
+}
+html[data-mode="explore"][data-level="sub"] .subnode-body {
+  animation: slide-in var(--duration-base) var(--ease-out) both;
+  animation-delay: 60ms;
+}
+html[data-mode="explore"][data-level="node"] .subnodes {
+  animation: slide-back var(--duration-base) var(--ease-out) both;
+}
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(3rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes slide-back {
+  from {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+html[data-mode="explore"][data-level="sub"] .subnode-link {
+  pointer-events: none;
+}
+
+/* --- El escenario: un solo lienzo fijo detrás de todo ---------------------- */
+
+html[data-mode="explore"] .stage,
+html[data-switching="cv"] .stage {
+  display: block;
+  position: fixed;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(115% 85% at 72% 108%, #121b34 0%, rgba(18, 27, 52, 0.38) 36%, transparent 70%),
-    var(--color-bg);
 }
-
-.hero-canvas {
-  display: block;
+.stage-svg {
+  position: absolute;
+  inset: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+.stage-svg-off {
+  opacity: 0;
+}
+.diagram {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
 }
+.diagram-portrait {
+  display: none;
+}
+@media (max-aspect-ratio: 9/10) {
+  .diagram-landscape {
+    display: none;
+  }
+  .diagram-portrait {
+    display: block;
+  }
+}
+.diagram line {
+  stroke: var(--color-border-strong);
+  stroke-opacity: 0.35;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.diagram line[data-kind="governs"] {
+  stroke: var(--color-accent);
+  stroke-opacity: 0.2;
+}
+.diagram line[data-kind="hood"] {
+  stroke-dasharray: 4 4;
+}
+.diagram circle {
+  fill: var(--color-accent);
+  fill-opacity: 0.16;
+}
+.diagram circle[data-node="core"] {
+  fill-opacity: 0.1;
+}
+.stage-canvas {
+  position: absolute !important;
+  inset: 0;
+}
 
-/* Las cifras no deben cambiar de ancho mientras el contador corre. */
+/* --- Las etiquetas de los nodos --------------------------------------------- */
+
+html[data-mode="explore"] .map-labels {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.map-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  text-decoration: none;
+  color: var(--color-fg);
+  pointer-events: auto;
+  visibility: hidden;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.map-label[data-placed],
+.map-label[data-live] {
+  visibility: visible;
+}
+.map-label[data-offscreen] {
+  visibility: hidden;
+}
+.map-label-agent {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.map-label-name {
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+.map-label {
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    margin-top var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+}
+.map-label:hover,
+.map-label:focus-visible,
+.map-label.is-hover,
+.map-label[aria-current] {
+  color: var(--color-accent);
+}
+/* Al encender el nodo, la etiqueta sube. */
+.map-label:hover,
+.map-label.is-hover {
+  margin-top: -4px;
+}
+/* El fantasma que viaja de la etiqueta al nombre de la sala. */
+.map-label-ghost {
+  position: fixed;
+  z-index: 4;
+  visibility: visible;
+  pointer-events: none;
+  transform-origin: 0 0;
+}
+.map-label:hover .map-label-agent,
+.map-label:focus-visible .map-label-agent {
+  color: var(--color-accent-soft);
+}
+@media (max-aspect-ratio: 9/10) {
+  .map-label {
+    padding: 0.25rem 0.5rem;
+  }
+  .map-label-name {
+    font-size: 0.75rem;
+    line-height: 1.125rem;
+  }
+}
+/* Con una sala abierta las etiquetas se van con el mapa: se apagan en lo que
+   la sala se vela, y no vuelven hasta el mapa. (Va sobre `.map-label`, no sobre
+   el contenedor: `visibility` se hereda, pero la etiqueta colocada la fija.) */
+html[data-mode="explore"][data-level]:not([data-level="map"]) .map-label {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    visibility 0s var(--duration-fast);
+}
+
+/* --- La ruta, tipo terminal ------------------------------------------------- */
+
+html[data-mode="explore"] .route {
+  display: block;
+  position: fixed;
+  top: var(--spacing-nav);
+  inset-inline: 0;
+  z-index: 40;
+  padding: 0 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1rem;
+  color: var(--color-subtle);
+  background: var(--color-nav);
+  border-bottom: 1px solid var(--color-border);
+  backdrop-filter: blur(12px);
+}
+.route-list {
+  display: flex;
+  margin-inline: auto;
+  max-width: 64rem;
+  padding-inline: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+@media (min-width: 640px) {
+  .route-list {
+    padding-inline: 0.5rem;
+  }
+}
+.route-item {
+  display: inline-flex;
+  align-items: center;
+}
+.route-sep {
+  color: var(--color-border-strong);
+}
+/* Cada tramo es un objetivo de al menos 24 × 24 px (WCAG 2.2, 2.5.8). */
+.route-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  padding: 0 0.25rem;
+  color: var(--color-muted);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.route-link:hover,
+.route-link:focus-visible {
+  color: var(--color-accent);
+}
+.route-link[aria-current] {
+  color: var(--color-fg);
+}
+
+/* ===========================================================================
+   Bajo el capó: el marcador de la corrida y la ventana de contexto
+   =========================================================================== */
+
+.marker {
+  display: grid;
+  gap: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1rem;
+  color: var(--color-subtle);
+}
+.marker-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.marker-row dd {
+  color: var(--color-muted);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.marker-id {
+  color: var(--color-fg);
+}
+
+.context-window {
+  display: grid;
+  gap: 0.625rem;
+}
+.context-track {
+  margin-top: 0.375rem;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-border);
+}
+/* Las barras se llenan al abrir la sala, un bloque tras otro; en la columna
+   y sin JavaScript se ven llenas de entrada. */
+.context-bar {
+  height: 100%;
+  background: var(--color-accent);
+  transform-origin: left;
+  transform: scaleX(1);
+}
+html[data-mode="explore"] .room[data-active] .context-bar {
+  animation: bar-in var(--duration-base) var(--ease-out) both;
+  animation-delay: calc(var(--duration-flight) + var(--i, 0) * 40ms);
+}
+@keyframes bar-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Las cifras no cambian de ancho. */
 .tnum {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
+}
+
+/* ===========================================================================
+   El momento de Dalton: 180+ nodos que colapsan en un orquestador
+   ---------------------------------------------------------------------------
+   SVG en línea dentro del subnodo. Cada nodo lleva sus dos posiciones y el
+   CSS interpola entre el caos (--x0, --y0) y el orden (--x1, --y1) cuando el
+   bloque cambia de estado. Sin JavaScript se ve el estado final.
+   =========================================================================== */
+
+.moment {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+}
+.moment-svg {
+  display: block;
+  width: 100%;
+  max-width: 34rem;
+  height: auto;
+  margin-inline: auto;
+}
+.moment-nodes circle {
+  fill: var(--color-muted);
+  transform: translate(var(--x1), var(--y1));
+  transition:
+    transform var(--duration-flight) var(--ease-in-out),
+    fill var(--duration-flight) var(--ease-in-out);
+  transition-delay: calc(var(--i, 0) * 2ms);
+}
+.moment[data-state="before"] .moment-nodes circle {
+  fill: var(--color-subtle);
+  transform: translate(var(--x0), var(--y0));
+}
+.moment-nodes .moment-hub {
+  fill: var(--color-accent);
+}
+.moment-nodes .moment-branch {
+  fill: var(--color-accent-soft);
+}
+.moment-chaos-edges line {
+  stroke: var(--color-border-strong);
+  stroke-opacity: 0.55;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.moment-chaos-edges {
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+.moment[data-state="after"] .moment-chaos-edges {
+  opacity: 0;
+}
+.moment-order-edges line {
+  stroke: var(--color-accent);
+  stroke-opacity: 0.7;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.moment-order-edges {
+  transition: opacity var(--duration-base) var(--ease-out);
+  transition-delay: var(--duration-flight);
+}
+.moment[data-state="before"] .moment-order-edges {
+  opacity: 0;
+  transition-delay: 0s;
+}
+.moment-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1rem;
+  color: var(--color-subtle);
+}
+.moment-before,
+.moment-after {
+  transition: color var(--duration-base) var(--ease-out);
+}
+.moment[data-state="before"] .moment-before,
+.moment[data-state="after"] .moment-after {
+  color: var(--color-fg);
+}
+.moment-metric {
+  color: var(--color-accent);
+}
+.moment-caption {
+  @apply mt-3 text-sm leading-relaxed text-muted text-pretty;
 }
 
 /* ===========================================================================
@@ -353,13 +1385,57 @@ html[data-navigated] .rise {
 }
 
 /* ===========================================================================
+   Impresión: siempre la columna, sin barra ni mapa
+   =========================================================================== */
+
+@media print {
+  header,
+  .route,
+  .stage,
+  .map-labels,
+  .tour,
+  .mode-switch,
+  .threshold,
+  .room-close,
+  .core-hint {
+    display: none !important;
+  }
+  html[data-mode="threshold"] main.page {
+    position: static !important;
+    transform: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+  }
+  html[data-mode="explore"] .core,
+  html[data-mode="explore"] .room {
+    display: block !important;
+    position: static !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    inset: auto !important;
+    padding: 1.5rem 0 !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    animation: none !important;
+  }
+  html[data-mode="explore"] .subnode,
+  html[data-mode="explore"] .subnode-body {
+    display: block !important;
+  }
+  html[data-mode="explore"] footer.page {
+    display: block;
+  }
+}
+
+/* ===========================================================================
    prefers-reduced-motion
    ---------------------------------------------------------------------------
    Las animaciones se quitan, no se acortan. `animation: none` deja cada
    elemento en su estado final —el héroe aparece entero, sin entrada— y
-   `transition: none` hace que un hover cambie de color sin interpolar. El
-   contador consulta la preferencia y se queda en su cifra. El fondo WebGL ni
-   se descarga.
+   `transition: none` hace que un hover cambie de color sin interpolar. La
+   cámara no vuela: salta, y la sala llega con un fundido de opacidad, que es
+   lo único que se conserva. El grafo de Dalton se queda en su estado final.
    =========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
@@ -372,6 +1448,25 @@ html[data-navigated] .rise {
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+
+  html[data-mode="explore"] .room[data-active] {
+    animation: room-fade var(--duration-base) linear both !important;
+  }
+  html[data-mode="explore"] .room[data-active] .cascade {
+    animation: none !important;
+  }
+  html[data-falling] main.page,
+  html[data-falling] .stage {
+    transition: opacity 200ms linear !important;
+  }
+  @keyframes room-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   /* El fundido entre idiomas: a los pseudoelementos del view transition no
