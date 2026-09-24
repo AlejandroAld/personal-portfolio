@@ -70,6 +70,8 @@ export interface Perfil {
     readonly keywords: readonly string[];
   }[];
   readonly certificaciones: readonly { readonly nombre: string; readonly estado: string }[];
+  /** Cómo trabajo: cuatro principios, frase y prueba, con texto aprobado. */
+  readonly principios: readonly { readonly frase: string; readonly prueba: string }[];
 }
 
 export const perfil = raw as unknown as Perfil;
@@ -78,6 +80,7 @@ export const persona = perfil.persona;
 export const contacto = persona.contacto;
 export const publicacion = perfil.publicaciones[0];
 export const educacion = perfil.educacion[0];
+export const principios = perfil.principios;
 
 /** El puesto o proyecto con ese id, o `undefined` si el YAML cambió. */
 export function rol(id: string): PerfilRol | undefined {
@@ -109,7 +112,8 @@ export function formatMonth(value: string, dict: Dictionary): string {
 }
 
 export function formatPeriod(inicio: string, fin: string, dict: Dictionary): string {
-  return `${formatMonth(inicio, dict)} — ${formatMonth(fin, dict)}`;
+  // Rango con semirraya: el sitio no usa guion largo.
+  return `${formatMonth(inicio, dict)} – ${formatMonth(fin, dict)}`;
 }
 
 /** Sólo el año y el promedio del periodo de estudios, sin reescribirlo. */
@@ -118,7 +122,7 @@ export function educacionPeriodo(): { years: string; gpa: string | null } {
   const years = /(\d{4})-\d{2}\s*a\s*(\d{4})-\d{2}/.exec(educacion.periodo);
   const gpa = /([\d.]+\s*\/\s*[\d.]+)/.exec(educacion.periodo);
   return {
-    years: years ? `${years[1]} — ${years[2]}` : educacion.periodo,
+    years: years ? `${years[1]} – ${years[2]}` : educacion.periodo,
     gpa: gpa ? gpa[1] : null,
   };
 }

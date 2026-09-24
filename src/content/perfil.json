@@ -1,15 +1,15 @@
 {
   "_meta": {
-    "fuente": "https://github.com/AlejandroAld/cv-agent/blob/ad823278716c9780eef042e7ef08179fdcd133c0/data/perfil.yaml",
+    "fuente": "https://github.com/AlejandroAld/cv-agent/blob/77d97a22a1bf9d386a3b7fd4c396daa1ee301a6d/data/perfil.yaml",
     "repo": "AlejandroAld/cv-agent",
-    "sha": "ad823278716c9780eef042e7ef08179fdcd133c0",
-    "sincronizado": "2026-09-23",
+    "sha": "77d97a22a1bf9d386a3b7fd4c396daa1ee301a6d",
+    "sincronizado": "2026-09-24",
     "nota": "Generado por scripts/sync-perfil.mjs. No editar a mano: edita perfil.yaml en el repo del agente y vuelve a sincronizar."
   },
   "persona": {
     "nombre": "José Alejandro Aldama Ramos",
     "alias": "Alex",
-    "titular": "Ingeniero en Inteligencia Artificial — agentes en producción, evaluación e integración con sistemas de negocio",
+    "titular": "Ingeniero en Inteligencia Artificial: agentes en producción, evaluación e integración con sistemas de negocio",
     "presentacion": "Responsable técnico de los sistemas de IA generativa en producción de un grupo automotriz, con una publicación arbitrada en NLP. Trabajo el tramo de piloto a producción: tool calling contra sistemas de negocio reales, evaluación anclada en modos de falla reales, guardarraíles, trazabilidad y costo por interacción. También construyo las plataformas internas donde una persona revisa, aprueba y corrige lo que el agente produce antes de que tenga efecto.",
     "ubicacion": "Guadalajara, Jalisco, México",
     "zona_horaria": "America/Mexico_City",
@@ -144,7 +144,7 @@
     },
     {
       "id": "exp-ipn",
-      "puesto": "Investigador en IA Aplicada — NLP y Deep Learning",
+      "puesto": "Investigador en IA Aplicada: NLP y Deep Learning",
       "empresa": "Instituto Politécnico Nacional",
       "cliente": "Investigación académica",
       "inicio": "2024-01",
@@ -492,6 +492,24 @@
     {
       "pregunta": "¿Puedes darme detalles del negocio donde trabajas?",
       "respuesta": "Puedo hablar de arquitectura, decisiones técnicas y de cómo resolví los problemas, pero no de clientes, marcas socias, cifras de negocio ni nombres de sistemas internos. Eso es información de mi empleador. Con gusto entro en el detalle técnico que necesites.\n"
+    }
+  ],
+  "principios": [
+    {
+      "frase": "Un agente se prueba con tráfico real, no en el demo.",
+      "prueba": "Hoy tengo cuatro en producción con clientes reales, medidos en calidad, costo y latencia por interacción."
+    },
+    {
+      "frase": "El modelo propone; la persona decide.",
+      "prueba": "Por eso construí las plataformas donde alguien revisa, aprueba y corrige lo que produce el agente antes de que tenga efecto."
+    },
+    {
+      "frase": "Lo simple escala mejor que lo impresionante.",
+      "prueba": "Reemplacé un sistema de más de 180 nodos por un solo orquestador trazable, y el volumen atendido creció."
+    },
+    {
+      "frase": "Lo construyo con quien lo va a operar.",
+      "prueba": "Trabajo directo con las direcciones de negocio y capacito a los equipos que usan lo que construyo."
     }
   ]
 }

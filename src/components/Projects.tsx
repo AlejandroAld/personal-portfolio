@@ -39,7 +39,7 @@ export default function Projects({ dict }: { dict: Dictionary }) {
             <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted text-pretty">{copy.summary}</p>
 
             {copy.bullets && (
-              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+              <ul className="mt-4 space-y-2">
                 {copy.bullets.map((b) => (
                   <li key={b} className="flex gap-2 text-xs leading-relaxed text-subtle">
                     <span aria-hidden="true" className="dot" />
@@ -49,7 +49,7 @@ export default function Projects({ dict }: { dict: Dictionary }) {
               </ul>
             )}
 
-            <ul className="mt-5 flex flex-wrap gap-1.5">
+            <ul className="mt-5 mb-5 flex flex-wrap gap-1.5">
               {stack.map((tech) => (
                 <li key={tech} className="tag">
                   {tech}
@@ -57,7 +57,8 @@ export default function Projects({ dict }: { dict: Dictionary }) {
               ))}
             </ul>
 
-            <div className="mt-5 flex items-center gap-4 border-t border-border pt-4">
+            {/* Al fondo de la tarjeta: en una fila, los pies quedan alineados. */}
+            <div className="mt-auto flex items-center gap-4 border-t border-border pt-4">
               {href ? (
                 <a href={href} target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-accent transition-colors hover:text-accent-soft">
                   {copy.hrefLabel ?? dict.projects.viewCode} ↗

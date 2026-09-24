@@ -9,12 +9,17 @@ import SourceLink from "../SourceLink";
  * La publicación es la credencial menos común del perfil y va con sus
  * números, el enlace a la revista y la sección de limitaciones, que es lo que
  * separa citar un paper de entenderlo.
+ *
+ * Una sola columna: la publicación es mucho más larga que idiomas y
+ * certificaciones juntos, y la regla del sitio es que ninguna columna deje un
+ * hueco al lado de la otra. Las certificaciones van en una fila de tarjetas
+ * de la misma altura.
  */
 export default function Training({ dict }: { dict: Dictionary }) {
   const { years, gpa } = educacionPeriodo();
   return (
-    <div className="grid gap-10 lg:grid-cols-5 lg:gap-14">
-      <div className="lg:col-span-3">
+    <div>
+      <div className="max-w-3xl">
         <h3 className="label">{dict.context.education}</h3>
         <p className="mt-4 text-base font-semibold text-fg">{term(educacion.titulo, dict)}</p>
         <p className="mt-1 text-sm text-muted">{educacion.institucion}</p>
@@ -49,8 +54,8 @@ export default function Training({ dict }: { dict: Dictionary }) {
         </p>
       </div>
 
-      <div className="lg:col-span-2">
-        <h3 className="label">{dict.context.languages}</h3>
+      <div>
+        <h3 className="label mt-10">{dict.context.languages}</h3>
         <ul className="mt-4 space-y-2">
           {persona.idiomas.map((i) => (
             <li key={i.idioma} className="text-sm leading-relaxed text-muted">
@@ -60,11 +65,11 @@ export default function Training({ dict }: { dict: Dictionary }) {
         </ul>
 
         <h3 className="label mt-10">{dict.context.certifications}</h3>
-        <ul className="mt-4 space-y-2">
+        <ul className="mt-4 grid gap-3 sm:grid-cols-3">
           {perfil.certificaciones.map((cert) => (
-            <li key={cert.nombre} className="flex flex-wrap items-center justify-between gap-2 rounded-sm border border-border px-3 py-2.5">
+            <li key={cert.nombre} className="flex flex-col justify-between gap-3 rounded-sm border border-border px-3 py-2.5">
               <span className="text-sm text-muted text-pretty">{cert.nombre}</span>
-              <span className="badge shrink-0">{dict.certifications.inProgress}</span>
+              <span className="badge self-start">{dict.certifications.inProgress}</span>
             </li>
           ))}
         </ul>

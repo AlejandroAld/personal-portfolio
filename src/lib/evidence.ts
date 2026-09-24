@@ -12,7 +12,7 @@
  */
 
 export const CV_AGENT_REPO = "AlejandroAld/cv-agent";
-export const CV_AGENT_SHA = "ad823278716c9780eef042e7ef08179fdcd133c0";
+export const CV_AGENT_SHA = "77d97a22a1bf9d386a3b7fd4c396daa1ee301a6d";
 export const CV_AGENT_URL = `https://github.com/${CV_AGENT_REPO}`;
 
 /** Una línea suelta, o un rango [desde, hasta]. */
@@ -100,12 +100,17 @@ export const CITES = {
   cotizador: { label: "perfil.yaml:248-259", href: perfil([248, 259]) },
   research: { label: "perfil.yaml:133-148", href: perfil([133, 148]) },
   education: { label: "perfil.yaml:281-300", href: perfil([281, 300]) },
-  /** El ingreso en 2021 y sus dos fuentes: el plan 2020 de ESCOM y el anuncio de ChatGPT. */
-  educationContext: { label: "perfil.yaml:291-300", href: perfil([291, 300]) },
   certifications: { label: "perfil.yaml:312-318", href: perfil([312, 318]) },
   presentation: { label: "perfil.yaml:21", href: perfil(21) },
   availability: { label: "perfil.yaml:31", href: perfil(31) },
   thesis: { label: "perfil.yaml:55-67", href: perfil([55, 67]) },
+
+  // --- Cómo trabajo: los cuatro principios, frase y prueba ------------------
+  // Van al final de perfil.yaml (77d97a2), así que ninguna línea de arriba se movió.
+  workRealTraffic: { label: "perfil.yaml:373-376", href: perfil([373, 376]) },
+  workPersonDecides: { label: "perfil.yaml:377-380", href: perfil([377, 380]) },
+  workSimple: { label: "perfil.yaml:381-384", href: perfil([381, 384]) },
+  workWithOperators: { label: "perfil.yaml:385-388", href: perfil([385, 388]) },
 } as const satisfies Record<string, Cite>;
 
 export type CiteKey = keyof typeof CITES;

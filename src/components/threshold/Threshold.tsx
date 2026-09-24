@@ -1,6 +1,5 @@
 import type { Dictionary } from "@/content/dictionary";
 import { persona } from "@/content/perfil";
-import { readingTimes } from "@/lib/reading-time";
 import ThresholdClient from "./ThresholdClient";
 
 /**
@@ -17,17 +16,13 @@ import ThresholdClient from "./ThresholdClient";
  * mitades vive en variables CSS que comparten marco, previsualización y
  * botón, y cambia al pasar el cursor.
  *
- * Los tiempos se calculan sobre el texto real (`src/lib/reading-time.ts`).
- * Las previsualizaciones son decorativas para lectores de pantalla y no
- * reciben foco (van `inert`); los dos botones son reales, con el tiempo en su
- * nombre accesible, y las flechas cambian de opción.
+ * Las opciones no llevan tiempo: "respuesta rápida" con doce minutos de
+ * lectura contradecía a "razonamiento profundo" con dos, así que sólo van el
+ * sobretítulo y el título. Las previsualizaciones son decorativas para
+ * lectores de pantalla y no reciben foco (van `inert`); los dos botones son
+ * reales, su nombre accesible es su texto, y las flechas cambian de opción.
  */
 export default function Threshold({ dict }: { dict: Dictionary }) {
-  const t = readingTimes(dict);
-  const cvTime = dict.threshold.minutes.replace("{n}", String(t.cvMinutes));
-  const exploreTime = dict.threshold.minutes.replace("{n}", String(t.tourMinutes));
-  const aria = (title: string, time: string) => dict.threshold.optionAria.replace("{title}", title).replace("{time}", time);
-
   return (
     // Mientras el umbral está a la vista, la columna va `inert` y no expone su
     // landmark ni su h1: aquí el umbral es el main y el nombre es el h1.
@@ -44,15 +39,13 @@ export default function Threshold({ dict }: { dict: Dictionary }) {
       <div className="th-frame th-frame-explore" aria-hidden="true" data-side="explore" />
 
       <div className="th-options" role="group" aria-label={dict.threshold.groupAria}>
-        <button type="button" className="th-option th-option-cv" data-choose="cv" aria-label={aria(dict.threshold.cvTitle, cvTime)}>
+        <button type="button" className="th-option th-option-cv" data-choose="cv">
           <span className="th-kicker">{dict.threshold.cvKicker}</span>
           <span className="th-title">{dict.threshold.cvTitle}</span>
-          <span className="th-time tnum">{cvTime}</span>
         </button>
-        <button type="button" className="th-option th-option-explore" data-choose="explore" aria-label={aria(dict.threshold.exploreTitle, exploreTime)}>
+        <button type="button" className="th-option th-option-explore" data-choose="explore">
           <span className="th-kicker">{dict.threshold.exploreKicker}</span>
           <span className="th-title">{dict.threshold.exploreTitle}</span>
-          <span className="th-time tnum">{exploreTime}</span>
         </button>
       </div>
 

@@ -7,10 +7,13 @@ import { perfil, term, terms } from "@/content/perfil";
  *
  * No se recortan ni se reordenan aquí. Si una categoría sobra o falta, se
  * arregla en el YAML y se vuelve a sincronizar.
+ *
+ * Una sola columna: las categorías tienen de cuatro a catorce elementos, y
+ * en rejilla las cortas dejaban hueco al lado de las largas.
  */
 export default function Skills({ dict }: { dict: Dictionary }) {
   return (
-    <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="space-y-7">
       {perfil.habilidades.map((grupo) => (
         <li key={grupo.categoria} className="cluster">
           <h3 className="text-sm font-semibold text-fg">{term(grupo.categoria, dict)}</h3>

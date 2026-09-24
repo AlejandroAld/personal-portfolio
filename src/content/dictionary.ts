@@ -58,15 +58,6 @@ export interface ProjectCopy {
   readonly bullets?: readonly string[];
 }
 
-export interface FailureMode {
-  readonly id: string;
-  readonly title: string;
-  readonly symptom: string;
-  readonly fix: string;
-  readonly lesson: string;
-  readonly cites: readonly CiteKey[];
-}
-
 export interface Dictionary {
   /**
    * `false` mientras la traducción esté a medias: el idioma queda fuera del
@@ -109,10 +100,6 @@ export interface Dictionary {
     readonly cvTitle: string;
     readonly exploreKicker: string;
     readonly exploreTitle: string;
-    /** "unos {n} min" */
-    readonly minutes: string;
-    /** Nombre accesible del botón: "{title}, {time}" */
-    readonly optionAria: string;
     readonly groupAria: string;
   };
 
@@ -137,7 +124,6 @@ export interface Dictionary {
     readonly title: string;
     readonly intro?: string;
     readonly lookingFor: string;
-    readonly since2021: string;
   };
 
   /** Training · Formación. */
@@ -192,14 +178,15 @@ export interface Dictionary {
     readonly gpa: string;
   };
 
-  readonly thinking: {
-    /** "Cómo pienso": el rótulo del bloque dentro de "Quién soy". */
+  readonly work: {
+    /** "Cómo trabajo": el rótulo del bloque dentro de "Quién soy". */
     readonly eyebrow: string;
-    readonly intro: string;
-    readonly symptom: string;
-    readonly fix: string;
-    readonly lesson: string;
-    readonly items: readonly FailureMode[];
+    /**
+     * Cuatro principios: una frase grande y una línea de prueba con su cita.
+     * El texto es literal de `principios` en perfil.yaml; en inglés, la
+     * traducción aprobada.
+     */
+    readonly items: readonly { readonly phrase: string; readonly proof: string; readonly cite: CiteKey }[];
   };
 
   readonly contact: {
@@ -225,6 +212,8 @@ export interface Dictionary {
     /** "{n} tok" */
     readonly tokens: string;
     readonly pending: string;
+    /** El hueco de una cifra que todavía no existe: sin grabación no hay número. */
+    readonly none: string;
     readonly done: string;
     readonly note: string;
     readonly recordedFrom: string;
@@ -242,9 +231,6 @@ export interface Dictionary {
     readonly education: string;
     readonly languages: string;
     readonly certifications: string;
-    readonly sources: string;
-    /** Traducción de `educacion.contexto`; en español va el YAML tal cual. */
-    readonly contextLine: string | null;
     /** Nombres en inglés de los bloques del prompt; en español van tal cual. */
     readonly blocks: Readonly<Record<string, string>>;
   };

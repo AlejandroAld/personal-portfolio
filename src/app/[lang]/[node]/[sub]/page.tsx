@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const dict = getDictionary(lang);
   const role = dict.experience.roles[s.ref];
   return {
-    title: `${role?.headline ?? s.slug[lang]} — ${dict.meta.title}`,
+    title: `${role?.headline ?? s.slug[lang]} · ${dict.meta.title}`,
     alternates: { canonical: absoluteUrl(pathFor(lang, n.id, s.ref)) },
   };
 }

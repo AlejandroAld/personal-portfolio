@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const { lang } = await params;
   if (!isLocale(lang)) return {};
   const dict = getDictionary(lang);
-  return { title: `${dict.map.cvMode} — ${dict.meta.title}`, alternates: { canonical: absoluteUrl(cvPath(lang)) } };
+  return { title: `${dict.map.cvMode} · ${dict.meta.title}`, alternates: { canonical: absoluteUrl(cvPath(lang)) } };
 }
 
 /** El Modo CV con URL propia: /es/cv, /en/cv. La misma página, abierta como columna. */

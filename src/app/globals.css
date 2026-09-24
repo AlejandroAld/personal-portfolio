@@ -77,7 +77,6 @@
   /* Barra + ruta: lo que la sala abierta deja libre arriba. */
   --spacing-chrome: 5.0625rem;
   /* Columna de fechas y empresa en la trayectoria. */
-  --spacing-meta: 11rem;
 
   /* --- Movimiento --------------------------------------------------------- */
   /* Sólo los que algo usa: `npm run lint` falla si uno se queda sin uso, y
@@ -160,13 +159,6 @@ body {
   }
 
   /* Trayectoria: fechas y empresa a la izquierda, el resultado a la derecha. */
-  .role-grid {
-    @apply grid gap-4 sm:gap-8;
-    @variant sm {
-      grid-template-columns: var(--spacing-meta) minmax(0, 1fr);
-    }
-  }
-
   /* El eyebrow de sección y la etiqueta de campo son la misma pieza en dos
      colores: acento para abrir una sección, gris para nombrar un dato. */
   .eyebrow,
@@ -665,7 +657,7 @@ html[data-hover="explore"] .th-frame-explore {
     clip-path: inset(0 0 44vh 0 round 1.25rem);
   }
 }
-/* Las opciones, encima de cada marco: sobretítulo, título y tiempo. */
+/* Las opciones, encima de cada marco: sobretítulo y título. */
 .th-options {
   position: absolute;
   inset: 0;
@@ -691,11 +683,11 @@ html[data-hover="explore"] .th-frame-explore {
     opacity var(--duration-base) var(--ease-out);
 }
 .th-option-cv {
-  transform: translate(var(--th-cv-x), calc(var(--th-cv-y) - 5.25rem));
+  transform: translate(var(--th-cv-x), calc(var(--th-cv-y) - 4.125rem));
   opacity: var(--th-cv-dim);
 }
 .th-option-explore {
-  transform: translate(var(--th-ex-x), calc(var(--th-ex-y) - 5.25rem));
+  transform: translate(var(--th-ex-x), calc(var(--th-ex-y) - 4.125rem));
   opacity: var(--th-ex-dim);
 }
 .th-kicker {
@@ -708,17 +700,12 @@ html[data-hover="explore"] .th-frame-explore {
 .th-title {
   @apply text-2xl font-semibold tracking-tight sm:text-3xl;
 }
-.th-time {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--color-muted);
-}
 @media (max-aspect-ratio: 9/10) {
   .th-option-cv {
-    transform: translate(var(--th-cv-x), calc(var(--th-cv-y) - 4.75rem));
+    transform: translate(var(--th-cv-x), calc(var(--th-cv-y) - 3.625rem));
   }
   .th-option-explore {
-    transform: translate(var(--th-ex-x), calc(var(--th-ex-y) - 4.75rem));
+    transform: translate(var(--th-ex-x), calc(var(--th-ex-y) - 3.625rem));
   }
   .th-title {
     @apply text-xl;

@@ -64,7 +64,6 @@ src/
     evidence.ts              SHA fijado + todas las citas, en un solo lugar
     map-graph.ts             el mapa: nodos, slugs, aristas, tour, cámara
     explorer.ts              el explorador: umbral y caída, niveles, URLs, tour, teclado, modo
-    reading-time.ts          los tiempos del umbral, calculados sobre el texto real
     tokens.ts                las curvas y el vuelo, en JS, iguales que en el CSS
     bezier.ts                cubic-bezier() como función, 40 líneas
     site.ts                  dominio, endpoint del agente, idiomas, banderas
@@ -115,13 +114,11 @@ la derecha el mapa real (`.stage`), el mismo lienzo que después ocupa la
 pantalla completa, orbitando despacio; mientras el 3D carga se ve el SVG.
 Nada es una captura y nada se vuelve a cargar al elegir. Encima de cada
 marco va la opción, en grande: "Respuesta rápida · Leer el CV" y
-"Razonamiento profundo · Explorar", con su tiempo.
-
-**Los tiempos se calculan** (`src/lib/reading-time.ts`): leer el CV son las
-palabras del texto real de la columna a 230 palabras por minuto; explorar es
-la duración real del tour, parada por parada: el vuelo, el asentamiento y
-leer lo que abre cada sala. Los dos se redondean hacia arriba. Hoy salen
-12 y 2 minutos: el CV entero tarda más que el tour, y se dice tal cual.
+"Razonamiento profundo · Explorar", sin tiempo. Hubo una versión con los
+minutos calculados sobre el texto real (el CV entero, doce; el tour, dos) y
+se quitó porque se contradecía sola: la "respuesta rápida" tardaba seis
+veces más que el "razonamiento profundo". El nombre accesible de cada botón
+es su texto.
 
 Al pasar el cursor, esa mitad crece a cerca del 60 % del ancho y se inclina
 hacia la persona con el marco en acento; la otra se atenúa y se aleja. Al
@@ -176,13 +173,13 @@ toque o Enter usa `pushState`.
 | Nodo | Sala | Contenido |
 |---|---|---|
 | Alex | El núcleo | La primera pantalla: nombre, rol, las tres cifras con fuente y contacto, encima del mapa completo, y la pista "Haz scroll o toca un nodo". |
-| System prompt · Quién soy | `/es/quien-soy` | Quién soy, qué busco, cómo pienso (los modos de falla) y la frase del ingreso en 2021 con sus fuentes. |
-| Memory · Experiencia | `/es/memoria` | Los cuatro puestos como subnodos, del más reciente al más antiguo, con slugs por función (`/es/memoria/agentes-en-produccion`), nunca con ids del YAML. Dentro del primero, el momento fuerte: un grafo de más de 180 nodos que colapsa en un solo orquestador con cuatro ramas, y el 92 %. |
+| System prompt · Quién soy | `/es/quien-soy` | Quién soy y qué busco, en una sola columna, y debajo, a todo el ancho, "Cómo trabajo": cuatro principios en una rejilla de 2 × 2 (una columna en móvil), cada uno con su frase, su línea de prueba y la cita a `principios` en perfil.yaml. |
+| Memory · Experiencia | `/es/memoria` | Los cuatro puestos como subnodos, del más reciente al más antiguo, con slugs por función (`/es/memoria/agentes-en-produccion`), nunca con ids del YAML. Dentro del primero, el momento fuerte: un grafo de más de 180 nodos que colapsa en un solo orquestador con cuatro ramas, y el 92 %. La ficha de cada puesto (fechas, lugar, empresa, puesto) va en dos líneas encima del titular, no en una columna al lado. |
 | Outputs · Proyectos | `/es/proyectos` | Los siete proyectos de perfil.yaml. |
-| Tools · Stack | `/es/stack` | Las nueve categorías de habilidades, en racimos. |
-| Training · Formación | `/es/formacion` | IPN, la publicación arbitrada con sus límites, idiomas y certificaciones en curso. |
+| Tools · Stack | `/es/stack` | Las nueve categorías de habilidades, una debajo de otra: en rejilla las cortas dejaban hueco al lado de las largas. |
+| Training · Formación | `/es/formacion` | IPN, la publicación arbitrada con sus límites, idiomas y certificaciones en curso, en una sola columna; las certificaciones en una fila de tarjetas de la misma altura. |
 | API · Contacto | `/es/contacto` | Correo, LinkedIn y GitHub. |
-| Bajo el capó | `/es/bajo-el-capo` | Cómo funciona la página: la ventana de contexto bloque por bloque y la corrida grabada con su marcador. Las grabaciones sólo se usan aquí. |
+| Bajo el capó | `/es/bajo-el-capo` | Cómo funciona la página: la ventana de contexto bloque por bloque y la corrida grabada con su marcador. Las grabaciones sólo se usan aquí. Ventana de contexto y marcador van en una sola columna. |
 
 **Es verdad, no una simulación.** Lo que "Bajo el capó" reproduce es una
 corrida grabada contra el agente desplegado (`scripts/grabar_corrida.py` en
@@ -259,6 +256,20 @@ se toca desde el sitio, porque una página web no puede guardar una llave en
 secreto: la protección es por consumo, con tope por IP. Un route handler en
 medio habría escondido un hostname que no es secreto a cambio de romper esa
 protección, porque todo saldría con la IP del servidor.
+
+## Composición y tipografía
+
+Dos reglas para todo el sitio, Modo CV y salas por igual:
+
+- **Ninguna columna deja un hueco al lado de la otra.** Si dos bloques no
+  quedan parejos, van en una sola columna. Por eso "Quién soy" es una
+  columna arriba (presentación y qué busco) y una rejilla de 2 × 2 abajo,
+  y por eso las rejillas de tarjetas estiran cada fila. Se revisa con
+  capturas de cada sección a 1280, 1440 y 1920 px y a 390 px.
+- **Sin guion largo en el texto del sitio.** Donde había uno va dos puntos,
+  coma o punto; los rangos de fechas llevan semirraya ("2021 – 2025"). Los
+  dos títulos que venían del YAML con guion largo (el titular y el puesto de
+  investigador) cambiaron en perfil.yaml, que es de donde sale el texto.
 
 ## Trazabilidad
 

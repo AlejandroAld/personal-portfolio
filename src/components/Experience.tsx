@@ -21,7 +21,9 @@ const CITE_BY_ROLE = {
  * subnodo abre el detalle. Dalton lleva su momento: el sistema de más de 180
  * nodos que colapsa en un orquestador.
  *
- * Fechas, empresas, puestos y ubicaciones salen de perfil.json tal cual.
+ * Fechas, empresas, puestos y ubicaciones salen de perfil.json tal cual, en
+ * dos líneas encima del titular: una columna de fichas al lado del contenido
+ * dejaba un hueco enorme, y ninguna columna deja un hueco al lado de la otra.
  */
 export default function Experience({ dict, locale, activeSub }: { dict: Dictionary; locale: Locale; activeSub: string | null }) {
   const subs = SUBNODES.memory ?? [];
@@ -41,16 +43,18 @@ export default function Experience({ dict, locale, activeSub }: { dict: Dictiona
           <li key={rol.id}>
             {/* `data-sub` lleva el ref del YAML (interno); el id y la URL llevan el slug por función. */}
             <article id={`${slugMemory}-${slug}`} className="subnode" data-sub={ref} data-active-sub={activeSub === ref ? "" : undefined} aria-labelledby={headingId}>
-              <div className="role-grid">
+              <div>
                 <div className="subnode-meta">
-                  <p className="font-mono text-xs text-subtle tnum">{formatPeriod(rol.inicio, rol.fin, dict)}</p>
-                  <p className="mt-1.5 text-sm font-medium text-fg">{rol.empresa}</p>
-                  <p className="mt-0.5 text-xs text-subtle">{term(rol.puesto, dict)}</p>
-                  <p className="mt-0.5 text-xs text-subtle">{term(rol.ubicacion, dict)}</p>
+                  <p className="font-mono text-xs text-subtle tnum">
+                    {formatPeriod(rol.inicio, rol.fin, dict)} · {term(rol.ubicacion, dict)}
+                  </p>
+                  <p className="mt-1 text-sm text-muted">
+                    <span className="font-medium text-fg">{rol.empresa}</span> · {term(rol.puesto, dict)}
+                  </p>
                 </div>
 
                 <div>
-                  <h3 id={headingId} className="text-lg font-semibold tracking-tight text-fg text-balance">
+                  <h3 id={headingId} className="mt-3 text-lg font-semibold tracking-tight text-fg text-balance">
                     {/* En modo explorar la cabecera es la puerta al subnodo; en Modo CV es sólo el título. */}
                     <a href={href} data-enter="memory" data-sub={ref} className="subnode-link">
                       {copy?.headline ?? term(rol.puesto, dict)}

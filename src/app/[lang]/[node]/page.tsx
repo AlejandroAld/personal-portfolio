@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const dict = getDictionary(lang);
   const name = dict.map.nodes[n.id].name;
   return {
-    title: `${name} — ${dict.meta.title}`,
+    title: `${name} · ${dict.meta.title}`,
     alternates: { canonical: absoluteUrl(pathFor(lang, n.id)) },
   };
 }
