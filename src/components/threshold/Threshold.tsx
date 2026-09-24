@@ -31,7 +31,13 @@ export default function Threshold({ dict }: { dict: Dictionary }) {
         <h1 className="th-name">
           {persona.nombre} <span className="text-subtle">· {dict.hero.eyebrow}</span>
         </h1>
-        <p className="th-intro">{dict.threshold.intro}</p>
+        {/* La definición, literal de `umbral` en perfil.yaml. Entra con
+            desplazamiento y sin fundido (rise-solid): es el LCP del umbral y
+            Chrome no cuenta un elemento en opacidad 0; con movimiento reducido
+            no hay animación. */}
+        <p className="th-greet rise-solid">{dict.threshold.greeting}</p>
+        <p className="th-def rise-solid rise-2">{dict.threshold.definition}</p>
+        <p className="th-intro rise-solid rise-3">{dict.threshold.intro}</p>
       </div>
 
       {/* Los marcos: sólo el borde con profundidad. Lo de adentro es la página misma. */}

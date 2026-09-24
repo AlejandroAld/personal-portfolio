@@ -11,7 +11,7 @@
 
 import type { CiteKey } from "@/lib/evidence";
 import type { Dictionary } from "./dictionary";
-import { persona, principios } from "./perfil";
+import { persona, principios, umbral } from "./perfil";
 
 /** La cita de cada principio, en el orden del YAML. */
 const PRINCIPIOS_CITES: readonly CiteKey[] = ["workRealTraffic", "workPersonDecides", "workSimple", "workWithOperators"];
@@ -61,7 +61,10 @@ const es: Dictionary = {
   },
 
   threshold: {
-    intro: "Dos formas de conocerme. Si tienes prisa, lee mi CV. Si tienes unos minutos, explora mi perfil como un agente: cada nodo es una parte de mi trayectoria.",
+    // Literal del YAML (`umbral.es`).
+    greeting: umbral.es.saludo,
+    definition: umbral.es.definicion,
+    intro: umbral.es.presentacion,
     cvKicker: "Respuesta rápida",
     cvTitle: "Leer el CV",
     exploreKicker: "Razonamiento profundo",
@@ -141,7 +144,7 @@ const es: Dictionary = {
   },
 
   experience: {
-    title: "Cuatro años, cuatro salas",
+    title: "Cuatro puestos, cuatro salas",
     present: "Actualidad",
     roles: {
       "exp-dalton": {
@@ -150,7 +153,6 @@ const es: Dictionary = {
           "Responsable técnico de las soluciones de IA generativa en producción, de extremo a extremo: arquitectura, integración con los sistemas de negocio, despliegue, seguridad, evaluación y monitoreo.",
         highlights: [
           "Recibí un sistema de más de 180 nodos donde la lógica estaba repartida, se perdía contexto entre saltos y los errores no eran reproducibles. Lo reconstruí sobre un orquestador único y trazable con estado explícito: el costo mensual de operación bajó 92%.",
-          "Bajé un proceso de cálculo de 48 a 10 horas semanales de trabajo manual y lo hice trazable. Antes del sistema el cálculo no dejaba rastro y su tasa de error era inmedible.",
           "Los sistemas que opero dan servicio a cuatro unidades de negocio distintas del grupo.",
           "El bot de comunicación interna tiene alcance nacional y llega a miles de asesores del grupo.",
           "Cuatro agentes conversacionales con tráfico real de clientes sobre WhatsApp Business API, cada uno con su propio estado de sesión, catálogo de herramientas y almacén de conversación.",

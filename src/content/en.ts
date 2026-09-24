@@ -10,7 +10,7 @@
  */
 
 import type { Dictionary } from "./dictionary";
-import { educacion } from "./perfil";
+import { educacion, umbral } from "./perfil";
 
 const en: Dictionary = {
   complete: true,
@@ -59,7 +59,10 @@ const en: Dictionary = {
   },
 
   threshold: {
-    intro: "Two ways to get to know me. If you're in a hurry, read my CV. If you have a few minutes, explore my profile as an agent: every node is a part of my path.",
+    // Literal del YAML (`umbral.en`).
+    greeting: umbral.en.saludo,
+    definition: umbral.en.definicion,
+    intro: umbral.en.presentacion,
     cvKicker: "Quick answer",
     cvTitle: "Read the CV",
     exploreKicker: "Deep reasoning",
@@ -139,7 +142,7 @@ const en: Dictionary = {
   },
 
   experience: {
-    title: "Four years, four rooms",
+    title: "Four roles, four rooms",
     present: "Present",
     roles: {
       "exp-dalton": {
@@ -148,7 +151,6 @@ const en: Dictionary = {
           "Technical owner of the generative AI systems in production, end to end: architecture, integration with the business systems, deployment, security, evaluation and monitoring.",
         highlights: [
           "Inherited a system of more than 180 nodes where logic was scattered, context was lost between hops and errors weren't reproducible. Rebuilt it onto a single traceable orchestrator with explicit state: monthly operating cost fell 92%.",
-          "Cut a recurring calculation from 48 to 10 hours of manual work per week, and made it auditable. Before the system, the calculation left no trace and its error rate could not be measured.",
           "The systems I run serve four separate business units inside the group.",
           "The internal communications bot runs nationwide and reaches thousands of advisors across the group.",
           "Four conversational agents with real customer traffic on WhatsApp Business API, each with its own session state, tool catalog and conversation store.",
@@ -458,8 +460,8 @@ const en: Dictionary = {
     "Español": "Spanish",
     "Inglés": "English",
     Nativo: "Native",
-    "B2, competencia profesional de trabajo. Lectura y escritura técnica fluidas, con una publicación arbitrada escrita en inglés. Conversacional en nivel intermedio alto, en mejora activa.":
-      "B2, professional working proficiency. Fluent technical reading and writing, with a peer-reviewed publication written in English. Conversational at an upper-intermediate level, actively improving.",
+    "B2, competencia profesional de trabajo. Lectura y escritura técnica a diario, con una publicación arbitrada escrita en inglés. Conversacional en nivel intermedio alto, en mejora activa.":
+      "B2, professional working proficiency. Daily technical reading and writing, with a peer-reviewed publication written in English. Conversational at an upper-intermediate level, actively improving.",
     // El titular del YAML, para los datos estructurados de la página en inglés.
     "Ingeniero en Inteligencia Artificial: agentes en producción, evaluación e integración con sistemas de negocio":
       "AI Engineer: agents in production, evaluation and integration with business systems",
