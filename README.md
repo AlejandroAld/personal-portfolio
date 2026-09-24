@@ -33,21 +33,23 @@ De ahí las dos piezas que definen la arquitectura:
 ```
 src/
   app/
-    [lang]/                  layout raíz (pone el modo antes de pintar), imagen OG
-      page.tsx               el mapa            /en, /es
-      [node]/page.tsx        un nodo            /es/memoria, /en/memory…
-      [node]/[sub]/page.tsx  un subnodo         /es/memoria/dalton
+    [lang]/                  layout raíz (pone el modo, el umbral y el nivel antes de pintar), imagen OG
+      page.tsx               el mapa (o el umbral, la primera vez)   /en, /es
+      cv/page.tsx            el Modo CV con URL propia               /es/cv, /en/cv
+      [node]/page.tsx        un nodo                                 /es/memoria, /en/memory…
+      [node]/[sub]/page.tsx  un subnodo                              /es/memoria/agentes-en-produccion
     sitemap.ts               sólo los idiomas terminados; cada nodo y subnodo
     robots.ts                los pendientes van a Disallow
     globals.css              tokens (@theme), clases de componente, los dos modos, reduced-motion
   components/
-    Site.tsx                 la página entera, para cualquier ruta del mapa
+    Site.tsx                 la página entera, para cualquier ruta
+    threshold/               el umbral: Threshold (las dos opciones y los marcos), ThresholdClient (eventos)
     Core.tsx                 el núcleo: la primera pantalla
     map/                     el marco: Explorer (almacén), MapStage + MapScene (WebGL), MapDiagram (SVG),
                              MapLabels, RouteBar, Room, RoomClose
     rooms/                   WhoIAm, Training, Hood, DaltonMoment
     Experience, Projects, Skills, Contact   el cuerpo de las salas
-    Nav, ModeToggle, LanguageLink
+    Nav, ModeSwitch (CV | Explorar), LanguageLink
     AgentChat, AgentDemo     ← escritos, SIN publicar
   content/
     perfil.json              GENERADO — no editar a mano
@@ -61,7 +63,8 @@ src/
   lib/
     evidence.ts              SHA fijado + todas las citas, en un solo lugar
     map-graph.ts             el mapa: nodos, slugs, aristas, tour, cámara
-    explorer.ts              el explorador: niveles, URLs, scroll, teclado, modo
+    explorer.ts              el explorador: umbral y caída, niveles, URLs, tour, teclado, modo
+    reading-time.ts          los tiempos del umbral, calculados sobre el texto real
     tokens.ts                las curvas y el vuelo, en JS, iguales que en el CSS
     bezier.ts                cubic-bezier() como función, 40 líneas
     site.ts                  dominio, endpoint del agente, idiomas, banderas
@@ -70,7 +73,7 @@ scripts/
   check-tokens.mjs           lint: las curvas y el vuelo del JS son los del CSS y ningún token está muerto
   check-claims.mjs           lint: cada número y nombre propio de la prosa está en perfil.yaml
   check-runs.mjs             lint: las corridas grabadas tienen forma completa y son del agente desplegado
-  a11y.mjs                   axe-core contra la página construida, 2 idiomas × 8 estados
+  a11y.mjs                   axe-core contra la página construida, 2 idiomas × 10 estados
 docs/
   agent-run-map.md           lo que pasa de verdad en una corrida, con archivo:línea
 tests/
@@ -102,11 +105,79 @@ Tres principios mandan sobre todo lo demás:
    e imprimible: es también lo que se ve sin JavaScript o sin WebGL, y lo que
    lee un buscador.
 
+### El umbral: la entrada donde se elige cómo conocerme
+
+En la primera visita, antes de todo, la pantalla se divide en dos y cada
+mitad es una previsualización viva de su modo dentro de un marco con
+profundidad: a la izquierda el Modo CV —la columna real (`main.page`) a
+escala, con un desplazamiento lento que se detiene al pasar el cursor—, y a
+la derecha el mapa real (`.stage`), el mismo lienzo que después ocupa la
+pantalla completa, orbitando despacio; mientras el 3D carga se ve el SVG.
+Nada es una captura y nada se vuelve a cargar al elegir. Encima de cada
+marco va la opción, en grande: "Respuesta rápida · Leer el CV" y
+"Razonamiento profundo · Explorar", con su tiempo.
+
+**Los tiempos se calculan** (`src/lib/reading-time.ts`): leer el CV son las
+palabras del texto real de la columna a 230 palabras por minuto; explorar es
+la duración real del tour, parada por parada: el vuelo, el asentamiento y
+leer lo que abre cada sala. Los dos se redondean hacia arriba. Hoy salen
+12 y 2 minutos: el CV entero tarda más que el tour, y se dice tal cual.
+
+Al pasar el cursor, esa mitad crece a cerca del 60 % del ancho y se inclina
+hacia la persona con el marco en acento; la otra se atenúa y se aleja. Al
+elegir, la previsualización se vuelve un portal que crece hacia la pantalla
+desde el punto exacto del clic (el punto de fuga), el marco se disuelve al
+rebasar los bordes y la otra mitad cae hacia atrás. Elegir el CV aterriza
+arriba de la columna con un rebote suave de resorte; elegir explorar sigue
+dentro del 3D: la cámara cae a través del grafo con los nodos pasando de
+largo y las partículas en estela, desacelera y se asienta en el mapa con el
+héroe. Todo dura 1.25 s (`--duration-fall`), sólo transform y opacidad en el
+HTML (Web Animations), sin saltos de layout. En móvil la división es
+vertical y se elige tocando.
+
+Reglas: sale sólo la primera vez, la elección se guarda en el navegador y
+después el sitio abre en el último modo elegido; un enlace directo a un nodo
+se lo salta; `/es/cv` y `/en/cv` abren en Modo CV. Todo eso lo decide un
+script en línea en `<head>` antes del primer pintado, sin destello. Las
+previsualizaciones van `inert` y son decorativas para lectores de pantalla;
+los dos botones son reales, con el tiempo en su nombre accesible, y las
+flechas cambian de opción. Sin JavaScript se ve el CV directamente; con
+movimiento reducido no hay caída, sólo un fundido de 200 ms. El LCP sigue
+siendo texto del servidor: la explicación del umbral.
+
+**El interruptor** "CV | Explorar", segmentado y con el modo activo en acento,
+va siempre en la barra y en móvil, además, fijo abajo. Cambiar de modo usa la
+misma caída, en corto (`--duration-fall-short`, 550 ms).
+
+### El nodo se convierte en la sala
+
+Nada aparece de la nada; cada cosa sale de otra. Entrar a un nodo tiene
+coreografía: una anticipación de 80 ms (el nodo se ilumina y la cámara
+retrocede un poco), un vuelo en curva —no en línea recta— con un leve
+cierre del campo de visión al llegar, el anillo del nodo que se abre como
+diafragma hasta ser el marco de la sala, las partículas que fluyen hacia el
+nodo como tokens que entran, y el resto del grafo que se aleja con desenfoque
+progresivo (en móvil, atenuación y escala). La etiqueta del nodo viaja desde
+el mapa hasta convertirse en el nombre de la sala (un fantasma animado con
+Web Animations, sincronizado con la cámara), y el contenido entra en cascada
+con 50 ms entre nombre, título, entrada y cuerpo: todo legible antes de
+700 ms desde el clic (`--duration-flight`, 650 ms). La salida es el reverso,
+al 65 %: el contenido se recoge hacia el nodo y la cámara se retira.
+
+La cámara es un resorte críticamente amortiguado y se puede reorientar a
+medio vuelo: si se elige otro nodo en pleno vuelo, cambia de destino sin
+cortes. Del nodo al subnodo no hay vuelo: la sala se desplaza de lado, como
+avanzar por una línea de tiempo. El tour por scroll arrastra el objetivo del
+resorte por una trayectoria continua (Catmull-Rom por todas las paradas) con
+asentamiento suave en cada una; la persona manda la velocidad y nada
+secuestra el scroll. El scroll usa `replaceState`; sólo entrar con clic,
+toque o Enter usa `pushState`.
+
 | Nodo | Sala | Contenido |
 |---|---|---|
 | Alex | El núcleo | La primera pantalla: nombre, rol, las tres cifras con fuente y contacto, encima del mapa completo, y la pista "Haz scroll o toca un nodo". |
 | System prompt · Quién soy | `/es/quien-soy` | Quién soy, qué busco, cómo pienso (los modos de falla) y la frase del ingreso en 2021 con sus fuentes. |
-| Memory · Experiencia | `/es/memoria` | Los cuatro puestos como subnodos, del más reciente al más antiguo. Dentro de Dalton, el momento fuerte: un grafo de 184 nodos que colapsa en un solo orquestador con cuatro ramas, y el 92 %. |
+| Memory · Experiencia | `/es/memoria` | Los cuatro puestos como subnodos, del más reciente al más antiguo, con slugs por función (`/es/memoria/agentes-en-produccion`), nunca con ids del YAML. Dentro del primero, el momento fuerte: un grafo de más de 180 nodos que colapsa en un solo orquestador con cuatro ramas, y el 92 %. |
 | Outputs · Proyectos | `/es/proyectos` | Los siete proyectos de perfil.yaml. |
 | Tools · Stack | `/es/stack` | Las nueve categorías de habilidades, en racimos. |
 | Training · Formación | `/es/formacion` | IPN, la publicación arbitrada con sus límites, idiomas y certificaciones en curso. |
@@ -136,18 +207,23 @@ abierta en el HTML.
 **El escenario** es un solo lienzo fijo detrás de todo (three.js con React
 Three Fiber, `src/components/map/MapScene.tsx`): el grafo con el núcleo al
 centro y los nodos a distintas profundidades, compuesto a mano para apaisado
-y para vertical (`src/lib/map-graph.ts`). Las aristas significan algo —el
-system prompt gobierna a todos, Tools alimenta a Outputs, Training alimenta a
-Memory— y por ellas viajan partículas tenues como tokens. En reposo, paralaje
-suave con el cursor. `frameloop="demand"`: renderiza durante un vuelo, con el
-paralaje, y —para las partículas— a 20 cuadros por segundo mientras el mapa
-está a la vista y hubo interacción en los últimos 20 segundos; después se
-duerme, y con la pestaña oculta o con movimiento reducido no pide ningún
-cuadro. DPR tope 2 (1.5 en vertical), sin luces ni posprocesado. Se carga
-después del LCP en su propio chunk (**241 KB gzip**, tope 300); mientras
-tanto está el mismo mapa como SVG del servidor, proyectado con la misma
-cámara. Sin WebGL la página pasa a Modo CV, y en Modo CV el lienzo se
-desmonta: nunca hay dos contextos WebGL, y a veces ninguno.
+y para vertical (`src/lib/map-graph.ts`). Los nodos son esferas de vidrio
+—un sombreado propio con borde fresnel en acento y brillo interior— que se
+encienden al pasar el cursor por la esfera o por la etiqueta, y con ellas se
+encienden sus aristas, tramo por tramo, nunca bajo texto. El núcleo lleva un
+halo suave detrás del bloque del héroe: es el origen del que salen las
+aristas. Las aristas significan algo —el system prompt gobierna a todos,
+Tools alimenta a Outputs, Training alimenta a Memory— y por ellas viajan
+partículas redondas y suaves, con mezcla aditiva y una estela corta, como
+tokens. En reposo, paralaje suave con el cursor. `frameloop="demand"`:
+renderiza mientras hay algo que mover —el umbral, una caída, un resorte sin
+asentar, el paralaje y las partículas mientras el mapa está a la vista— y
+con la pestaña oculta o con movimiento reducido no pide ningún cuadro. DPR
+tope 2 (1.5 en vertical), sin luces ni posprocesado. Se carga después del
+LCP en su propio chunk (**243 KB gzip**, 242 795 B; tope 300); mientras tanto está el
+mismo mapa como SVG del servidor, proyectado con la misma cámara. Sin WebGL
+la página pasa a Modo CV, y en Modo CV el lienzo se desmonta: nunca hay dos
+contextos WebGL, y a veces ninguno.
 
 **Etiquetas, teclado y lectores de pantalla.** Las etiquetas de los nodos son
 HTML encima del lienzo (enlaces de verdad, con su URL y objetivos táctiles
@@ -253,11 +329,13 @@ que dependa de JavaScript para resolverse, y no hay librería de animación.
 Los tokens de movimiento viven en el `@theme` de `globals.css` y son sólo los
 que algo usa: `duration-fast` (150 ms: hover, foco, estado), `duration-base`
 (300 ms: la entrada del núcleo, el borde de una tarjeta, el cambio de idioma,
-la llegada de una sala), `duration-flight` (900 ms: el vuelo de la cámara y
-el colapso del grafo de Dalton), `ease-out` `cubic-bezier(0.16, 1, 0.3, 1)`,
-`ease-in-out` `cubic-bezier(0.65, 0, 0.35, 1)` y `distance` (16 px; tope 20).
-`npm run lint` falla si un token se queda sin uso, y comprueba que las curvas
-y el vuelo que usa el JS (`src/lib/tokens.ts`) sean los mismos que en el CSS.
+la llegada de una sala), `duration-flight` (650 ms: la entrada a un nodo y
+el colapso del grafo de Dalton), `duration-fall` (1.25 s: la caída del
+umbral), `duration-fall-short` (550 ms: la misma caída desde el
+interruptor), `ease-out` `cubic-bezier(0.16, 1, 0.3, 1)`, `ease-in-out`
+`cubic-bezier(0.65, 0, 0.35, 1)` y `distance` (16 px; tope 20). `npm run
+lint` falla si un token se queda sin uso, y comprueba que las curvas y las
+duraciones que usa el JS (`src/lib/tokens.ts`) sean las mismas que en el CSS.
 
 **Regla dura:** todo lo que se mueve anima sólo `transform` y `opacity`. Los
 hovers cambian color, que no dispara layout. Se puede comprobar en el CSS
@@ -267,8 +345,9 @@ opacidad y transform.
 | Qué | Cómo |
 |---|---|
 | Entrada del núcleo | Una animación CSS: fade + 16 px, 300 ms, ease-out, en cuatro tandas a 60 ms (nombre, titular, cifras, contacto). Corre sin JS y arranca en el primer pintado, así que no retrasa el LCP. Sólo en la primera carga: al cambiar de idioma `<html>` lleva `data-navigated` y el núcleo nuevo llega con el fundido. |
-| Vuelo de la cámara | Lo que anima desde JavaScript: al entrar o salir de un nodo la cámara interpola posición y objetivo en 900 ms con `ease-in-out` (`cubic-bezier()` resuelta en 40 líneas propias, `src/lib/bezier.ts`); el nodo abierto crece y le sale un halo. La sala llega con fade + 16 px cuando la cámara ya casi aterrizó (`duration-flight − duration-base`). |
-| El grafo de Dalton | 184 círculos en un SVG con sus dos posiciones en variables CSS; al cambiar `data-state` el CSS interpola `transform` en 900 ms con 2 ms de escalonado. Sin JavaScript se ve el estado final. |
+| Vuelo de la cámara | Lo que anima desde JavaScript: un resorte críticamente amortiguado sobre posición, objetivo y campo de visión, reorientable a medio vuelo, con anticipación de 80 ms y vuelo en curva. La sala llega en cascada cuando la cámara ya casi aterrizó (`duration-flight`), y la etiqueta del nodo viaja hasta el nombre de la sala con Web Animations. |
+| La caída del umbral | Web Animations sobre transform y opacidad: la previsualización elegida crece hacia la pantalla desde el punto del clic (con rebote de resorte para el CV) y la otra cae hacia atrás; en el 3D, la cámara atraviesa el grafo con impulso y se asienta. `duration-fall` (1.25 s); desde el interruptor, `duration-fall-short` (550 ms). |
+| El grafo de Dalton | Más de 180 círculos en un SVG con sus dos posiciones en variables CSS; al cambiar `data-state` el CSS interpola `transform` en 650 ms con 2 ms de escalonado. Sin JavaScript se ve el estado final. |
 | Hovers | Tarjetas: el borde pasa del gris fino al acento en 300 ms, sólo color. Enlaces del nav: un subrayado que crece desde la izquierda, que es un `scaleX` sobre un pseudoelemento. Botones: fondo, 150 ms. Las utilidades `transition-*` de Tailwind heredan los tokens de estado. |
 | Cambio de idioma | Fundido cruzado con la View Transitions API a `duration-base`, disparado por `LanguageLink`: sin recarga, sin blanco en medio. La posición de lectura se conserva a propósito (`scroll: false` en las dos rutas): las dos páginas tienen la misma estructura, y el mismo desplazamiento muestra la misma sección en el otro idioma. Sin la API, el enlace navega como siempre. |
 | El mapa en reposo | Partículas por las aristas y paralaje con el cursor, en el bucle bajo demanda: 20 cuadros por segundo mientras hay vida, ninguno cuando no. Detalle arriba, en "El perfil como un agente". |
@@ -330,6 +409,38 @@ pone el script de `<head>` antes de pintar por lo mismo: si el CSS esperara a
 la hidratación para saber que no hay sala abierta, escondería el núcleo
 durante 200 ms. Accesibilidad, buenas prácticas y SEO: 100 en las seis.
 
+**Con el umbral** (primera visita), mismo contenedor, 3 corridas por ruta.
+Lighthouse corre sin WebGL, así que ve lo que ve un navegador sin WebGL: el
+script de `<head>` lo detecta antes de pintar y abre en Modo CV, sin destello
+ni salto de layout.
+
+| Ruta | Rendimiento | LCP | TBT | CLS | Accesibilidad |
+|---|---|---|---|---|---|
+| `/en` | 98 (98 / 99 / 96) | 2.31 s | 34 ms | 0.000 | 100 |
+| `/es` | 96 (96 / 96 / 96) | 2.72 s | 34 ms | 0.000 | 100 |
+| `/en/cv` | 99 (99 / 98 / 99) | 2.17 s | 44 ms | 0.000 | 100 |
+
+El elemento LCP es el titular (`h1`) en las tres rutas: como Lighthouse no
+tiene WebGL, `/en` y `/es` abren en Modo CV y el titular es lo más grande
+que pinta el servidor. El LCP de este contenedor sigue siendo bimodal (2.2 o
+2.7 s según la corrida, como en las mediciones anteriores): `/en` 2.31 / 2.26 /
+2.73 s, `/es` 2.72 / 2.72 / 2.71 s, `/en/cv` 2.17 / 2.19 / 2.15 s; FCP 1.06 s
+en las tres y ningún cambio de layout (0 layout shifts en las nueve corridas).
+
+**Cuadros perdidos**, con traza de Chrome (`Tracing` por CDP, eventos
+`PipelineReporter`) y con `requestAnimationFrame` (un intervalo mayor de
+25 ms es un cuadro perdido), sin limitar la CPU y con limitación 4x
+(`Emulation.setCPUThrottlingRate`). Este contenedor no tiene GPU: el WebGL
+corre en SwiftShader, por software, y la traza lo dice —más del 85 % de
+cada ventana se va en `Graphics.Pipeline`, con estilo y layout en 30–70 ms—,
+así que son cotas inferiores, no lo que verá una máquina con GPU:
+
+| Momento | CPU 1x | CPU 4x |
+|---|---|---|
+| Caída del umbral → explorar (1.4 s) | 38 cuadros rAF, peor intervalo 73 ms; traza: 49 perdidos de 127 | 32 cuadros, peor 178 ms; 56 de 118 |
+| Entrada a un nodo (0.8 s) | 15 cuadros, peor 162 ms; 41 de 77 | 12 cuadros, peor 138 ms; 75 de 138 |
+| Salida (0.7 s) | 8 cuadros, peor 130 ms; 43 de 65 | 6 cuadros, peor 249 ms; 64 de 82 |
+
 JS servido en `/en`, gzip, medido chunk por chunk contra `next start`:
 
 | | JS servido (gzip) |
@@ -338,6 +449,7 @@ JS servido en `/en`, gzip, medido chunk por chunk contra `next start`:
 | Sin librería: héroe en CSS, contador con `requestAnimationFrame` | **172 733 B** |
 | Corrida del agente: héroe, marcador y escenario; el chunk 3D (237 786 B) va aparte y se pide después del LCP | **175 450 B** + 237 786 B diferidos |
 | El mapa: núcleo, explorador, etiquetas y ruta; el chunk 3D (240 628 B, tope 300 KB) va aparte, se pide después del LCP y sólo en modo explorar | **179 109 B** + 240 628 B diferidos |
+| Con el umbral y el interruptor; el chunk 3D (242 795 B, tope 300 KB) suma el vidrio, las partículas con estela y el resorte | **181 868 B** + 242 795 B diferidos |
 
 **34 397 bytes gzip menos.** `motion` no aparece en `package.json`, en ningún
 import ni en el bundle compilado; la única palabra "motion" que queda es
@@ -349,9 +461,11 @@ Accesibilidad, con herramientas y no con impresión:
   13.5, axe 4.13): 25 auditorías pasan, 0 fallan, 10 son manuales, 40 no
   aplican. `color-contrast` pasa con 0 elementos señalados.
 - **axe-core 4.13 desde el proyecto** (`npm run a11y`): 0 violaciones WCAG 2.x
-  A/AA y 0 de best-practice en 16 estados (2 idiomas × móvil, menú abierto,
-  mapa, sala abierta, subnodo, sala en móvil, Modo CV, movimiento reducido);
-  29 reglas pasan. La única regla "por revisar" es `color-contrast` sobre lo
+  A/AA y 0 de best-practice en 20 estados (2 idiomas × móvil, menú abierto,
+  umbral en escritorio y en móvil, mapa, sala abierta, subnodo, sala en
+  móvil, Modo CV, movimiento reducido); 29 reglas pasan. En el umbral
+  la columna va `inert`, así que el umbral es el `main` y el nombre es el
+  `h1`; el interruptor fijo de móvil va en su propio landmark. La única regla "por revisar" es `color-contrast` sobre lo
   que está encima del lienzo, porque axe no mide contra un fondo que no es un
   color plano. Eso se mide aparte, abajo. La primera pasada encontró un
   fallo real de `target-size` en los tramos de la ruta (`~` medía 10 px);
@@ -367,18 +481,24 @@ Accesibilidad, con herramientas y no con impresión:
   plano. El mapa es una dependencia de contraste, con presupuesto: el cuerpo
   de texto (`muted`) tiene que quedar en AAA sobre lo que sea que el grafo
   pinte detrás, y eso fija el píxel más claro permitido bajo un bloque de
-  texto en rgb(14, 20, 38). El escenario lo cumple por construcción —cada
+  texto: luminancia relativa 0.0085, que es rgb(22, 22, 22) en gris o
+  rgb(14, 20, 38) en el azul del mapa. El escenario lo cumple por construcción —cada
   nodo, anillo y partícula se proyecta a pantalla y, si cae bajo el texto del
   héroe, bajo el panel de una sala o bajo una etiqueta, pinta por debajo del
   tope; las aristas van pre-mezcladas con el fondo y siempre por debajo— y se
   mide con el lienzo corriendo: se esconde el texto y se toma el píxel más
   claro bajo el héroe (con las partículas viajando), bajo las siete
-  etiquetas y bajo el panel de tres salas, en escritorio y a 390 px. Hoy:
-  **7.12:1** en escritorio (bajo el héroe) y **7.13:1** en móvil (bajo una
-  etiqueta) para `muted` (peor caso), `subtle` 5.40:1, `accent` 4.96:1. La
-  primera medición encontró la arista punteada al núcleo a rgb(28, 28, 29),
-  por encima del tope; bajó al 7.5 %. Si cambian los colores del mapa, se
-  vuelve a medir.
+  etiquetas, bajo el panel de tres salas y bajo el texto del umbral, en
+  escritorio y a 390 px. Hoy: **7.09:1** en escritorio y **7.12:1** en
+  móvil para `muted` (peor caso), `subtle` 5.38:1, `accent` 4.94:1. Cada
+  cambio de la escena volvió a medirse: la arista punteada al núcleo salía a
+  rgb(28, 28, 29) y bajó al 7.5 %; las partículas aditivas con estela
+  primero se atenuaban bajo texto y aun así, sumadas a la arista atenuada y
+  entre sí, salían a rgb(28, 33, 54): ahora se apagan del todo al llegar al
+  texto, con una banda suave de 28 px (20 en vertical) antes del borde y el
+  radio de su sprite como margen; y las etiquetas se esconden mientras hay
+  una sala abierta (a 390 px no hay desenfoque y una etiqueta bajo el velo
+  daba rgb(28, 28, 28)). Si cambian los colores del mapa, se vuelve a medir.
 
 Sin JavaScript: la columna completa (Modo CV), sin lienzo ni botón de modo;
 de los 407 nodos de texto de `<main>`, **0 ocultos** en los dos idiomas, y
