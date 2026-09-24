@@ -427,16 +427,16 @@ ni salto de layout.
 
 | Ruta | Rendimiento | LCP | TBT | CLS | Accesibilidad |
 |---|---|---|---|---|---|
-| `/en` | 98 (98 / 99 / 96) | 2.31 s | 34 ms | 0.000 | 100 |
-| `/es` | 96 (96 / 96 / 96) | 2.72 s | 34 ms | 0.000 | 100 |
-| `/en/cv` | 99 (99 / 98 / 99) | 2.17 s | 44 ms | 0.000 | 100 |
+| `/en` | 99 (99 / 99 / 99) | 2.17 s | 40 ms | 0.000 | 100 |
+| `/es` | 99 (97 / 100 / 99) | 2.16 s | 33 ms | 0.000 | 100 |
+| `/en/cv` | 100 (99 / 100 / 100) | 1.87 s | 35 ms | 0.000 | 100 |
 
 El elemento LCP es el titular (`h1`) en las tres rutas: como Lighthouse no
 tiene WebGL, `/en` y `/es` abren en Modo CV y el titular es lo más grande
-que pinta el servidor. El LCP de este contenedor sigue siendo bimodal (2.2 o
-2.7 s según la corrida, como en las mediciones anteriores): `/en` 2.31 / 2.26 /
-2.73 s, `/es` 2.72 / 2.72 / 2.71 s, `/en/cv` 2.17 / 2.19 / 2.15 s; FCP 1.06 s
-en las tres y ningún cambio de layout (0 layout shifts en las nueve corridas).
+que pinta el servidor. El LCP de este contenedor sigue siendo bimodal (1.9 o
+2.2 s según la corrida, con alguna a 2.6): `/en` 2.18 / 2.15 / 2.17 s, `/es`
+2.57 / 1.85 / 2.16 s, `/en/cv` 2.15 / 1.87 / 1.86 s; FCP 0.91 s en las tres
+y ningún cambio de layout (0 layout shifts en las nueve corridas).
 
 **Cuadros perdidos**, con traza de Chrome (`Tracing` por CDP, eventos
 `PipelineReporter`) y con `requestAnimationFrame` (un intervalo mayor de
