@@ -72,6 +72,8 @@ export interface Perfil {
   readonly certificaciones: readonly { readonly nombre: string; readonly estado: string }[];
   /** Cómo trabajo: cuatro principios, frase y prueba, con texto aprobado. */
   readonly principios: readonly { readonly frase: string; readonly prueba: string }[];
+  /** El umbral: la definición que abre el sitio, literal y por idioma. */
+  readonly umbral: Readonly<Record<"es" | "en", { readonly saludo: string; readonly definicion: string; readonly presentacion: string }>>;
 }
 
 export const perfil = raw as unknown as Perfil;
@@ -81,6 +83,7 @@ export const contacto = persona.contacto;
 export const publicacion = perfil.publicaciones[0];
 export const educacion = perfil.educacion[0];
 export const principios = perfil.principios;
+export const umbral = perfil.umbral;
 
 /** El puesto o proyecto con ese id, o `undefined` si el YAML cambió. */
 export function rol(id: string): PerfilRol | undefined {

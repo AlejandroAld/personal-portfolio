@@ -106,13 +106,21 @@ Tres principios mandan sobre todo lo demás:
 
 ### El umbral: la entrada donde se elige cómo conocerme
 
-En la primera visita, antes de todo, la pantalla se divide en dos y cada
-mitad es una previsualización viva de su modo dentro de un marco con
-profundidad: a la izquierda el Modo CV —la columna real (`main.page`) a
+En la primera visita, antes de todo, lo primero que se lee es la
+definición, literal de `umbral` en perfil.yaml y en los dos idiomas:
+"Puedes decirme Alex." como lo más grande de la pantalla, "Antes que nada,
+soy hermano e hijo mayor." un paso abajo, y la presentación en tamaño
+normal; el nombre, "Ingeniero en IA" y "Guadalajara, México" quedan arriba
+en pequeño y el nombre sigue en el `h1`. Entra con desplazamiento y sin
+fundido, así que no retrasa el LCP, y con movimiento reducido no se anima.
+Debajo, la pantalla se divide en dos y cada mitad es una previsualización
+viva de su modo dentro de un marco con profundidad: a la izquierda el Modo CV —la columna real (`main.page`) a
 escala, con un desplazamiento lento que se detiene al pasar el cursor—, y a
 la derecha el mapa real (`.stage`), el mismo lienzo que después ocupa la
 pantalla completa, orbitando despacio; mientras el 3D carga se ve el SVG.
-Nada es una captura y nada se vuelve a cargar al elegir. Encima de cada
+Nada es una captura y nada se vuelve a cargar al elegir. Definición y
+opciones caben sin scroll a 390 × 844 y a 1440 × 900: si algo no cabe, se
+achican las previsualizaciones, no la definición. Encima de cada
 marco va la opción, en grande: "Respuesta rápida · Leer el CV" y
 "Razonamiento profundo · Explorar", sin tiempo. Hubo una versión con los
 minutos calculados sobre el texto real (el CV entero, doce; el tour, dos) y

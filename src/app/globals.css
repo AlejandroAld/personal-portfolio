@@ -485,38 +485,38 @@ html[data-mode="threshold"] .mode-switch {
    =========================================================================== */
 
 :root {
-  --th-cv-x: 4vw;
-  --th-cv-y: 43vh;
-  --th-cv-s: 0.44;
+  --th-cv-x: 5vw;
+  --th-cv-y: 52vh;
+  --th-cv-s: 0.4;
   --th-cv-tilt: rotateY(0deg);
   --th-cv-dim: 1;
-  --th-ex-x: 52vw;
-  --th-ex-y: 43vh;
-  --th-ex-s: 0.44;
+  --th-ex-x: 55vw;
+  --th-ex-y: 52vh;
+  --th-ex-s: 0.4;
   --th-ex-tilt: rotateY(0deg);
   --th-ex-dim: 1;
-  --th-top: 10vh;
+  --th-top: 6vh;
 }
 /* Al pasar el cursor (o enfocar), esa mitad crece a cerca del 60 % del ancho y
    se inclina hacia la persona; la otra se atenúa y se aleja. */
 html[data-hover="cv"] {
   --th-cv-x: 3vw;
-  --th-cv-y: 39vh;
-  --th-cv-s: 0.57;
+  --th-cv-y: 46vh;
+  --th-cv-s: 0.5;
   --th-cv-tilt: rotateY(4deg);
   --th-ex-x: 63vw;
-  --th-ex-y: 46vh;
-  --th-ex-s: 0.34;
+  --th-ex-y: 54vh;
+  --th-ex-s: 0.32;
   --th-ex-dim: 0.55;
 }
 html[data-hover="explore"] {
   --th-ex-x: 40vw;
-  --th-ex-y: 39vh;
-  --th-ex-s: 0.57;
+  --th-ex-y: 46vh;
+  --th-ex-s: 0.5;
   --th-ex-tilt: rotateY(-4deg);
   --th-cv-x: 3vw;
-  --th-cv-y: 46vh;
-  --th-cv-s: 0.34;
+  --th-cv-y: 54vh;
+  --th-cv-s: 0.32;
   --th-cv-dim: 0.55;
 }
 /* En vertical, CV arriba y exploración abajo, con la previsualización
@@ -525,14 +525,14 @@ html[data-hover="explore"] {
   :root,
   html[data-hover="cv"],
   html[data-hover="explore"] {
-    --th-cv-x: 25vw;
-    --th-cv-y: 30vh;
-    --th-cv-s: 0.5;
+    --th-cv-x: 30vw;
+    --th-cv-y: 42vh;
+    --th-cv-s: 0.4;
     --th-cv-tilt: rotateY(0deg);
     --th-cv-dim: 1;
-    --th-ex-x: 25vw;
-    --th-ex-y: 70vh;
-    --th-ex-s: 0.5;
+    --th-ex-x: 30vw;
+    --th-ex-y: 75vh;
+    --th-ex-s: 0.4;
     --th-ex-tilt: rotateY(0deg);
     --th-ex-dim: 1;
     --th-top: 3vh;
@@ -564,13 +564,33 @@ html[data-mode="threshold"] body {
 .th-name {
   @apply text-sm font-medium text-fg;
 }
-/* En vertical, `.th-name` y `.th-intro` van más chicos (abajo). */
-.th-intro {
-  @apply mx-auto mt-4 max-w-2xl text-lg leading-snug text-muted text-balance sm:text-2xl;
+/* La definición: la primera línea es lo más grande de la pantalla, la
+   segunda va un paso abajo y la tercera en tamaño normal. Si algo no cabe,
+   se achican las previsualizaciones (las variables de arriba), no esto. */
+.th-greet {
+  @apply mt-3 font-semibold tracking-tight text-fg text-balance;
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  line-height: 1.1;
 }
+.th-def {
+  @apply mx-auto mt-2 max-w-2xl font-medium text-fg text-balance;
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  line-height: 1.25;
+}
+.th-intro {
+  @apply mx-auto mt-3 max-w-2xl text-base leading-snug text-muted text-balance sm:text-lg;
+}
+/* En vertical, todo un paso más chico (abajo). */
 @media (max-aspect-ratio: 9/10) {
   .th-name {
     @apply text-xs;
+  }
+  .th-greet {
+    font-size: 2rem;
+  }
+  .th-def {
+    @apply mt-1.5;
+    font-size: 1.125rem;
   }
   .th-intro {
     @apply mt-2 text-sm;
@@ -609,7 +629,7 @@ html[data-mode="threshold"] .stage {
 @media (max-aspect-ratio: 9/10) {
   html[data-mode="threshold"] main.page,
   html[data-mode="threshold"] .stage {
-    clip-path: inset(0 0 44vh 0);
+    clip-path: inset(0 0 43vh 0);
   }
 }
 /* En el umbral el núcleo es parte de la columna (la previsualización del CV). */
@@ -654,7 +674,7 @@ html[data-hover="explore"] .th-frame-explore {
 }
 @media (max-aspect-ratio: 9/10) {
   .th-frame {
-    clip-path: inset(0 0 44vh 0 round 1.25rem);
+    clip-path: inset(0 0 43vh 0 round 1.25rem);
   }
 }
 /* Las opciones, encima de cada marco: sobretítulo y título. */

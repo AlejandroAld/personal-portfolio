@@ -95,6 +95,9 @@ export interface Dictionary {
 
   /** El umbral: la entrada donde se elige cómo conocerme. */
   readonly threshold: {
+    /** La definición en grande, literal de `umbral` en perfil.yaml: saludo, definición y presentación. */
+    readonly greeting: string;
+    readonly definition: string;
     readonly intro: string;
     readonly cvKicker: string;
     readonly cvTitle: string;
